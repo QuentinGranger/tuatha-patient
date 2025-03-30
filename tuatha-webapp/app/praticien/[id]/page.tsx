@@ -40,7 +40,7 @@ const practitionerData: Record<string, Practitioner> = {
     lastName: "Jones",
     specialty: "Diététicienne - Nutritionniste",
     imageUrl: "/img/Jessica-Jones.jpg",
-    bio: "Jessica Jones est une diététicienne-nutritionniste expérimentée, spécialisée dans les troubles alimentaires et la nutrition sportive. Elle aide ses patients à développer une relation saine avec la nourriture et à atteindre leurs objectifs de santé. Avec plus de 8 ans d'expérience, elle propose des plans nutritionnels personnalisés adaptés aux besoins individuels."
+    bio: "Bonjour, je suis Jessica Jones, diététicienne-nutritionniste avec plus de 8 ans d'expérience. Après une période difficile dans ma vie où j'ai dû reconstruire ma relation avec la nourriture, j'ai décidé de mettre mon expérience personnelle et ma force au service des autres. Je suis spécialisée dans les troubles alimentaires et la nutrition sportive. Mon approche est directe mais efficace - pas de promesses miraculeuses, juste des plans nutritionnels basés sur des preuves scientifiques et adaptés à votre réalité quotidienne. Je travaille souvent avec des athlètes, mais aussi avec des personnes souffrant de troubles alimentaires ou cherchant simplement à retrouver une relation saine avec leur alimentation. J'ai vécu à Hell's Kitchen pendant des années, ce qui m'a appris l'importance de rester ancrée dans la réalité et de comprendre les véritables défis de la vie quotidienne. Si vous cherchez quelqu'un qui vous dira la vérité sans détour et vous aidera réellement à atteindre vos objectifs, nous devrions travailler ensemble."
   },
   "2": {
     id: 2,
@@ -48,7 +48,7 @@ const practitionerData: Record<string, Practitioner> = {
     lastName: "Crusher",
     specialty: "Médecin généraliste",
     imageUrl: "/img/Beverly_Crusher.webp",
-    bio: "Dr. Beverly Crusher est une médecin généraliste dévouée avec plus de 15 ans d'expérience dans le domaine médical. Elle est connue pour son approche holistique de la santé, prenant en compte le bien-être physique et mental de ses patients. Le Dr. Crusher est particulièrement intéressée par la médecine préventive et l'éducation à la santé."
+    bio: "Je suis le Dr. Beverly Crusher, médecin généraliste avec plus de 15 ans d'expérience en médecine familiale et d'urgence. Après avoir servi comme médecin-chef à bord de l'USS Enterprise, j'ai développé une approche holistique de la santé qui intègre les dernières avancées médicales tout en maintenant une relation humaine privilégiée avec mes patients. Ma formation m'a permis de traiter des conditions médicales extrêmement diverses, des plus courantes aux plus rares. Je m'intéresse particulièrement à la médecine préventive et à l'éducation à la santé, car je crois fermement que comprendre son corps est la première étape vers le bien-être. Mon fils Wesley m'a appris la patience et l'importance d'expliquer clairement les traitements. J'ai également développé une expertise en xénobiologie que j'applique aujourd'hui dans ma compréhension des différences génétiques entre patients. Mon cabinet est un espace où la science médicale rencontre l'empathie, et où chaque patient est traité avec respect, quelle que soit son origine ou sa condition."
   },
   "3": {
     id: 3,
@@ -56,7 +56,7 @@ const practitionerData: Record<string, Practitioner> = {
     lastName: "Balboa",
     specialty: "Coach sportif",
     imageUrl: "/img/Rocky-Balboa.jpeg",
-    bio: "Rocky Balboa est un coach sportif passionné spécialisé dans la boxe et le conditionnement physique général. Ancien champion, il met son expérience au service de ses clients pour les aider à dépasser leurs limites et atteindre leur plein potentiel. Rocky est connu pour sa méthode d'entraînement motivante et son approche personnalisée adaptée à chaque niveau."
+    bio: "Yo, moi c'est Rocky Balboa ! Après une carrière dans la boxe qui m'a mené du quartier de Philadelphie jusqu'au titre de champion du monde poids lourd, j'ai décidé de partager tout ce que j'ai appris sur la force mentale et physique. Je suis pas du genre à vous faire des grands discours compliqués - je crois en l'effort, la persévérance et le cœur qu'on met dans chaque entraînement. Ma méthode est basée sur ce que j'ai appris dans les rues et sur le ring : peu importe combien de fois vous tombez, c'est combien de fois vous vous relevez qui compte. Je travaille avec des clients de tous niveaux, des débutants complets aux athlètes de compétition. Ce que j'apporte, c'est pas juste un programme d'entraînement, c'est une mentalité. Comme je le dis souvent : 'Ce n'est pas la force qui fait un champion, mais la volonté, la détermination et la capacité à encaisser les coups durs de la vie.' Ensemble, on va repousser vos limites et vous montrer que vous êtes bien plus fort que vous ne le pensez - mentalement et physiquement. Adrian, ma femme, m'a toujours soutenu, et c'est ce genre de soutien que je veux vous apporter dans votre parcours sportif."
   },
   "4": {
     id: 4,
@@ -64,7 +64,7 @@ const practitionerData: Record<string, Practitioner> = {
     lastName: "Stark",
     specialty: "Médecin du sport",
     imageUrl: "/img/TonyStark.jpg",
-    bio: "Dr. Tony Stark est un médecin du sport reconnu qui combine expertise médicale et connaissance approfondie de la performance athlétique. Il se spécialise dans le traitement des blessures sportives et la rééducation. Le Dr. Stark travaille avec des athlètes de tous niveaux pour optimiser leurs performances et assurer une récupération rapide après blessure."
+    bio: "Dr. Tony Stark à votre service. Oui, le même qui a révolutionné la technologie des prothèses médicales et de l'équipement sportif à travers les industries Stark. Après des années à développer des technologies de pointe et à repousser les limites du corps humain (y compris le mien), j'ai décidé de me consacrer à la médecine du sport. Pourquoi? Parce que la performance m'a toujours fasciné, et qui de mieux que moi pour comprendre comment optimiser le potentiel du corps humain? Ma double expertise en ingénierie biomédicale et en médecine me permet d'offrir des traitements innovants pour les blessures sportives. J'utilise des technologies exclusives de régénération tissulaire et des protocoles de rééducation que j'ai personnellement développés et testés. Mon approche combine haute technologie et connaissance approfondie de la biomécanique. J'ai traité des athlètes olympiques, des membres des forces spéciales, et même quelques super-héros (mais ça, c'est confidentiel). Si vous voulez revenir de blessure plus fort qu'avant ou simplement repousser vos limites actuelles, mon équipe et moi avons la solution. Et non, je ne porte pas mon armure pendant les consultations... sauf demande spéciale."
   }
 };
 
