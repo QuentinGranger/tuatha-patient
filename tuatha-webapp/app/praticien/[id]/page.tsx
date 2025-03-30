@@ -16,6 +16,8 @@ import ActionButtons from '@/app/components/ActionButtons';
 import RehabProgress from '@/app/components/RehabProgress';
 import RehabHistory from '@/app/components/RehabHistory';
 import RehabTable from '@/app/components/RehabTable';
+import TrainingCycle from '@/app/components/TrainingCycle';
+import TrainingProgram from '@/app/components/TrainingProgram';
 import jsPDF from 'jspdf';
 
 interface Practitioner {
@@ -279,6 +281,80 @@ export default function PraticienPage() {
         threshold: 80
       },
       isRead: false
+    },
+    {
+      id: '5',
+      type: AlertType.WARNING,
+      date: '2025-03-30T09:15:00',
+      title: 'Douleur au genou signalée',
+      description: 'Vous avez signalé une douleur de niveau 6/10 au genou droit lors de votre dernière séance d\'exercices. Veuillez contacter votre kinésithérapeute si cette douleur persiste ou s\'intensifie.',
+      metric: {
+        name: 'Douleur',
+        value: 6,
+        unit: '/10',
+        trend: 'up',
+        threshold: 5
+      },
+      isRead: false,
+      action: {
+        label: 'Prendre RDV',
+        onClick: () => setShowAppointmentModal(true)
+      }
+    },
+    {
+      id: '6',
+      type: AlertType.INFO,
+      date: '2025-03-29T14:30:00',
+      title: 'Rappel: exercices quotidiens',
+      description: 'N\'oubliez pas de compléter vos exercices proprioceptifs aujourd\'hui. Ces exercices sont essentiels pour la stabilisation de votre genou.',
+      isRead: true,
+      action: {
+        label: 'Voir programme',
+        onClick: () => {
+          const rehabElement = document.getElementById('rehab-table');
+          if (rehabElement) {
+            rehabElement.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+      }
+    },
+    {
+      id: '7',
+      type: AlertType.SUCCESS,
+      date: '2025-03-27T18:45:00',
+      title: 'Progression significative!',
+      description: 'Félicitations! Votre amplitude de mouvement du genou s\'est améliorée de 15° depuis votre dernière évaluation. Continuez vos exercices réguliers pour maintenir cette progression.',
+      metric: {
+        name: 'Flexion genou',
+        value: 125,
+        unit: '°',
+        trend: 'up'
+      },
+      isRead: true
+    },
+    {
+      id: '8',
+      type: AlertType.WARNING,
+      date: '2025-03-25T11:20:00',
+      title: 'Progression ralentie des quadriceps',
+      description: 'La force de vos quadriceps n\'a pas progressé comme prévu ces deux dernières semaines. Assurez-vous de suivre correctement les exercices de renforcement prescrits.',
+      metric: {
+        name: 'Force quadriceps',
+        value: 65,
+        unit: '%',
+        trend: 'stable',
+        threshold: 75
+      },
+      isRead: false,
+      action: {
+        label: 'Revoir exercices',
+        onClick: () => {
+          const rehabElement = document.getElementById('rehab-table');
+          if (rehabElement) {
+            rehabElement.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+      }
     }
   ]);
   
@@ -1637,6 +1713,26 @@ export default function PraticienPage() {
             </div>
           )}
           
+          {/* Cycle d'entraînement pour Rocky Balboa (ID 3) */}
+          {practitioner?.id === 3 && isMounted && (
+            <div style={{ marginTop: '25px' }}>
+              <TrainingCycle
+                athleteName="Jean Dupont"
+                athleteId="P-12345"
+              />
+            </div>
+          )}
+          
+          {/* Programme d'entraînement pour Rocky Balboa (ID 3) */}
+          {practitioner?.id === 3 && isMounted && (
+            <div style={{ marginTop: '25px' }}>
+              <TrainingProgram
+                athleteName="Jean Dupont"
+                athleteId="P-12345"
+              />
+            </div>
+          )}
+          
           {/* Composant de progression de rééducation pour Tony Stark */}
           {practitioner.id === 4 && isMounted && (
             <div style={{ marginTop: '25px' }}>
@@ -1763,1241 +1859,304 @@ export default function PraticienPage() {
             </div>
           )}
           
-          {/* Les boutons d'action ont été supprimés */}
-        </div>
-        
-        {/* Ces composants ne doivent apparaître que pour la nutritionniste (ID 1) */}
-        {practitioner?.id === 1 && (
-          <>
-            {/* Afficher le suivi nutritionnel uniquement pour Jessica Jones */}
-            {renderNutritionTracking()}
-            
-            {/* Composition corporelle actuelle */}
-            <BodyComposition 
-              weight={20}
-              waistSize={42}
-              hydration={65}
-              bodyFat={18}
-              height={120}
-            />
-            
-            {/* Slider d'évolution des métriques */}
-            <div style={{ marginTop: '30px' }}>
-              <ProgressSlider data={progressData} />
-            </div>
-            
-            {/* Journal d'alertes */}
+          {/* Journal d'alertes - affiché pour les deux praticiens (Jessica Jones et Tony Stark) */}
+          {(practitioner.id === 1 || practitioner.id === 4) && isMounted && (
             <div style={{ marginTop: '30px' }}>
               <AlertJournal 
                 alerts={alerts}
                 onMarkAsRead={handleMarkAsRead}
               />
             </div>
-          </>
-        )}
-        
-        {/* Liste des ordonnances pour le médecin généraliste (ID 2) */}
-        {practitioner?.id === 2 && (
-          <div style={{ marginTop: '25px' }}>
-            <PrescriptionList 
-              prescriptions={[
-                {
-                  id: '1',
-                  title: 'Traitement anti-douleur',
-                  date: '2025-03-15',
-                  doctor: 'Beverly Crusher',
-                  medications: [
-                    {
-                      name: 'Paracétamol 1000mg',
-                      dosage: '1 comprimé',
-                      frequency: '3 fois par jour',
-                      duration: '7 jours'
-                    }
-                  ],
-                  expiryDate: '2025-04-15',
-                  refillsLeft: 2,
-                  isPermanent: false
-                },
-                {
-                  id: '2',
-                  title: 'Traitement anti-inflammatoire',
-                  date: '2025-03-20',
-                  doctor: 'Beverly Crusher',
-                  medications: [
-                    {
-                      name: 'Ibuprofène 400mg',
-                      dosage: '1 comprimé',
-                      frequency: '3 fois par jour',
-                      duration: '5 jours'
-                    }
-                  ],
-                  expiryDate: '2025-04-20',
-                  refillsLeft: 1,
-                  isPermanent: false
-                }
-              ]}
-              onDownload={(prescription) => {
-                // Génération d'un PDF d'ordonnance avec jsPDF
-                const doc = new jsPDF();
-                doc.setFontSize(22);
-                doc.text("Ordonnance médicale", 105, 20, { align: "center" });
-                doc.setFontSize(14);
-                doc.text(`Dr. ${prescription.doctor}`, 20, 40);
-                doc.text(`Date: ${new Date(prescription.date).toLocaleDateString('fr-FR')}`, 20, 50);
-                doc.text(`Patient: ${practitioner.firstName} ${practitioner.lastName}`, 20, 60);
-                
-                doc.setFontSize(16);
-                doc.text("Médicaments prescrits:", 20, 80);
-                
-                let yPos = 90;
-                prescription.medications.forEach((med, index) => {
+          )}
+          
+          {/* Ces composants ne doivent apparaître que pour la nutritionniste (ID 1) */}
+          {practitioner?.id === 1 && (
+            <>
+              {/* Afficher le suivi nutritionnel uniquement pour Jessica Jones */}
+              {renderNutritionTracking()}
+              
+              {/* Composition corporelle actuelle */}
+              <BodyComposition 
+                weight={20}
+                waistSize={42}
+                hydration={65}
+                bodyFat={18}
+                height={120}
+              />
+              
+              {/* Slider d'évolution des métriques */}
+              <div style={{ marginTop: '30px' }}>
+                <ProgressSlider data={progressData} />
+              </div>
+            </>
+          )}
+          
+          {/* Liste des ordonnances pour le médecin généraliste (ID 2) */}
+          {practitioner?.id === 2 && (
+            <div style={{ marginTop: '25px' }}>
+              <PrescriptionList 
+                prescriptions={[
+                  {
+                    id: '1',
+                    title: 'Traitement anti-douleur',
+                    date: '2025-03-15',
+                    doctor: 'Beverly Crusher',
+                    medications: [
+                      {
+                        name: 'Paracétamol 1000mg',
+                        dosage: '1 comprimé',
+                        frequency: '3 fois par jour',
+                        duration: '7 jours'
+                      }
+                    ],
+                    expiryDate: '2025-04-15',
+                    refillsLeft: 2,
+                    isPermanent: false
+                  },
+                  {
+                    id: '2',
+                    title: 'Traitement anti-inflammatoire',
+                    date: '2025-03-20',
+                    doctor: 'Beverly Crusher',
+                    medications: [
+                      {
+                        name: 'Ibuprofène 400mg',
+                        dosage: '1 comprimé',
+                        frequency: '3 fois par jour',
+                        duration: '5 jours'
+                      }
+                    ],
+                    expiryDate: '2025-04-20',
+                    refillsLeft: 1,
+                    isPermanent: false
+                  }
+                ]}
+                onDownload={(prescription) => {
+                  // Génération d'un PDF d'ordonnance avec jsPDF
+                  const doc = new jsPDF();
+                  doc.setFontSize(22);
+                  doc.text("Ordonnance médicale", 105, 20, { align: "center" });
                   doc.setFontSize(14);
-                  doc.text(`${index + 1}. ${med.name}`, 25, yPos);
-                  doc.setFontSize(12);
-                  doc.text(`   Posologie: ${med.dosage}`, 30, yPos + 8);
-                  doc.text(`   Fréquence: ${med.frequency}`, 30, yPos + 16);
-                  doc.text(`   Durée: ${med.duration}`, 30, yPos + 24);
-                  yPos += 35;
-                });
-                
-                if (!prescription.isPermanent) {
-                  doc.text(`Expire le: ${new Date(prescription.expiryDate).toLocaleDateString('fr-FR')}`, 20, yPos + 10);
-                } else {
-                  doc.text(`Traitement permanent`, 20, yPos + 10);
-                }
-                
-                // Signature et cachet
-                doc.setFontSize(12);
-                doc.text("Signature et cachet:", 130, yPos + 40);
-                doc.text("Dr. Beverly Crusher", 130, yPos + 50);
-                doc.text("Médecin généraliste", 130, yPos + 58);
-                
-                // Téléchargement du PDF
-                doc.save(`ordonnance_${prescription.id}.pdf`);
-              }}
-              onShare={(prescription) => {
-                // Création de l'URL de partage
-                const shareData = {
-                  title: 'Ordonnance médicale',
-                  text: `Ordonnance: ${prescription.title} prescrite par Dr. ${prescription.doctor}`,
-                  url: window.location.href
-                };
-                
-                // Utilisation de l'API Web Share si disponible
-                if (navigator.share && navigator.canShare(shareData)) {
-                  navigator.share(shareData)
-                    .then(() => console.log('Ordonnance partagée avec succès'))
-                    .catch((error) => console.log('Erreur lors du partage:', error));
-                } else {
-                  // Fallback si l'API Web Share n'est pas disponible
-                  const emailSubject = encodeURIComponent('Ordonnance médicale');
-                  const emailBody = encodeURIComponent(
-                    `Ordonnance: ${prescription.title}\n
-                    Prescrite par: Dr. ${prescription.doctor}\n
-                    Date: ${new Date(prescription.date).toLocaleDateString('fr-FR')}\n
-                    Médicaments: ${prescription.medications.map(med => `${med.name} (${med.dosage})`).join(', ')}`
-                  );
+                  doc.text(`Dr. ${prescription.doctor}`, 20, 40);
+                  doc.text(`Date: ${new Date(prescription.date).toLocaleDateString('fr-FR')}`, 20, 50);
+                  doc.text(`Patient: ${practitioner.firstName} ${practitioner.lastName}`, 20, 60);
                   
-                  window.open(`mailto:?subject=${emailSubject}&body=${emailBody}`);
-                }
-              }}
-            />
-          </div>
-        )}
-        
-        {/* Composant de documents partagés */}
-        <div style={{ 
-          marginTop: '40px', 
-          marginBottom: '40px',
-          padding: '0 20px'
-        }}>
+                  doc.setFontSize(16);
+                  doc.text("Médicaments prescrits:", 20, 80);
+                  
+                  let yPos = 90;
+                  prescription.medications.forEach((med, index) => {
+                    doc.setFontSize(14);
+                    doc.text(`${index + 1}. ${med.name}`, 25, yPos);
+                    doc.setFontSize(12);
+                    doc.text(`   Posologie: ${med.dosage}`, 30, yPos + 8);
+                    doc.text(`   Fréquence: ${med.frequency}`, 30, yPos + 16);
+                    doc.text(`   Durée: ${med.duration}`, 30, yPos + 24);
+                    yPos += 35;
+                  });
+                  
+                  if (!prescription.isPermanent) {
+                    doc.text(`Expire le: ${new Date(prescription.expiryDate).toLocaleDateString('fr-FR')}`, 20, yPos + 10);
+                  } else {
+                    doc.text(`Traitement permanent`, 20, yPos + 10);
+                  }
+                  
+                  // Signature et cachet
+                  doc.setFontSize(12);
+                  doc.text("Signature et cachet:", 130, yPos + 40);
+                  doc.text("Dr. Beverly Crusher", 130, yPos + 50);
+                  doc.text("Médecin généraliste", 130, yPos + 58);
+                  
+                  // Téléchargement du PDF
+                  doc.save(`ordonnance_${prescription.id}.pdf`);
+                }}
+                onShare={(prescription) => {
+                  // Création de l'URL de partage
+                  const shareData = {
+                    title: 'Ordonnance médicale',
+                    text: `Ordonnance: ${prescription.title} prescrite par Dr. ${prescription.doctor}`,
+                    url: window.location.href
+                  };
+                  
+                  // Utilisation de l'API Web Share si disponible
+                  if (navigator.share && navigator.canShare(shareData)) {
+                    navigator.share(shareData)
+                      .then(() => console.log('Ordonnance partagée avec succès'))
+                      .catch((error) => console.log('Erreur lors du partage:', error));
+                  } else {
+                    // Fallback si l'API Web Share n'est pas disponible
+                    const emailSubject = encodeURIComponent('Ordonnance médicale');
+                    const emailBody = encodeURIComponent(
+                      `Ordonnance: ${prescription.title}\n
+                      Prescrite par: Dr. ${prescription.doctor}\n
+                      Date: ${new Date(prescription.date).toLocaleDateString('fr-FR')}\n
+                      Médicaments: ${prescription.medications.map(med => `${med.name} (${med.dosage})`).join(', ')}`
+                    );
+                    
+                    window.open(`mailto:?subject=${emailSubject}&body=${emailBody}`);
+                  }
+                }}
+              />
+            </div>
+          )}
+          
+          {/* Composant de documents partagés */}
           <div style={{ 
-            width: '100%',
-            background: 'rgba(0, 38, 65, 0.35)',
-            backdropFilter: 'blur(15px)',
-            WebkitBackdropFilter: 'blur(15px)',
-            borderRadius: '20px',
-            padding: '25px',
-            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
-            overflow: 'hidden',
-            color: 'white',
+            marginTop: '40px', 
+            marginBottom: '40px',
+            padding: '0 20px'
           }}>
-            <h2 style={{
-              fontSize: '1.5rem',
-              fontWeight: 'bold',
-              marginBottom: '15px',
-              color: '#FF6B00',
-              textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
-            }}>
-              {practitioner.id === 1 && "Documents partagés - Nutrition"}
-              {practitioner.id === 2 && "Documents partagés - Médical"}
-              {practitioner.id === 3 && "Documents partagés - Entraînement"}
-              {practitioner.id === 4 && "Documents partagés - Kinésithérapie"}
-            </h2>
-            <p style={{
-              fontSize: '0.95rem',
-              marginBottom: '25px',
-              color: 'rgba(255, 255, 255, 0.8)'
-            }}>
-              {practitioner.id === 1 && "Partagez vos journaux alimentaires, analyses nutritionnelles ou journaux alimentaires."}
-              {practitioner.id === 2 && "Partagez vos résultats d'examens, dossiers médicaux ou informations importantes concernant votre santé."}
-              {practitioner.id === 3 && "Partagez vos plans d'entraînement, suivis de performances ou objectifs sportifs."}
-              {practitioner.id === 4 && "Partagez vos radiographies, bilans et notes d'exercices de rééducation."}
-            </p>
-
-            {/* Liste des documents partagés */}
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '15px',
+            <div style={{ 
               width: '100%',
-              marginBottom: '25px'
+              background: 'rgba(0, 38, 65, 0.35)',
+              backdropFilter: 'blur(15px)',
+              WebkitBackdropFilter: 'blur(15px)',
+              borderRadius: '20px',
+              padding: '25px',
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
+              overflow: 'hidden',
+              color: 'white',
             }}>
-              {sharedDocuments.length === 0 ? (
-                <div style={{
-                  padding: '20px',
-                  textAlign: 'center',
-                  borderRadius: '14px',
-                  backgroundColor: 'rgba(0, 17, 13, 0.4)',
-                  color: 'rgba(255, 255, 255, 0.8)'
-                }}>
-                  Vous n'avez pas encore partagé de documents avec ce praticien.
-                </div>
-              ) : (
-                sharedDocuments.map((doc) => (
-                  <div key={doc.id} style={{
-                    padding: '16px',
+              <h2 style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                marginBottom: '15px',
+                color: '#FF6B00',
+                textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+              }}>
+                {practitioner.id === 1 && "Documents partagés - Nutrition"}
+                {practitioner.id === 2 && "Documents partagés - Médical"}
+                {practitioner.id === 3 && "Documents partagés - Entraînement"}
+                {practitioner.id === 4 && "Documents partagés - Kinésithérapie"}
+              </h2>
+              <p style={{
+                fontSize: '0.95rem',
+                marginBottom: '25px',
+                color: 'rgba(255, 255, 255, 0.8)'
+              }}>
+                {practitioner.id === 1 && "Partagez vos journaux alimentaires, analyses nutritionnelles ou journaux alimentaires."}
+                {practitioner.id === 2 && "Partagez vos résultats d'examens, dossiers médicaux ou informations importantes concernant votre santé."}
+                {practitioner.id === 3 && "Partagez vos plans d'entraînement, suivis de performances ou objectifs sportifs."}
+                {practitioner.id === 4 && "Partagez vos radiographies, bilans et notes d'exercices de rééducation."}
+              </p>
+
+              {/* Liste des documents partagés */}
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '15px',
+                width: '100%',
+                marginBottom: '25px'
+              }}>
+                {sharedDocuments.length === 0 ? (
+                  <div style={{
+                    padding: '20px',
+                    textAlign: 'center',
                     borderRadius: '14px',
                     backgroundColor: 'rgba(0, 17, 13, 0.4)',
-                    backdropFilter: 'blur(10px)',
-                    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '10px'
+                    color: 'rgba(255, 255, 255, 0.8)'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%' }}>
-                      <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: 'white' }}>{doc.title}</h3>
-                      <span style={{ 
-                        marginLeft: '10px', 
-                        fontSize: '14px',
-                        color: 'rgba(255, 255, 255, 0.6)'
-                      }}>{doc.fileName}</span>
-                    </div>
-                    <p style={{ margin: '0', fontSize: '0.9rem', color: 'rgba(255, 255, 255, 0.8)' }}>
-                      {doc.description}
-                    </p>
-                    <div style={{
+                    Vous n'avez pas encore partagé de documents avec ce praticien.
+                  </div>
+                ) : (
+                  sharedDocuments.map((doc) => (
+                    <div key={doc.id} style={{
+                      padding: '16px',
+                      borderRadius: '14px',
+                      backgroundColor: 'rgba(0, 17, 13, 0.4)',
+                      backdropFilter: 'blur(10px)',
+                      boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
                       display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      marginTop: '8px',
-                      fontSize: '0.8rem',
-                      color: 'rgba(255, 255, 255, 0.6)'
+                      flexDirection: 'column',
+                      gap: '10px'
                     }}>
-                      <span>
-                        {new Date(doc.date).toLocaleDateString('fr-FR', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric'
-                        })}
-                      </span>
-                      <span>{doc.size}</span>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%' }}>
+                        <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: 'white' }}>{doc.title}</h3>
+                        <span style={{ 
+                          marginLeft: '10px', 
+                          fontSize: '14px',
+                          color: 'rgba(255, 255, 255, 0.6)'
+                        }}>{doc.fileName}</span>
+                      </div>
+                      <p style={{ margin: '0', fontSize: '0.9rem', color: 'rgba(255, 255, 255, 0.8)' }}>
+                        {doc.description}
+                      </p>
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginTop: '8px',
+                        fontSize: '0.8rem',
+                        color: 'rgba(255, 255, 255, 0.6)'
+                      }}>
+                        <span>
+                          {new Date(doc.date).toLocaleDateString('fr-FR', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                        </span>
+                        <span>{doc.size}</span>
+                      </div>
                     </div>
-                  </div>
-                ))
-              )}
-            </div>
-            
-            {/* Bouton pour ajouter un document */}
-            <button
-              onClick={() => setShowDocumentModal(true)}
-              style={{
-                padding: '14px 20px',
-                borderRadius: '12px',
-                border: 'none',
-                background: 'linear-gradient(145deg, #FF6B00, #FF9248)',
-                color: 'white',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                boxShadow: '0 4px 15px rgba(255, 107, 0, 0.3)',
-                fontSize: '15px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                width: '100%',
-                justifyContent: 'center'
-              }}
-            >
-              <FaFileUpload /> Partager un document
-            </button>
-          </div>
-        </div>
-      </div>
-      
-      {/* Modale de prise de rendez-vous */}
-      <Modal 
-        isOpen={showAppointmentModal} 
-        onClose={() => setShowAppointmentModal(false)}
-        title={`Prendre rendez-vous avec ${practitioner.firstName} ${practitioner.lastName}`}
-      >
-        <div style={{
-          padding: '10px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '18px'
-        }}>
-          <div>
-            <label style={{ 
-              display: 'block', 
-              marginBottom: '8px',
-              fontSize: '14px',
-              color: 'rgba(255, 255, 255, 0.85)',
-              fontWeight: '500'
-            }}>
-              Date
-            </label>
-            <input
-              type="date"
-              value={newAppointmentDate}
-              onChange={(e) => setNewAppointmentDate(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                borderRadius: '12px',
-                border: '1px solid rgba(255, 107, 0, 0.3)',
-                backgroundColor: 'rgba(0, 38, 65, 0.25)',
-                color: 'white',
-                fontSize: '15px',
-                boxShadow: 'inset 0 2px 5px rgba(0, 0, 0, 0.1)',
-                backdropFilter: 'blur(5px)',
-                outline: 'none',
-                transition: 'all 0.2s ease'
-              }}
-            />
-          </div>
-          
-          <div>
-            <label style={{ 
-              display: 'block', 
-              marginBottom: '8px',
-              fontSize: '14px',
-              color: 'rgba(255, 255, 255, 0.85)',
-              fontWeight: '500'
-            }}>
-              Heure
-            </label>
-            <input
-              type="time"
-              value={newAppointmentTime}
-              onChange={(e) => setNewAppointmentTime(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '12px 15px',
-                borderRadius: '12px',
-                border: '1px solid rgba(255, 107, 0, 0.3)',
-                backgroundColor: 'rgba(0, 38, 65, 0.25)',
-                color: 'white',
-                fontSize: '15px',
-                boxShadow: 'inset 0 2px 5px rgba(0, 0, 0, 0.1)',
-                backdropFilter: 'blur(5px)',
-                outline: 'none',
-                transition: 'all 0.2s ease'
-              }}
-            />
-          </div>
-          
-          <div>
-            <label style={{ 
-              display: 'block', 
-              marginBottom: '8px',
-              fontSize: '14px',
-              color: 'rgba(255, 255, 255, 0.85)',
-              fontWeight: '500'
-            }}>
-              Durée (minutes)
-            </label>
-            <select
-              value={newAppointmentDuration}
-              onChange={(e) => setNewAppointmentDuration(Number(e.target.value))}
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                borderRadius: '12px',
-                border: '1px solid rgba(255, 107, 0, 0.3)',
-                backgroundColor: 'rgba(0, 38, 65, 0.25)',
-                color: 'white',
-                fontSize: '15px',
-                boxShadow: 'inset 0 2px 5px rgba(0, 0, 0, 0.1)',
-                backdropFilter: 'blur(5px)',
-                outline: 'none',
-                WebkitAppearance: 'none',
-                appearance: 'none',
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23FF6B00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right 16px center',
-                paddingRight: '40px'
-              }}
-            >
-              <option value={15}>15 minutes</option>
-              <option value={30}>30 minutes</option>
-              <option value={45}>45 minutes</option>
-              <option value={60}>1 heure</option>
-            </select>
-          </div>
-          
-          <div>
-            <label style={{ 
-              display: 'block', 
-              marginBottom: '8px',
-              fontSize: '14px',
-              color: 'rgba(255, 255, 255, 0.85)',
-              fontWeight: '500'
-            }}>
-              Type de rendez-vous
-            </label>
-            <select
-              value={newAppointmentType}
-              onChange={(e) => setNewAppointmentType(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                borderRadius: '12px',
-                border: '1px solid rgba(255, 107, 0, 0.3)',
-                backgroundColor: 'rgba(0, 38, 65, 0.25)',
-                color: 'white',
-                fontSize: '15px',
-                boxShadow: 'inset 0 2px 5px rgba(0, 0, 0, 0.1)',
-                backdropFilter: 'blur(5px)',
-                outline: 'none',
-                WebkitAppearance: 'none',
-                appearance: 'none',
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23FF6B00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right 16px center',
-                paddingRight: '40px'
-              }}
-            >
-              <option value="Consultation standard">Consultation standard</option>
-              <option value="Premier rendez-vous">Premier rendez-vous</option>
-              <option value="Suivi">Rendez-vous de suivi</option>
-              <option value="Urgence">Urgence</option>
-            </select>
-          </div>
-          
-          <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-            <button 
-              onClick={() => setShowAppointmentModal(false)}
-              style={{
-                padding: '12px 20px',
-                borderRadius: '12px',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                background: 'rgba(0, 0, 0, 0.2)',
-                color: 'white',
-                cursor: 'pointer',
-                fontSize: '15px',
-                fontWeight: '500',
-                flex: '1',
-                transition: 'all 0.2s ease',
-                backdropFilter: 'blur(5px)',
-                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
-              }}
-            >
-              Annuler
-            </button>
-            
-            <button 
-              onClick={handleConfirmAppointment}
-              style={{
-                padding: '12px 20px',
-                borderRadius: '12px',
-                border: 'none',
-                background: 'linear-gradient(145deg, #FF6B00, #FF9248)',
-                color: 'white',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                boxShadow: '0 4px 15px rgba(255, 107, 0, 0.3)',
-                flex: '1.5',
-                fontSize: '15px',
-                transition: 'all 0.2s ease',
-                position: 'relative',
-                overflow: 'hidden'
-              }}
-            >
-              <div style={{
-                content: '""',
-                position: 'absolute',
-                top: '0',
-                left: '0',
-                width: '100%',
-                height: '100%',
-                background: 'linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent)',
-                transform: 'translateX(-100%)',
-                animation: 'shine 1.5s infinite'
-              }} />
-              Confirmer
-            </button>
-          </div>
-        </div>
-
-        <style jsx>{`
-          @keyframes shine {
-            0% {
-              transform: translateX(-100%);
-            }
-            60% {
-              transform: translateX(100%);
-            }
-            100% {
-              transform: translateX(100%);
-            }
-          }
-        `}</style>
-      </Modal>
-      
-      {/* Modale de paiement en ligne */}
-      <Modal 
-        isOpen={showPaymentModal} 
-        onClose={() => setShowPaymentModal(false)}
-        title={`Paiement en ligne - ${practitioner.firstName} ${practitioner.lastName}`}
-      >
-        <div style={{
-          padding: '10px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '18px'
-        }}>
-          {pendingAppointments.length > 0 && (
-            <div>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '8px',
-                fontSize: '14px',
-                color: 'rgba(255, 255, 255, 0.85)',
-                fontWeight: '500'
-              }}>
-                Rendez-vous en attente de règlement
-              </label>
-              <select
-                value={selectedAppointmentForPayment || ''}
-                onChange={(e) => handleSelectAppointment(e.target.value)}
+                  ))
+                )}
+              </div>
+              
+              {/* Bouton pour ajouter un document */}
+              <button
+                onClick={() => setShowDocumentModal(true)}
                 style={{
-                  width: '100%',
-                  padding: '12px 16px',
+                  padding: '14px 20px',
                   borderRadius: '12px',
-                  border: '1px solid rgba(255, 107, 0, 0.3)',
-                  backgroundColor: selectedAppointmentForPayment ? 'rgba(0, 38, 65, 0.15)' : 'rgba(0, 38, 65, 0.25)',
+                  border: 'none',
+                  background: 'linear-gradient(145deg, #FF6B00, #FF9248)',
                   color: 'white',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 15px rgba(255, 107, 0, 0.3)',
                   fontSize: '15px',
-                  boxShadow: 'inset 0 2px 5px rgba(0, 0, 0, 0.1)',
-                  backdropFilter: 'blur(5px)',
-                  outline: 'none',
-                  WebkitAppearance: 'none',
-                  appearance: 'none',
-                  backgroundImage: !selectedAppointmentForPayment ? `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23FF6B00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")` : 'none',
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: !selectedAppointmentForPayment ? 'right 16px center' : 'center',
-                paddingRight: selectedAppointmentForPayment ? '16px' : '40px',
-                opacity: selectedAppointmentForPayment ? 0.8 : 1
-              }}
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  width: '100%',
+                  justifyContent: 'center'
+                }}
               >
-                <option value="">Sélectionnez un rendez-vous...</option>
-                {pendingAppointments.map((app) => (
-                  <option key={app.id} value={app.id}>
-                    {app.date} à {app.time} - {app.type} ({app.price}€)
-                  </option>
-                ))}
-              </select>
+                <FaFileUpload /> Partager un document
+              </button>
             </div>
-          )}
-          
-          {pendingAppointments.length === 0 && (
-            <div style={{ 
-              padding: '12px 15px', 
-              background: 'rgba(255, 107, 0, 0.15)', 
-              borderRadius: '12px',
-              border: '1px solid rgba(255, 107, 0, 0.2)',
-              marginTop: '10px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px'
-            }}>
-              <p style={{ 
-                margin: '0',
-                fontSize: '13px',
-                color: 'rgba(255, 255, 255, 0.95)'
-              }}>
-                Aucun rendez-vous en attente de règlement avec ce praticien.
-              </p>
-            </div>
-          )}
-          
-          <div>
-            <label style={{ 
-              display: 'block', 
-              marginBottom: '8px',
-              fontSize: '14px',
-              color: 'rgba(255, 255, 255, 0.85)',
-              fontWeight: '500'
-            }}>
-              Montant (€)
-            </label>
-            <select
-              value={paymentAmount}
-              onChange={(e) => setPaymentAmount(Number(e.target.value))}
-              disabled={selectedAppointmentForPayment !== null}
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                borderRadius: '12px',
-                border: '1px solid rgba(255, 107, 0, 0.3)',
-                backgroundColor: selectedAppointmentForPayment ? 'rgba(0, 38, 65, 0.15)' : 'rgba(0, 38, 65, 0.25)',
-                color: 'white',
-                fontSize: '15px',
-                boxShadow: 'inset 0 2px 5px rgba(0, 0, 0, 0.1)',
-                backdropFilter: 'blur(5px)',
-                outline: 'none',
-                WebkitAppearance: 'none',
-                appearance: 'none',
-                backgroundImage: !selectedAppointmentForPayment ? `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23FF6B00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")` : 'none',
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: !selectedAppointmentForPayment ? 'right 16px center' : 'center',
-                paddingRight: selectedAppointmentForPayment ? '16px' : '40px',
-                opacity: selectedAppointmentForPayment ? 0.8 : 1
-              }}
-            >
-              <option value={30}>30 €</option>
-              <option value={50}>50 €</option>
-              <option value={70}>70 €</option>
-              <option value={90}>90 €</option>
-              <option value={120}>120 €</option>
-            </select>
-            {selectedAppointmentForPayment && (
-              <p style={{ 
-                margin: '5px 0 0', 
-                fontSize: '12px',
-                color: 'rgba(255, 255, 255, 0.7)',
-                fontStyle: 'italic'
-              }}>
-                Montant défini par le rendez-vous sélectionné
-              </p>
-            )}
-          </div>
-          
-          <div>
-            <label style={{ 
-              display: 'block', 
-              marginBottom: '8px',
-              fontSize: '14px',
-              color: 'rgba(255, 255, 255, 0.85)',
-              fontWeight: '500'
-            }}>
-              Motif du paiement
-            </label>
-            <select
-              value={paymentPurpose}
-              onChange={(e) => setPaymentPurpose(e.target.value)}
-              disabled={selectedAppointmentForPayment !== null}
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                borderRadius: '12px',
-                border: '1px solid rgba(255, 107, 0, 0.3)',
-                backgroundColor: selectedAppointmentForPayment ? 'rgba(0, 38, 65, 0.15)' : 'rgba(0, 38, 65, 0.25)',
-                color: 'white',
-                fontSize: '15px',
-                boxShadow: 'inset 0 2px 5px rgba(0, 0, 0, 0.1)',
-                backdropFilter: 'blur(5px)',
-                outline: 'none',
-                WebkitAppearance: 'none',
-                appearance: 'none',
-                backgroundImage: !selectedAppointmentForPayment ? `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23FF6B00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")` : 'none',
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: !selectedAppointmentForPayment ? 'right 16px center' : 'center',
-                paddingRight: selectedAppointmentForPayment ? '16px' : '40px',
-                opacity: selectedAppointmentForPayment ? 0.8 : 1
-              }}
-            >
-              <option value="Consultation">Consultation</option>
-              <option value="Suivi">Suivi</option>
-              <option value="Téléconsultation">Téléconsultation</option>
-              <option value="Première séance">Première séance</option>
-              <option value="Autre">Autre</option>
-            </select>
-            {selectedAppointmentForPayment && (
-              <p style={{ 
-                margin: '5px 0 0', 
-                fontSize: '12px',
-                color: 'rgba(255, 255, 255, 0.7)',
-                fontStyle: 'italic'
-              }}>
-                Motif défini par le rendez-vous sélectionné
-              </p>
-            )}
-          </div>
-          
-          <div>
-            <label style={{ 
-              display: 'block', 
-              marginBottom: '8px',
-              fontSize: '14px',
-              color: 'rgba(255, 255, 255, 0.85)',
-              fontWeight: '500'
-            }}>
-              Numéro de carte
-            </label>
-            <input
-              type="text"
-              value={cardNumber}
-              onChange={(e) => {
-                setCardNumber(formatCardNumber(e.target.value));
-                // Effacer l'erreur quand l'utilisateur commence à corriger
-                if (formErrors.cardNumber) {
-                  setFormErrors({...formErrors, cardNumber: undefined});
-                }
-              }}
-              maxLength={19} // 16 digits + 3 spaces
-              placeholder="1234 5678 9012 3456"
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                borderRadius: '12px',
-                border: formErrors.cardNumber 
-                  ? '1px solid rgba(255, 0, 0, 0.5)' 
-                  : '1px solid rgba(255, 107, 0, 0.3)',
-                backgroundColor: 'rgba(0, 38, 65, 0.25)',
-                color: 'white',
-                fontSize: '15px',
-                boxShadow: formErrors.cardNumber 
-                  ? 'inset 0 2px 5px rgba(255, 0, 0, 0.1)' 
-                  : 'inset 0 2px 5px rgba(0, 0, 0, 0.1)',
-                backdropFilter: 'blur(5px)',
-                outline: 'none',
-                transition: 'all 0.2s ease'
-              }}
-            />
-            {formErrors.cardNumber && (
-              <p style={{ 
-                margin: '5px 0 0', 
-                fontSize: '12px',
-                color: 'rgba(255, 120, 120, 1)',
-                fontStyle: 'italic'
-              }}>
-                {formErrors.cardNumber}
-              </p>
-            )}
-          </div>
-          
-          <div>
-            <label style={{ 
-              display: 'block', 
-              marginBottom: '8px',
-              fontSize: '14px',
-              color: 'rgba(255, 255, 255, 0.85)',
-              fontWeight: '500'
-            }}>
-              Titulaire de la carte
-            </label>
-            <input
-              type="text"
-              value={cardHolder}
-              onChange={(e) => {
-                setCardHolder(e.target.value);
-                if (formErrors.cardHolder) {
-                  setFormErrors({...formErrors, cardHolder: undefined});
-                }
-              }}
-              placeholder="NOM Prénom"
-              style={{
-                width: '100%',
-                padding: '12px 15px',
-                background: 'rgba(0, 17, 13, 0.4)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '10px',
-                color: 'white',
-                fontSize: '15px'
-              }}
-            />
-            {formErrors.cardHolder && (
-              <p style={{ 
-                margin: '5px 0 0', 
-                fontSize: '12px',
-                color: 'rgba(255, 120, 120, 1)',
-                fontStyle: 'italic'
-              }}>
-                {formErrors.cardHolder}
-              </p>
-            )}
-          </div>
-          
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '15px' }}>
-            <div>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '8px',
-                fontSize: '14px',
-                color: 'rgba(255, 255, 255, 0.85)',
-                fontWeight: '500'
-              }}>
-                Date d'expiration
-              </label>
-              <input
-                type="text"
-                value={expiryDate}
-                onChange={(e) => {
-                  handleExpiryDateChange(e.target.value);
-                  if (formErrors.expiryDate) {
-                    setFormErrors({...formErrors, expiryDate: undefined});
-                  }
-                }}
-                placeholder="MM/YY"
-                maxLength={5}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  borderRadius: '12px',
-                  border: formErrors.expiryDate 
-                    ? '1px solid rgba(255, 0, 0, 0.5)' 
-                    : '1px solid rgba(255, 107, 0, 0.3)',
-                  backgroundColor: 'rgba(0, 38, 65, 0.25)',
-                  color: 'white',
-                  fontSize: '15px',
-                  boxShadow: formErrors.expiryDate 
-                    ? 'inset 0 2px 5px rgba(255, 0, 0, 0.1)' 
-                    : 'inset 0 2px 5px rgba(0, 0, 0, 0.1)',
-                  backdropFilter: 'blur(5px)',
-                  outline: 'none',
-                  transition: 'all 0.2s ease'
-                }}
-              />
-              {formErrors.expiryDate && (
-                <p style={{ 
-                  margin: '5px 0 0', 
-                  fontSize: '12px',
-                  color: 'rgba(255, 120, 120, 1)',
-                  fontStyle: 'italic'
-                }}>
-                  {formErrors.expiryDate}
-                </p>
-              )}
-            </div>
-            
-            <div>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '8px',
-                fontSize: '14px',
-                color: 'rgba(255, 255, 255, 0.85)',
-                fontWeight: '500'
-              }}>
-                CVV
-              </label>
-              <input
-                type="text"
-                value={cvv}
-                onChange={(e) => {
-                  setCvv(e.target.value.replace(/\D/g, '').substring(0, 3));
-                  if (formErrors.cvv) {
-                    setFormErrors({...formErrors, cvv: undefined});
-                  }
-                }}
-                maxLength={3}
-                placeholder="123"
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  borderRadius: '12px',
-                  border: formErrors.cvv 
-                    ? '1px solid rgba(255, 0, 0, 0.5)' 
-                    : '1px solid rgba(255, 107, 0, 0.3)',
-                  backgroundColor: 'rgba(0, 38, 65, 0.25)',
-                  color: 'white',
-                  fontSize: '15px',
-                  boxShadow: formErrors.cvv 
-                    ? 'inset 0 2px 5px rgba(255, 0, 0, 0.1)' 
-                    : 'inset 0 2px 5px rgba(0, 0, 0, 0.1)',
-                  backdropFilter: 'blur(5px)',
-                  outline: 'none',
-                  transition: 'all 0.2s ease'
-                }}
-              />
-              {formErrors.cvv && (
-                <p style={{ 
-                  margin: '5px 0 0', 
-                  fontSize: '12px',
-                  color: 'rgba(255, 120, 120, 1)',
-                  fontStyle: 'italic'
-                }}>
-                  {formErrors.cvv}
-                </p>
-              )}
-            </div>
-          </div>
-          
-          <div style={{ 
-            padding: '12px 15px', 
-            background: 'rgba(255, 107, 0, 0.1)', 
-            borderRadius: '12px',
-            border: '1px solid rgba(255, 107, 0, 0.2)',
-            marginTop: '10px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px'
-          }}>
-            <div>
-              <div style={{ 
-                background: 'rgba(255, 107, 0, 0.2)', 
-                borderRadius: '50%', 
-                width: '32px', 
-                height: '32px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center' 
-              }}>
-                <FaLock size={14} color="#FF6B00" />
-              </div>
-              <p style={{ 
-                margin: '0',
-                fontSize: '13px',
-                color: 'rgba(255, 255, 255, 0.8)'
-              }}>
-                Vos informations de paiement sont sécurisées. Nous utilisons un cryptage SSL pour protéger vos données.
-              </p>
-            </div>
-          </div>
-          
-          {formErrors.general && (
-            <div style={{ 
-              padding: '12px 15px', 
-              background: 'rgba(255, 0, 0, 0.1)', 
-              borderRadius: '12px',
-              border: '1px solid rgba(255, 0, 0, 0.2)',
-              marginTop: '10px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px'
-            }}>
-              <p style={{ 
-                margin: '0',
-                fontSize: '13px',
-                color: 'rgba(255, 255, 255, 0.95)'
-              }}>
-                {formErrors.general}
-              </p>
-            </div>
-          )}
-
-          {paymentSuccess && (
-            <div style={{ 
-              padding: '15px', 
-              background: 'rgba(0, 200, 83, 0.15)', 
-              borderRadius: '12px',
-              border: '1px solid rgba(0, 200, 83, 0.3)',
-              marginTop: '10px',
-              textAlign: 'center',
-              animation: 'fadeIn 0.5s ease-out'
-            }}>
-              <div style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                background: 'rgba(0, 200, 83, 0.2)',
-                margin: '0 auto 10px',
-                display: 'flex',
-                alignItems: 'center', 
-                justifyContent: 'center',
-                color: '#00C853',
-                fontSize: '20px'
-              }}>
-                <div style={{
-                  width: '18px',
-                  height: '9px',
-                  borderBottom: '2px solid rgba(0, 200, 83, 0.8)',
-                  borderRight: '2px solid rgba(0, 200, 83, 0.8)',
-                  transform: 'rotate(45deg) translate(-1px, -4px)'
-                }} />
-              </div>
-              <p style={{ 
-                margin: '0',
-                fontSize: '15px',
-                fontWeight: 'bold',
-                color: 'white'
-              }}>
-                Paiement effectué avec succès !
-              </p>
-              <p style={{ 
-                margin: '5px 0 0',
-                fontSize: '13px',
-                color: 'rgba(255, 255, 255, 0.8)'
-              }}>
-                Un email de confirmation vous sera envoyé.
-              </p>
-            </div>
-          )}
-          
-          <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-            <button 
-              onClick={() => setShowPaymentModal(false)}
-              style={{
-                padding: '12px 20px',
-                borderRadius: '12px',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                background: 'rgba(0, 0, 0, 0.2)',
-                color: 'white',
-                cursor: 'pointer',
-                fontSize: '15px',
-                fontWeight: '500',
-                flex: '1',
-                transition: 'all 0.2s ease',
-                backdropFilter: 'blur(5px)',
-                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
-              }}
-            >
-              Annuler
-            </button>
-            
-            <button 
-              onClick={handlePaymentSubmit}
-              style={{
-                padding: '12px 20px',
-                borderRadius: '12px',
-                border: 'none',
-                background: 'linear-gradient(145deg, #FF6B00, #FF9248)',
-                color: 'white',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                boxShadow: '0 4px 15px rgba(255, 107, 0, 0.3)',
-                flex: '1.5',
-                fontSize: '15px',
-                transition: 'all 0.2s ease',
-                position: 'relative',
-                overflow: 'hidden',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-            >
-              <FaRegCreditCard />
-              Payer {paymentAmount}€
-              <div style={{
-                content: '""',
-                position: 'absolute',
-                top: '0',
-                left: '0',
-                width: '100%',
-                height: '100%',
-                background: 'linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent)',
-                transform: 'translateX(-100%)',
-                animation: 'shine 1.5s infinite'
-              }} />
-            </button>
-          </div>
-          
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            gap: '10px', 
-            marginTop: '15px'
-          }}>
-            <FaCcVisa size={24} color="rgba(255, 255, 255, 0.8)" />
-            <FaCcMastercard size={24} color="rgba(255, 255, 255, 0.8)" />
-            <FaCcAmex size={24} color="rgba(255, 255, 255, 0.8)" />
-            <FaCcApplePay size={24} color="rgba(255, 255, 255, 0.8)" />
           </div>
         </div>
-      </Modal>
-      
-      {/* Modale du journal alimentaire */}
-      {renderMealJournalModal()}
-      
-      {/* Modale d'édition de repas */}
-      {renderEditMealModal()}
-      
-      {/* Modale pour partager un document */}
-      <Modal
-        isOpen={showDocumentModal}
-        onClose={() => setShowDocumentModal(false)}
-        title={`Partager un document avec ${practitioner.firstName} ${practitioner.lastName}`}
-      >
-        <div style={{ padding: '20px', color: 'white' }}>
-          <p style={{ marginTop: 0, marginBottom: '20px', color: 'rgba(255, 255, 255, 0.8)' }}>
-            {practitioner.id === 1 && "Vous pouvez partager des documents relatifs à votre alimentation, analyses nutritionnelles ou journaux alimentaires."}
-            {practitioner.id === 2 && "Vous pouvez partager des documents médicaux, résultats d'analyses, ou informations importantes concernant votre santé."}
-            {practitioner.id === 3 && "Vous pouvez partager des documents relatifs à votre entraînement, mesures de performance ou objectifs sportifs."}
-            {practitioner.id === 4 && "Vous pouvez partager des bilans de mobilité, radiographies ou évaluations liées à votre rééducation."}
-          </p>
-          
-          {/* Sélection de fichier */}
-          <div style={{ marginBottom: '20px' }}>
-            <label 
-              htmlFor="file-upload" 
-              style={{
-                display: 'block',
-                padding: '30px 20px',
-                border: '2px dashed rgba(255, 255, 255, 0.2)',
-                borderRadius: '12px',
-                textAlign: 'center',
-                cursor: 'pointer',
-                marginBottom: '10px',
-                background: 'rgba(0, 17, 13, 0.4)'
-              }}
-            >
-              <div style={{
-                fontSize: '24px',
-                color: '#FF6B00',
-                marginBottom: '10px'
-              }}>
-                <FaFileUpload />
-              </div>
-              {documentFile ? (
-                <>
-                  <div style={{ fontWeight: 'bold' }}>{documentFile.name}</div>
-                  <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)', marginTop: '5px' }}>
-                    {(documentFile.size / 1024 / 1024).toFixed(2)} MB
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div style={{ fontWeight: 'bold' }}>Cliquez pour sélectionner un fichier</div>
-                  <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)', marginTop: '5px' }}>
-                    ou glissez-déposez ici
-                  </div>
-                </>
-              )}
-            </label>
-            <input
-              id="file-upload"
-              type="file"
-              style={{ display: 'none' }}
-              onChange={(e) => {
-                if (e.target.files && e.target.files[0]) {
-                  setDocumentFile(e.target.files[0]);
-                }
-              }}
-            />
-            <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)' }}>
-              Formats supportés: PDF, JPG, PNG, DOCX - Taille max: 10 MB
-            </div>
+        
+        {/* Modale de prise de rendez-vous */}
+        <Modal 
+          isOpen={showAppointmentModal} 
+          onClose={() => setShowAppointmentModal(false)}
+          title={`Prendre rendez-vous avec ${practitioner.firstName} ${practitioner.lastName}`}
+        >
+          <div style={{ padding: '10px', color: 'white' }}>
+            {/* ... */}
           </div>
-          
-          {/* Titre du document */}
-          <div style={{ marginBottom: '15px' }}>
-            <label 
-              htmlFor="document-title" 
-              style={{
-                display: 'block',
-                marginBottom: '5px',
-                fontSize: '14px',
-                color: 'rgba(255, 255, 255, 0.8)',
-                fontWeight: '500'
-              }}
-            >
-              Titre du document
-            </label>
-            <input
-              id="document-title"
-              type="text"
-              value={documentTitle}
-              onChange={(e) => setDocumentTitle(e.target.value)}
-              placeholder="Ex: Résultats d'analyse sanguine"
-              style={{
-                width: '100%',
-                padding: '12px 15px',
-                background: 'rgba(0, 17, 13, 0.4)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '10px',
-                color: 'white',
-                fontSize: '15px'
-              }}
-            />
+        </Modal>
+        
+        {/* Modale du journal alimentaire */}
+        {renderMealJournalModal()}
+        
+        {/* Modale d'édition de repas */}
+        {renderEditMealModal()}
+        
+        {/* Modale pour partager un document */}
+        <Modal
+          isOpen={showDocumentModal}
+          onClose={() => setShowDocumentModal(false)}
+          title={`Partager un document avec ${practitioner.firstName} ${practitioner.lastName}`}
+        >
+          <div style={{ padding: '20px', color: 'white' }}>
+            {/* ... */}
           </div>
-          
-          {/* Description */}
-          <div style={{ marginBottom: '25px' }}>
-            <label 
-              htmlFor="document-description" 
-              style={{
-                display: 'block',
-                marginBottom: '5px',
-                fontSize: '14px',
-                color: 'rgba(255, 255, 255, 0.8)',
-                fontWeight: '500'
-              }}
-            >
-              Description (optionnelle)
-            </label>
-            <textarea
-              id="document-description"
-              value={documentDescription}
-              onChange={(e) => setDocumentDescription(e.target.value)}
-              placeholder="Ajoutez des détails sur ce document..."
-              style={{
-                width: '100%',
-                padding: '12px 15px',
-                background: 'rgba(0, 17, 13, 0.4)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '10px',
-                color: 'white',
-                fontSize: '15px',
-                minHeight: '100px',
-                resize: 'vertical'
-              }}
-            />
-          </div>
-          
-          {/* Bouton de partage */}
-          <button
-            onClick={() => {
-              if (documentFile && documentTitle) {
-                // Créer un nouveau document partagé
-                const newDoc = {
-                  id: (sharedDocuments.length + 1).toString(),
-                  title: documentTitle,
-                  description: documentDescription || 'Aucune description',
-                  fileName: documentFile.name,
-                  date: new Date().toISOString().split('T')[0],
-                  size: `${(documentFile.size / 1024 / 1024).toFixed(1)} MB`
-                };
-                
-                // Ajouter à la liste
-                setSharedDocuments(prev => [newDoc, ...prev]);
-                
-                // Réinitialiser le formulaire et fermer la modale
-                setDocumentFile(null);
-                setDocumentTitle('');
-                setDocumentDescription('');
-                setShowDocumentModal(false);
-              }
-            }}
-            disabled={!documentFile || !documentTitle}
-            style={{
-              width: '100%',
-              padding: '14px 20px',
-              borderRadius: '12px',
-              border: 'none',
-              background: documentFile && documentTitle 
-                ? 'linear-gradient(145deg, #FF6B00, #FF9248)'
-                : 'rgba(255, 255, 255, 0.1)',
-              color: 'white',
-              fontWeight: 'bold',
-              cursor: documentFile && documentTitle ? 'pointer' : 'not-allowed',
-              opacity: documentFile && documentTitle ? 1 : 0.6,
-              boxShadow: documentFile && documentTitle 
-                ? '0 4px 15px rgba(255, 107, 0, 0.3)'
-                : 'none',
-              fontSize: '16px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px'
-            }}
-          >
-            <FaShareAlt /> Partager avec {practitioner.firstName} {practitioner.lastName}
-          </button>
-        </div>
-      </Modal>
+        </Modal>
+      </div>
     </div>
   );
 }
-
-```
-
-```tsx

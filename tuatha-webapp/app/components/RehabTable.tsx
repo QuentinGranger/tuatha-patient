@@ -5,6 +5,11 @@ import { FaDownload, FaShareAlt, FaCalendarAlt, FaRunning, FaStopwatch } from 'r
 import styles from './RehabTable.module.css';
 import jsPDF from 'jspdf';
 
+interface RehabTableProps {
+  patientName: string;
+  patientId: string;
+}
+
 interface ExerciseProgram {
   id: string;
   name: string;
@@ -19,29 +24,95 @@ interface ExerciseProgram {
   lastUpdated: string;
 }
 
-interface RehabTableProps {
-  patientName: string;
-  programStartDate: string;
-  programEndDate: string;
-  currentPhase: string;
-  nextAppointment: string;
-  exercisePrograms: ExerciseProgram[];
-  onUpdateProgress: (id: string, progress: number) => void;
-}
+// Données d'exemple pour le programme de rééducation
+const exampleExercisePrograms: ExerciseProgram[] = [
+  {
+    id: "ex1",
+    name: "Squats isométriques",
+    targetArea: "Quadriceps",
+    frequency: "3x / semaine",
+    sets: 3,
+    reps: 15,
+    duration: "30 secondes de maintien",
+    intensity: "Modérée",
+    notes: "Position maintenue à 90° de flexion du genou. Progression par augmentation du temps de maintien.",
+    progressLevel: 75,
+    lastUpdated: "2025-03-25"
+  },
+  {
+    id: "ex2",
+    name: "Extension du genou",
+    targetArea: "Quadriceps",
+    frequency: "4x / semaine",
+    sets: 3,
+    reps: 12,
+    duration: "Contraction 3s, relâchement 2s",
+    intensity: "Progressive",
+    notes: "Commencer sans poids puis ajouter 1kg par semaine selon tolérance. Attention à ne pas créer de douleur.",
+    progressLevel: 60,
+    lastUpdated: "2025-03-27"
+  },
+  {
+    id: "ex3",
+    name: "Exercices proprioceptifs",
+    targetArea: "Genou",
+    frequency: "Quotidien",
+    sets: 2,
+    reps: 10,
+    duration: "30 secondes par position",
+    intensity: "Légère à modérée",
+    notes: "Équilibre unipodal sur surface stable puis instable. Progression avec yeux fermés.",
+    progressLevel: 85,
+    lastUpdated: "2025-03-29"
+  },
+  {
+    id: "ex4",
+    name: "Vélo stationnaire",
+    targetArea: "Système cardio-vasculaire",
+    frequency: "3x / semaine",
+    sets: 1,
+    reps: 1,
+    duration: "20 minutes",
+    intensity: "Modérée",
+    notes: "Maintenir une cadence de 70-80 RPM avec résistance légère. Augmenter progressivement la durée jusqu'à 30 minutes.",
+    progressLevel: 90,
+    lastUpdated: "2025-03-28"
+  },
+  {
+    id: "ex5",
+    name: "Step-up latéral",
+    targetArea: "Hanches et stabilisateurs",
+    frequency: "3x / semaine",
+    sets: 3,
+    reps: 10,
+    duration: "Rythme contrôlé",
+    intensity: "Modérée",
+    notes: "Utiliser une marche de 15cm, monter latéralement puis redescendre en contrôlant le mouvement. Focaliser sur l'activation du moyen fessier.",
+    progressLevel: 65,
+    lastUpdated: "2025-03-26"
+  }
+];
 
-const RehabTable: React.FC<RehabTableProps> = ({ 
-  patientName, 
-  programStartDate, 
-  programEndDate,
-  currentPhase,
-  nextAppointment,
-  exercisePrograms,
-  onUpdateProgress
-}) => {
+const RehabTable: React.FC<RehabTableProps> = ({ patientName, patientId }) => {
   const [selectedProgram, setSelectedProgram] = useState<string | null>(null);
+  const [exercisePrograms, setExercisePrograms] = useState<ExerciseProgram[]>(exampleExercisePrograms);
+  
+  // Informations du programme
+  const programInfo = {
+    programStartDate: "2025-02-15",
+    programEndDate: "2025-05-30",
+    currentPhase: "2 - Renforcement",
+    nextAppointment: "2025-04-05"
+  };
   
   const handleProgressUpdate = (id: string, newProgress: number) => {
-    onUpdateProgress(id, newProgress);
+    setExercisePrograms(prevPrograms => 
+      prevPrograms.map(program => 
+        program.id === id 
+          ? { ...program, progressLevel: newProgress, lastUpdated: new Date().toISOString().split('T')[0] } 
+          : program
+      )
+    );
   };
   
   const calculateOverallProgress = (): number => {
@@ -75,10 +146,10 @@ const RehabTable: React.FC<RehabTableProps> = ({
     doc.setFontSize(16);
     doc.text('Programme:', 20, 70);
     doc.setFontSize(14);
-    doc.text(`Phase actuelle: ${currentPhase}`, 30, 80);
-    doc.text(`Date de début: ${new Date(programStartDate).toLocaleDateString('fr-FR')}`, 30, 90);
-    doc.text(`Date de fin prévue: ${new Date(programEndDate).toLocaleDateString('fr-FR')}`, 30, 100);
-    doc.text(`Prochain rendez-vous: ${new Date(nextAppointment).toLocaleDateString('fr-FR')}`, 30, 110);
+    doc.text(`Phase actuelle: ${programInfo.currentPhase}`, 30, 80);
+    doc.text(`Date de début: ${new Date(programInfo.programStartDate).toLocaleDateString('fr-FR')}`, 30, 90);
+    doc.text(`Date de fin prévue: ${new Date(programInfo.programEndDate).toLocaleDateString('fr-FR')}`, 30, 100);
+    doc.text(`Prochain rendez-vous: ${new Date(programInfo.nextAppointment).toLocaleDateString('fr-FR')}`, 30, 110);
     doc.text(`Progression globale: ${calculateOverallProgress()}%`, 30, 120);
     
     // Tableau des exercices
@@ -138,7 +209,7 @@ const RehabTable: React.FC<RehabTableProps> = ({
     // Création de l'URL de partage
     const shareData = {
       title: `Programme de rééducation de ${patientName}`,
-      text: `Voici le programme de rééducation actuel de ${patientName} (Phase: ${currentPhase}). Progression globale: ${calculateOverallProgress()}%.`,
+      text: `Voici le programme de rééducation actuel de ${patientName} (Phase: ${programInfo.currentPhase}). Progression globale: ${calculateOverallProgress()}%.`,
       url: window.location.href
     };
     
@@ -153,10 +224,10 @@ const RehabTable: React.FC<RehabTableProps> = ({
       const emailBody = encodeURIComponent(
         `Programme de rééducation actuel de ${patientName}
         
-        Phase: ${currentPhase}
-        Date de début: ${new Date(programStartDate).toLocaleDateString('fr-FR')}
-        Date de fin prévue: ${new Date(programEndDate).toLocaleDateString('fr-FR')}
-        Prochain rendez-vous: ${new Date(nextAppointment).toLocaleDateString('fr-FR')}
+        Phase: ${programInfo.currentPhase}
+        Date de début: ${new Date(programInfo.programStartDate).toLocaleDateString('fr-FR')}
+        Date de fin prévue: ${new Date(programInfo.programEndDate).toLocaleDateString('fr-FR')}
+        Prochain rendez-vous: ${new Date(programInfo.nextAppointment).toLocaleDateString('fr-FR')}
         Progression globale: ${calculateOverallProgress()}%
         
         Exercices prescrits:
@@ -169,13 +240,13 @@ const RehabTable: React.FC<RehabTableProps> = ({
   };
 
   return (
-    <div className={styles.rehabTableContainer}>
+    <div id="rehab-table" className={styles.rehabTableContainer}>
       <div className={styles.rehabTableHeader}>
         <h2 className={styles.rehabTableTitle}>
           Programme de Rééducation Actuel
         </h2>
         <p className={styles.rehabTableSubtitle}>
-          Phase {currentPhase} • Progression globale: {calculateOverallProgress()}%
+          Phase {programInfo.currentPhase} • Progression globale: {calculateOverallProgress()}%
         </p>
       </div>
       
@@ -186,7 +257,7 @@ const RehabTable: React.FC<RehabTableProps> = ({
           </div>
           <div className={styles.rehabInfoCardContent}>
             <div className={styles.rehabInfoCardLabel}>Début du programme</div>
-            <div className={styles.rehabInfoCardValue}>{new Date(programStartDate).toLocaleDateString('fr-FR')}</div>
+            <div className={styles.rehabInfoCardValue}>{new Date(programInfo.programStartDate).toLocaleDateString('fr-FR')}</div>
           </div>
         </div>
         
@@ -196,7 +267,7 @@ const RehabTable: React.FC<RehabTableProps> = ({
           </div>
           <div className={styles.rehabInfoCardContent}>
             <div className={styles.rehabInfoCardLabel}>Fin prévue</div>
-            <div className={styles.rehabInfoCardValue}>{new Date(programEndDate).toLocaleDateString('fr-FR')}</div>
+            <div className={styles.rehabInfoCardValue}>{new Date(programInfo.programEndDate).toLocaleDateString('fr-FR')}</div>
           </div>
         </div>
         
@@ -206,7 +277,7 @@ const RehabTable: React.FC<RehabTableProps> = ({
           </div>
           <div className={styles.rehabInfoCardContent}>
             <div className={styles.rehabInfoCardLabel}>Prochain RDV</div>
-            <div className={styles.rehabInfoCardValue}>{new Date(nextAppointment).toLocaleDateString('fr-FR')}</div>
+            <div className={styles.rehabInfoCardValue}>{new Date(programInfo.nextAppointment).toLocaleDateString('fr-FR')}</div>
           </div>
         </div>
       </div>
