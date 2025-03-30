@@ -1,0 +1,107 @@
+.calendar {
+  width: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.calendarContainer {
+  width: 100%;
+}
+
+/* En-tête avec les jours de la semaine */
+.header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 10px;
+}
+
+.dayHeader {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 6px 0;
+}
+
+/* Corps du calendrier */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.day {
+  position: relative;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 12px;
+  color: white;
+}
+
+.dayNumber {
+  position: relative;
+  z-index: 2;
+}
+
+.day:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.day.disabled {
+  color: rgba(255, 255, 255, 0.3);
+  cursor: default;
+}
+
+.day.selected {
+  background-color: #FF6B00;
+  color: white;
+  font-weight: 500;
+}
+
+/* Indicateurs de rendez-vous */
+.appointmentIndicator {
+  position: absolute;
+  bottom: 3px;
+  display: flex;
+  gap: 3px;
+  justify-content: center;
+}
+
+.indicator {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #FF6B00;
+}
+
+.indicator.past {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.indicator.canceled {
+  background-color: rgba(255, 0, 0, 0.6);
+}
+
+/* Responsive */
+@media (min-width: 600px) {
+  .day {
+    height: 40px;
+    font-size: 13px;
+  }
+}
+
+@media (min-width: 960px) {
+  .calendarContainer {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}

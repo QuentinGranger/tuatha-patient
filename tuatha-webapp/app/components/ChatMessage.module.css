@@ -1,0 +1,615 @@
+/* ChatMessage.module.css */
+/* Approche Mobile First comme demandé */
+
+.chatOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 17, 13, 0.7);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(8px);
+}
+
+.chatContainer {
+  width: 100%;
+  height: 100%;
+  max-width: 400px;
+  max-height: 90vh;
+  background: linear-gradient(135deg, rgba(0, 38, 65, 0.85), rgba(0, 17, 13, 0.95));
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  position: relative;
+  border: 1px solid rgba(255, 107, 0, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.chatHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: rgba(0, 17, 13, 0.7);
+  border-bottom: 1px solid rgba(255, 107, 0, 0.3);
+  backdrop-filter: blur(5px);
+}
+
+.proInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.proAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  border: 2px solid #FF6B00;
+  box-shadow: 0 2px 8px rgba(255, 107, 0, 0.3);
+}
+
+.proDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.proDetails h3 {
+  margin: 0;
+  font-size: 16px;
+  color: white;
+  font-weight: 600;
+}
+
+.proDetails p {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeButton:hover {
+  background-color: rgba(255, 107, 0, 0.2);
+}
+
+.messagesContainer {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: rgba(0, 38, 65, 0.5);
+  /* Fine pattern overlay for premium look */
+  background-image: linear-gradient(rgba(0, 38, 65, 0.7), rgba(0, 17, 13, 0.7)),
+                    url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFzSURBVGhD7ZgxTsMwFIZ/r0zl2oUNGNtVokOXLkDLCUBq2ZkqRiQmJDIh9QBFXboHFu4ACMIVmIG/iWMSEZSk9kve8Oxn+/vz4vj52S0QGmEa5JOCZMbVaJAlBdFEQTRREE0URBN/QXLnfOu3sP2OpV9B/jpSE06TdvHm118O+/UYo/Vy6vQO0m52E+Lw0XkdIPeXOkCn/YZYkHe/YnFXz4OuDN+UZqhSW4hhYvhNZiHSIlHM3HB2LWi54XIxYBmQBTlMQhaSKcXQwGZmY8ylJ7lkZTNlVsXcz6S3OMVZh0QqiBkbsNnZLg5GKIgmCqKJgmiiIJooiCYKoomCaKIgmvjbyGHuZlPnRzq5Oz+ZOrvD8uKYZURKgkOYSP5g1x9HW/SxYRmTDmKT8mQlMWnmcDafYc/Dl7jzEmKyIR3yczbF9Xw2X6/vMbmeQ8jzlY+HTSqEeSZdtT7xzv9rkE8KkhnhwHwAS2WNByXXM3cAAAAASUVORK5CYII=');
+}
+
+.message {
+  display: flex;
+  max-width: 85%;
+  position: relative;
+  margin-bottom: 1px;
+}
+
+.userMessage {
+  align-self: flex-end;
+}
+
+.proMessage {
+  align-self: flex-start;
+}
+
+.messageContent {
+  padding: 10px 14px;
+  border-radius: 20px;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.userMessage .messageContent {
+  background-color: #FF6B00;
+  color: white;
+  margin-right: 8px;
+  border-bottom-right-radius: 5px;
+  background: linear-gradient(135deg, #FF8C3E, #FF6B00);
+}
+
+.userMessage .messageContent::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: -6px;
+  width: 12px;
+  height: 12px;
+  background-color: #FF6B00;
+  border-bottom-left-radius: 12px;
+}
+
+.proMessage .messageContent {
+  background: rgba(0, 38, 65, 0.8);
+  color: white;
+  margin-left: 8px;
+  border-bottom-left-radius: 5px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.proMessage .messageContent::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -6px;
+  width: 12px;
+  height: 12px;
+  background: rgba(0, 38, 65, 0.8);
+  border-bottom-right-radius: 12px;
+}
+
+.messageContent p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: white;
+}
+
+.messageFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.messageTime {
+  display: inline-block;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.messageStatus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.messageStatus.read {
+  color: #FF6B00;
+}
+
+.inputContainer {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 17, 13, 0.7);
+  padding: 10px 16px;
+  border-top: 1px solid rgba(255, 107, 0, 0.3);
+  gap: 8px;
+  backdrop-filter: blur(5px);
+}
+
+.messageInput {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 107, 0, 0.3);
+  background: rgba(0, 38, 65, 0.6);
+  color: white;
+  font-size: 14px;
+  outline: none;
+  backdrop-filter: blur(5px);
+}
+
+.messageInput::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.attachButton,
+.emojiButton {
+  background: none;
+  border: none;
+  color: #FF6B00;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sendButton {
+  background: #FF6B00;
+  border: none;
+  color: white;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(255, 107, 0, 0.3);
+}
+
+.sendButton:disabled {
+  background: rgba(255, 107, 0, 0.4);
+  cursor: default;
+  box-shadow: none;
+}
+
+.attachButton:hover,
+.emojiButton:hover,
+.sendButton:hover:not(:disabled) {
+  background-color: rgba(255, 107, 0, 0.2);
+}
+
+/* Styles pour les groupes de messages */
+.messageGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 12px;
+}
+
+.userGroup {
+  align-items: flex-end;
+}
+
+.proGroup {
+  align-items: flex-start;
+}
+
+.userGroup .message:not(:last-child) .messageContent::after {
+  display: none;
+}
+
+.proGroup .message:not(:last-child) .messageContent::after {
+  display: none;
+}
+
+/* Indicateur de saisie (style premium Tuatha) */
+.typingIndicator {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background: rgba(0, 38, 65, 0.8);
+  border-radius: 18px;
+  border-bottom-left-radius: 5px;
+  width: 60px;
+  height: 30px;
+  justify-content: center;
+  position: relative;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.typingIndicator::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -6px;
+  width: 12px;
+  height: 12px;
+  background: rgba(0, 38, 65, 0.8);
+  border-bottom-right-radius: 12px;
+}
+
+.typingIndicator span {
+  height: 8px;
+  width: 8px;
+  background-color: #FF6B00;
+  border-radius: 50%;
+  display: inline-block;
+  margin: 0 2px;
+  opacity: 0.8;
+  animation: bouncingDots 1.4s infinite;
+}
+
+.typingIndicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typingIndicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes bouncingDots {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* Date du message */
+.dateLabel {
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 16px 0;
+  background: rgba(0, 38, 65, 0.6);
+  border-radius: 10px;
+  padding: 4px 12px;
+  display: inline-block;
+  align-self: center;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 107, 0, 0.2);
+}
+
+/* Styles pour les pièces jointes */
+.hiddenFileInput {
+  display: none;
+}
+
+.attachmentsContainer {
+  margin: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.attachmentItem {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.imageAttachment {
+  position: relative;
+  width: 100%;
+  max-width: 200px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.attachmentImage {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+}
+
+.fileAttachment {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 38, 65, 0.7);
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 107, 0, 0.2);
+  backdrop-filter: blur(5px);
+}
+
+.fileInfo {
+  flex: 1;
+}
+
+.fileName {
+  margin: 0 0 2px 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+
+.fileSize {
+  margin: 0;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Styles pour les pièces jointes en attente */
+.pendingAttachments {
+  background: rgba(0, 17, 13, 0.7);
+  padding: 8px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-height: 120px;
+  overflow-y: auto;
+  border-top: 1px solid rgba(255, 107, 0, 0.2);
+  backdrop-filter: blur(5px);
+}
+
+.pendingAttachmentItem {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.pendingImagePreview {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.previewThumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 107, 0, 0.2);
+}
+
+.pendingFilePreview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 38, 65, 0.7);
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 107, 0, 0.2);
+  backdrop-filter: blur(5px);
+  max-width: 200px;
+}
+
+.pendingFileInfo {
+  flex: 1;
+}
+
+.pendingFileName {
+  margin: 0 0 2px 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+}
+
+.pendingFileSize {
+  margin: 0;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.removeAttachmentButton {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0;
+}
+
+.removeAttachmentButton:hover {
+  background: rgba(255, 107, 0, 0.8);
+}
+
+/* Media queries pour les tablettes */
+@media (min-width: 768px) {
+  .chatContainer {
+    width: 90%;
+    max-width: 450px;
+  }
+  
+  .chatHeader {
+    padding: 16px 24px;
+  }
+  
+  .proAvatar {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .proDetails h3 {
+    font-size: 18px;
+  }
+  
+  .proDetails p {
+    font-size: 14px;
+  }
+  
+  .messagesContainer {
+    padding: 24px;
+  }
+  
+  .messageContent p {
+    font-size: 16px;
+  }
+  
+  .messageTime {
+    font-size: 12px;
+  }
+  
+  .inputContainer {
+    padding: 16px 24px;
+  }
+  
+  .messageInput {
+    font-size: 16px;
+  }
+  
+  .fileName, .pendingFileName {
+    max-width: 200px;
+  }
+  
+  .imageAttachment {
+    max-width: 250px;
+  }
+  
+  .pendingAttachments {
+    max-height: 150px;
+  }
+  
+  .pendingImagePreview {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+/* Media queries pour les ordinateurs */
+@media (min-width: 1024px) {
+  .chatContainer {
+    max-width: 600px;
+  }
+  
+  .proAvatar {
+    width: 56px;
+    height: 56px;
+  }
+  
+  .proDetails h3 {
+    font-size: 20px;
+  }
+  
+  .proDetails p {
+    font-size: 15px;
+  }
+  
+  .message {
+    max-width: 70%;
+  }
+  
+  .fileName, .pendingFileName {
+    max-width: 300px;
+  }
+  
+  .imageAttachment {
+    max-width: 300px;
+  }
+  
+  .pendingAttachments {
+    max-height: 180px;
+  }
+  
+  .pendingImagePreview {
+    width: 120px;
+    height: 120px;
+  }
+}
