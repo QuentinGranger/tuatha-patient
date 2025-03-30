@@ -1,0 +1,394 @@
+/* RehabTable.module.css */
+/* Approche mobile-first */
+
+.rehabTableContainer {
+  width: 100%;
+  background: rgba(0, 17, 13, 0.5);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  color: white;
+  margin-bottom: 30px;
+  position: relative;
+  overflow: hidden;
+}
+
+.rehabTableContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255, 107, 0, 0.05), transparent);
+  z-index: -1;
+}
+
+.rehabTableHeader {
+  margin-bottom: 25px;
+}
+
+.rehabTableTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.rehabTableSubtitle {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 20px;
+}
+
+.rehabInfoCards {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.rehabInfoCard {
+  background: rgba(0, 38, 65, 0.6);
+  border-radius: 12px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.rehabInfoCardIcon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 107, 0, 0.15);
+  border-radius: 50%;
+  margin-right: 15px;
+  color: #FF6B00;
+  font-size: 16px;
+}
+
+.rehabInfoCardContent {
+  flex: 1;
+}
+
+.rehabInfoCardLabel {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 4px;
+}
+
+.rehabInfoCardValue {
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+}
+
+.rehabTableWrapper {
+  overflow-x: auto;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  background: rgba(0, 38, 65, 0.4);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.rehabTable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.rehabTable th {
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 38, 65, 0.7);
+}
+
+.rehabTable td {
+  padding: 12px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.9rem;
+  vertical-align: middle;
+}
+
+.rehabTable tr:last-child td {
+  border-bottom: none;
+}
+
+.exerciseName {
+  font-weight: 600;
+  color: #FF6B00;
+}
+
+.progressBarContainer {
+  width: 100%;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progressBar {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.3s ease;
+}
+
+.progressText {
+  position: absolute;
+  right: 0;
+  top: -18px;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+}
+
+.selectedRow {
+  background: rgba(255, 107, 0, 0.1);
+}
+
+.rehabTable tr {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.rehabTable tr:hover {
+  background: rgba(255, 107, 0, 0.08);
+}
+
+.exerciseDetailPanel {
+  background: rgba(0, 38, 65, 0.5);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.exerciseDetailHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.exerciseDetailTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #FF6B00;
+  margin: 0;
+}
+
+.exerciseDetailTargetArea {
+  background: rgba(255, 107, 0, 0.1);
+  padding: 6px 12px;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  color: #FF6B00;
+}
+
+.exerciseDetailContent {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+.exerciseDetailItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.exerciseDetailLabel {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 5px;
+}
+
+.exerciseDetailValue {
+  font-size: 1rem;
+  color: white;
+  font-weight: 500;
+}
+
+.exerciseDetailNotes {
+  margin-top: 10px;
+}
+
+.exerciseDetailNotesText {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.9);
+  margin-top: 5px;
+}
+
+.exerciseDetailProgress {
+  margin-top: 10px;
+}
+
+.progressSliderContainer {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.progressSlider {
+  flex: 1;
+  height: 5px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  outline: none;
+}
+
+.progressSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #FF6B00;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.progressSlider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #FF6B00;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  border: none;
+}
+
+.progressValue {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #FF6B00;
+  min-width: 50px;
+  text-align: right;
+}
+
+.exerciseDetailLastUpdated {
+  margin-top: 15px;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: right;
+}
+
+.rehabTableActions {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.rehabTableButton {
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.primaryButton {
+  background: linear-gradient(145deg, #FF6B00, #FF9248);
+  color: white;
+  box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3);
+}
+
+.primaryButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4);
+}
+
+.secondaryButton {
+  background: rgba(0, 17, 13, 0.7);
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.secondaryButton:hover {
+  transform: translateY(-2px);
+  background: rgba(0, 17, 13, 0.8);
+}
+
+/* Media queries pour les tablettes et desktop */
+@media (min-width: 768px) {
+  .rehabInfoCards {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  
+  .rehabInfoCard {
+    flex: 1;
+    min-width: 180px;
+  }
+  
+  .exerciseDetailContent {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .exerciseDetailNotes {
+    grid-column: span 2;
+  }
+  
+  .exerciseDetailProgress {
+    grid-column: span 2;
+  }
+  
+  .rehabTableActions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  
+  .rehabTableButton {
+    min-width: 180px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .rehabTableContainer {
+    padding: 30px;
+  }
+  
+  .rehabInfoCards {
+    margin-bottom: 30px;
+  }
+  
+  .rehabTable th, .rehabTable td {
+    padding: 15px 20px;
+  }
+  
+  .exerciseDetailContent {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .exerciseDetailNotes {
+    grid-column: span 4;
+  }
+  
+  .exerciseDetailProgress {
+    grid-column: span 4;
+  }
+}

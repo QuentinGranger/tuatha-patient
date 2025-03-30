@@ -11,6 +11,11 @@ import BodyComposition from '@/app/components/BodyComposition';
 import ProgressSlider from '@/app/components/ProgressSlider';
 import AlertJournal, { Alert, AlertType } from '@/app/components/AlertJournal';
 import PrescriptionList, { Prescription } from '@/app/components/PrescriptionList';
+import VideoLibrary from '@/app/components/VideoLibrary';
+import ActionButtons from '@/app/components/ActionButtons';
+import RehabProgress from '@/app/components/RehabProgress';
+import RehabHistory from '@/app/components/RehabHistory';
+import RehabTable from '@/app/components/RehabTable';
 import jsPDF from 'jspdf';
 
 interface Practitioner {
@@ -945,27 +950,48 @@ export default function PraticienPage() {
                 <div style={{ 
                   width: '12px', 
                   height: '12px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  marginRight: '10px',
+                  background: 'rgba(0, 38, 65, 0.5)',
                   borderRadius: '50%', 
-                  backgroundColor: '#4CAF50' 
-                }}></div>
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+                }}>
+                  <FaCarrot style={{ color: '#FF6B00' }} />
+                </div>
                 <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)' }}>Consommé</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                 <div style={{ 
                   width: '12px', 
                   height: '12px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  marginRight: '10px',
+                  background: 'rgba(255, 59, 48, 0.5)',
                   borderRadius: '50%', 
-                  backgroundColor: '#F44336' 
-                }}></div>
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+                }}>
+                  <FaBreadSlice style={{ color: '#F44336' }} />
+                </div>
                 <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)' }}>Non consommé</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                 <div style={{ 
                   width: '12px', 
                   height: '12px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  marginRight: '10px',
+                  background: 'rgba(255, 107, 0, 0.5)',
                   borderRadius: '50%', 
-                  backgroundColor: '#FF9800' 
-                }}></div>
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+                }}>
+                  <FaAppleAlt style={{ color: '#FF9800' }} />
+                </div>
                 <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)' }}>En attente</span>
               </div>
             </div>
@@ -975,236 +1001,96 @@ export default function PraticienPage() {
             </p>
           </div>
           
-          {meals.map((meal: Meal) => {
-            const status = mealStatuses[meal.id] || 'pending';
-            let statusColor = '';
-            let statusText = '';
-            let statusIcon = null;
-            
-            // Définir la couleur et le texte selon le statut
-            if (status === 'consumed') {
-              statusColor = 'rgba(76, 175, 80, 0.3)';
-              statusText = 'Consommé';
-              statusIcon = '✓';
-            } else if (status === 'skipped') {
-              statusColor = 'rgba(244, 67, 54, 0.3)';
-              statusText = 'Non consommé';
-              statusIcon = '✗';
-            } else {
-              statusColor = 'rgba(255, 152, 0, 0.3)';
-              statusText = 'En attente';
-              statusIcon = '⏱️';
-            }
-            
-            // Calculer le décalage de la carte pendant le swipe
-            const isCurrentSwipe = currentSwipeMeal === meal.id;
-            const translateX = isCurrentSwipe ? -swipeDistance : 0;
-            
-            // Calculer l'opacité des indicateurs de swipe
-            const leftIndicatorOpacity = isCurrentSwipe && swipeDistance > 0 ? Math.min(swipeDistance / 100, 1) : 0;
-            const rightIndicatorOpacity = isCurrentSwipe && swipeDistance < 0 ? Math.min(-swipeDistance / 100, 1) : 0;
-            
-            return (
-              <div 
-                key={meal.id} 
-                style={{
-                  marginBottom: '25px',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}
-              >
-                {/* Indicateurs de swipe (à l'extérieur de la carte) */}
-                <div style={{
-                  position: 'absolute',
-                  left: '10px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'rgba(244, 67, 54, 0.9)',
-                  borderRadius: '50%',
-                  width: '40px',
-                  height: '40px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  fontSize: '20px',
-                  opacity: rightIndicatorOpacity,
-                  transition: isCurrentSwipe ? 'none' : 'opacity 0.3s ease',
-                  zIndex: 1
-                }}>
-                  ✗
-                </div>
-                
-                <div style={{
-                  position: 'absolute',
-                  right: '10px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'rgba(76, 175, 80, 0.9)',
-                  borderRadius: '50%',
-                  width: '40px',
-                  height: '40px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  fontSize: '20px',
-                  opacity: leftIndicatorOpacity,
-                  transition: isCurrentSwipe ? 'none' : 'opacity 0.3s ease',
-                  zIndex: 1
-                }}>
-                  ✓
-                </div>
-                
-                {/* Carte du repas */}
-                <div 
-                  style={{
-                    background: `rgba(0, 38, 65, 0.25)`,
-                    backdropFilter: 'blur(10px)',
-                    WebkitBackdropFilter: 'blur(10px)',
-                    borderRadius: '15px',
-                    padding: '15px',
-                    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    transition: isCurrentSwipe ? 'none' : 'all 0.3s ease',
-                    transform: `translateX(${translateX}px)`,
-                    backgroundColor: 
-                      (isCurrentSwipe && swipeDistance < 0) ? 'rgba(244, 67, 54, 0.2)' : // Rouge quand on swipe vers la gauche
-                      (isCurrentSwipe && swipeDistance > 0) ? 'rgba(76, 175, 80, 0.2)' : // Vert quand on swipe vers la droite
-                      status === 'consumed' ? 'rgba(76, 175, 80, 0.3)' : 
-                      status === 'skipped' ? 'rgba(244, 67, 54, 0.3)' : 
-                      'rgba(255, 152, 0, 0.3)',
-                    zIndex: 2
-                  }}
-                  onTouchStart={(e) => handleTouchStart(e, meal.id)}
-                  onTouchMove={handleTouchMove}
-                  onTouchEnd={handleTouchEnd}
-                >
-                  {/* Indicateur de statut avec animation */}
-                  <div style={{
-                    position: 'absolute',
-                    top: '0',
-                    left: '0',
-                    width: '100%',
-                    height: '100%',
-                    background: 
-                      (isCurrentSwipe && swipeDistance < 0) ? 'rgba(244, 67, 54, 0.3)' : // Rouge quand on swipe vers la gauche
-                      (isCurrentSwipe && swipeDistance > 0) ? 'rgba(76, 175, 80, 0.3)' : // Vert quand on swipe vers la droite
-                      statusColor,
-                    opacity: 0.5,
-                    zIndex: 0,
-                    pointerEvents: 'none',
-                    transition: isCurrentSwipe ? 'none' : 'background 0.3s ease'
-                  }}></div>
-                  
-                  <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center',
-                    marginBottom: '12px',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-                    paddingBottom: '8px',
-                    position: 'relative',
-                    zIndex: 1
+          {meals.map((meal: Meal) => (
+            <div key={meal.id} style={{
+              marginBottom: '25px',
+              background: 'rgba(0, 38, 65, 0.25)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              borderRadius: '12px',
+              padding: '15px',
+              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1)'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <h3 style={{ margin: 0, fontSize: '18px' }}>{meal.name}</h3>
+                <span style={{ 
+                  marginLeft: '10px', 
+                  fontSize: '14px',
+                  color: 'rgba(255, 255, 255, 0.6)'
+                }}>{meal.time}</span>
+              </div>
+              
+              <div>
+                {meal.foods.map((food: Food) => (
+                  <div key={food.name} style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    padding: '8px 0',
+                    borderBottom: food === meal.foods[meal.foods.length - 1] ? 'none' : '1px solid rgba(255, 255, 255, 0.05)'
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <h3 style={{ 
-                        fontSize: '18px', 
-                        fontWeight: 'bold',
-                        margin: 0,
-                        color: '#FF6B00'
-                      }}>{meal.name}</h3>
-                      <span style={{ 
-                        marginLeft: '10px', 
-                        fontSize: '14px',
-                        color: 'rgba(255, 255, 255, 0.6)'
-                      }}>{meal.time}</span>
-                    </div>
-                    <div style={{
-                      background: 'rgba(255, 107, 0, 0.2)',
-                      padding: '5px 10px',
-                      borderRadius: '20px',
-                      fontSize: '14px',
-                      fontWeight: 'bold'
-                    }}>
-                      {totalMealCalories(meal.foods)} kcal
-                    </div>
-                  </div>
-                  
-                  <div>
-                    {meal.foods.map((food: Food) => (
-                      <div key={food.name} style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        padding: '8px 0',
-                        borderBottom: food === meal.foods[meal.foods.length - 1] ? 'none' : '1px solid rgba(255, 255, 255, 0.05)'
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <div style={{ 
-                            width: '30px', 
-                            height: '30px', 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            justifyContent: 'center',
-                            marginRight: '10px',
-                            background: 'rgba(0, 17, 13, 0.5)',
-                            borderRadius: '8px',
-                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
-                          }}>
-                            {food.icon}
-                          </div>
-                          <span>{food.name}</span>
-                        </div>
-                        <div style={{ 
-                          display: 'flex', 
-                          flexDirection: 'column', 
-                          alignItems: 'flex-end',
-                          fontSize: '13px'
-                        }}>
-                          <span style={{ fontWeight: 'bold' }}>{food.calories} kcal</span>
-                          <span style={{ 
-                            color: 'rgba(255, 255, 255, 0.6)', 
-                            fontSize: '11px' 
-                          }}>
-                            P: {food.proteins}g • G: {food.carbs}g • L: {food.fats}g
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  {/* Boutons de contrôle manuel */}
-                  <div style={{ 
-                    marginTop: '15px', 
-                    display: 'flex', 
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                  }}>
-                    <button 
-                      onClick={() => handleEditMeal(meal)}
-                      style={{
-                        background: 'rgba(255, 255, 255, 0.1)',
-                        border: 'none',
-                        padding: '8px 15px',
+                      <div style={{ 
+                        width: '30px', 
+                        height: '30px', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center',
+                        marginRight: '10px',
+                        background: 'rgba(0, 17, 13, 0.5)',
                         borderRadius: '8px',
-                        color: 'white',
-                        cursor: 'pointer',
-                        backdropFilter: 'blur(5px)',
-                        WebkitBackdropFilter: 'blur(5px)',
-                        fontSize: '14px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                      }}
-                    >
-                      Modifier
-                    </button>
+                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
+                      }}>
+                        {food.icon}
+                      </div>
+                      <span>{food.name}</span>
+                    </div>
+                    <div style={{ 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      alignItems: 'flex-end',
+                      fontSize: '13px'
+                    }}>
+                      <span style={{ fontWeight: 'bold' }}>{food.calories} kcal</span>
+                      <span style={{ 
+                        color: 'rgba(255, 255, 255, 0.6)', 
+                        fontSize: '11px' 
+                      }}>
+                        P: {food.proteins}g • G: {food.carbs}g • L: {food.fats}g
+                      </span>
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
-            );
-          })}
+              
+              {/* Boutons de contrôle manuel */}
+              <div style={{ 
+                marginTop: '15px', 
+                display: 'flex', 
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <button 
+                  onClick={() => handleEditMeal(meal)}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    border: 'none',
+                    padding: '8px 15px',
+                    borderRadius: '8px',
+                    color: 'white',
+                    cursor: 'pointer',
+                    backdropFilter: 'blur(5px)',
+                    WebkitBackdropFilter: 'blur(5px)',
+                    fontSize: '14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  Modifier
+                </button>
+              </div>
+            </div>
+          ))}
           
           <div style={{ 
             display: 'flex', 
@@ -1449,6 +1335,9 @@ export default function PraticienPage() {
                 padding: '8px 15px',
                 color: 'white',
                 cursor: 'pointer',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                fontSize: '14px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px'
@@ -1687,60 +1576,194 @@ export default function PraticienPage() {
             />
           )}
           
-          {/* Boutons d'action */}
+          {/* Boutons d'action entre le calendrier et la bibliothèque vidéo */}
           <div style={{
-            display: 'flex',
-            gap: '10px',
-            marginTop: '20px',
-            flexDirection: 'column' // Empilés pour mobile
+            marginTop: '25px',
+            background: 'rgba(0, 38, 65, 0.25)',
+            borderRadius: '15px',
+            padding: '15px',
+            boxShadow: '0 8px 20px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.08)'
           }}>
-            <button 
-              onClick={() => {
-                // Obtenir la date d'aujourd'hui au format YYYY-MM-DD
-                const today = new Date();
-                const yyyy = today.getFullYear();
-                const mm = String(today.getMonth() + 1).padStart(2, '0');
-                const dd = String(today.getDate()).padStart(2, '0');
-                const formattedDate = `${yyyy}-${mm}-${dd}`;
-                
-                // Appeler la fonction handleAddAppointment avec la date d'aujourd'hui
-                handleAddAppointment(formattedDate);
-              }}
-              style={{
-                padding: '12px 20px',
-                borderRadius: '12px',
-                border: 'none',
-                background: 'linear-gradient(145deg, #FF6B00, #FF9248)',
-                color: 'white',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                boxShadow: '0 4px 12px rgba(255, 107, 0, 0.3)',
-                flex: '1',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              Prendre rendez-vous
-            </button>
-            
-            <button 
-              onClick={() => setShowPaymentModal(true)}
-              style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                color: 'white',
-                border: '1px solid rgba(255, 107, 0, 0.4)',
-                borderRadius: '12px',
-                padding: '12px 20px',
-                fontSize: '16px',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                flex: '1',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              Payer en ligne
-            </button>
+            <ActionButtons 
+              onAppointment={handleAddAppointment}
+              onPayment={() => setShowPaymentModal(true)}
+            />
           </div>
+          
+          {/* Bibliothèque vidéo pour Tony Stark */}
+          {practitioner.id === 4 && isMounted && (
+            <div style={{ marginTop: '25px' }}>
+              <VideoLibrary 
+                title="Vidéos d'exercices - Kinésithérapie"
+                subtitle="Visionnez ces exercices recommandés pour compléter votre traitement"
+                videos={[
+                  {
+                    id: "1",
+                    title: "Exercices pour douleurs lombaires",
+                    description: "Série d'exercices doux pour soulager les douleurs lombaires. À pratiquer quotidiennement pendant 10 minutes pour renforcer progressivement les muscles du dos et améliorer la mobilité.",
+                    url: "/img/video/kine/video1.mp4",
+                    category: "Dos"
+                  },
+                  {
+                    id: "2",
+                    title: "Mobilité des épaules",
+                    description: "Programme complet pour restaurer la mobilité des épaules et renforcer la coiffe des rotateurs. Idéal pour les personnes souffrant de douleurs chroniques ou en récupération post-opératoire.",
+                    url: "/img/video/kine/video2.mp4",
+                    category: "Épaules"
+                  },
+                  {
+                    id: "3",
+                    title: "Renforcement du genou",
+                    description: "Exercices ciblés pour renforcer l'articulation du genou et les muscles environnants. Particulièrement recommandé après une entorse ou pour les douleurs liées à l'arthrose.",
+                    url: "/img/video/kine/video3.mp4",
+                    category: "Genoux"
+                  },
+                  {
+                    id: "4",
+                    title: "Étirements cervicaux",
+                    description: "Séquence d'étirements doux pour soulager les tensions cervicales et améliorer la mobilité du cou. Parfait pour les personnes travaillant longtemps sur ordinateur ou souffrant de migraines.",
+                    url: "/img/video/kine/video4.mp4",
+                    category: "Cervicales"
+                  },
+                  {
+                    id: "5",
+                    title: "Rééducation de la cheville",
+                    description: "Programme progressif pour retrouver stabilité et force après une entorse de la cheville. Ces exercices améliorent la proprioception et renforcent les muscles stabilisateurs.",
+                    url: "/img/video/kine/video5.mp4",
+                    category: "Chevilles"
+                  }
+                ]}
+              />
+            </div>
+          )}
+          
+          {/* Composant de progression de rééducation pour Tony Stark */}
+          {practitioner.id === 4 && isMounted && (
+            <div style={{ marginTop: '25px' }}>
+              <RehabProgress
+                patientName="Jean Dupont"
+                injury="Entorse grave de la cheville gauche"
+                startDate="2025-02-10"
+                estimatedEndDate="2025-05-15"
+                currentProgress={65}
+                metrics={[
+                  {
+                    id: "1",
+                    name: "Amplitude de mouvement (degrés)",
+                    unit: "°",
+                    values: [
+                      { date: "2025-02-10", value: 10 },
+                      { date: "2025-02-17", value: 15 },
+                      { date: "2025-02-24", value: 22 },
+                      { date: "2025-03-03", value: 28 },
+                      { date: "2025-03-10", value: 35 },
+                      { date: "2025-03-17", value: 42 },
+                      { date: "2025-03-24", value: 48 }
+                    ],
+                    target: 70
+                  },
+                  {
+                    id: "2",
+                    name: "Force musculaire (échelle 0-5)",
+                    unit: "",
+                    values: [
+                      { date: "2025-02-10", value: 1.5 },
+                      { date: "2025-02-24", value: 2.0 },
+                      { date: "2025-03-10", value: 3.0 },
+                      { date: "2025-03-24", value: 3.5 }
+                    ],
+                    target: 5
+                  },
+                  {
+                    id: "3",
+                    name: "Distance de marche sans douleur",
+                    unit: "m",
+                    values: [
+                      { date: "2025-02-10", value: 50 },
+                      { date: "2025-02-24", value: 100 },
+                      { date: "2025-03-10", value: 250 },
+                      { date: "2025-03-24", value: 500 }
+                    ],
+                    target: 1000
+                  },
+                  {
+                    id: "4",
+                    name: "Douleur (échelle 0-10)",
+                    unit: "",
+                    values: [
+                      { date: "2025-02-10", value: 8 },
+                      { date: "2025-02-17", value: 7 },
+                      { date: "2025-02-24", value: 6 },
+                      { date: "2025-03-03", value: 5 },
+                      { date: "2025-03-10", value: 4 },
+                      { date: "2025-03-17", value: 3 },
+                      { date: "2025-03-24", value: 2 }
+                    ],
+                    target: 0
+                  }
+                ]}
+                goals={[
+                  {
+                    id: "g1",
+                    title: "Marcher sans béquilles",
+                    description: "Capacité à marcher 100m sans support ni assistance",
+                    targetDate: "2025-03-01",
+                    isCompleted: true
+                  },
+                  {
+                    id: "g2",
+                    title: "Monter un escalier standard",
+                    description: "Monter un étage d'escalier sans assistance et avec un mouvement fluide",
+                    targetDate: "2025-03-15",
+                    isCompleted: true
+                  },
+                  {
+                    id: "g3",
+                    title: "Courir sur tapis roulant",
+                    description: "Courir 5 minutes à 8 km/h sans douleur",
+                    targetDate: "2025-04-01",
+                    isCompleted: false
+                  },
+                  {
+                    id: "g4",
+                    title: "Réaliser 10 sauts de petite hauteur",
+                    description: "Effectuer 10 sauts consécutifs avec réception contrôlée sans douleur",
+                    targetDate: "2025-04-15",
+                    isCompleted: false
+                  },
+                  {
+                    id: "g5",
+                    title: "Reprise de l'activité sportive complète",
+                    description: "Retour aux activités sportives habituelles sans limitation",
+                    targetDate: "2025-05-10",
+                    isCompleted: false
+                  }
+                ]}
+              />
+            </div>
+          )}
+          
+          {/* Historique des rééducations pour Tony Stark */}
+          {practitioner.id === 4 && isMounted && (
+            <div style={{ marginTop: '25px' }}>
+              <RehabHistory
+                patientName="Jean Dupont"
+                patientId="P-12345"
+              />
+            </div>
+          )}
+          
+          {/* Tableau de rééducation pour Tony Stark */}
+          {practitioner.id === 4 && isMounted && (
+            <div style={{ marginTop: '25px' }}>
+              <RehabTable
+                patientName="Jean Dupont"
+                patientId="P-12345"
+              />
+            </div>
+          )}
+          
+          {/* Les boutons d'action ont été supprimés */}
         </div>
         
         {/* Ces composants ne doivent apparaître que pour la nutritionniste (ID 1) */}
@@ -1894,10 +1917,10 @@ export default function PraticienPage() {
             backdropFilter: 'blur(15px)',
             WebkitBackdropFilter: 'blur(15px)',
             borderRadius: '20px',
+            padding: '25px',
             boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
             overflow: 'hidden',
             color: 'white',
-            padding: '25px'
           }}>
             <h2 style={{
               fontSize: '1.5rem',
@@ -1916,9 +1939,9 @@ export default function PraticienPage() {
               marginBottom: '25px',
               color: 'rgba(255, 255, 255, 0.8)'
             }}>
-              {practitioner.id === 1 && "Partagez vos journaux alimentaires, analyses nutritionnelles et objectifs."}
-              {practitioner.id === 2 && "Partagez vos résultats d'examens, dossiers médicaux et ordonnances."}
-              {practitioner.id === 3 && "Partagez vos plans d'entraînement, suivis de performances et objectifs sportifs."}
+              {practitioner.id === 1 && "Partagez vos journaux alimentaires, analyses nutritionnelles ou journaux alimentaires."}
+              {practitioner.id === 2 && "Partagez vos résultats d'examens, dossiers médicaux ou informations importantes concernant votre santé."}
+              {practitioner.id === 3 && "Partagez vos plans d'entraînement, suivis de performances ou objectifs sportifs."}
               {practitioner.id === 4 && "Partagez vos radiographies, bilans et notes d'exercices de rééducation."}
             </p>
 
@@ -1952,64 +1975,17 @@ export default function PraticienPage() {
                     flexDirection: 'column',
                     gap: '10px'
                   }}>
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      justifyContent: 'space-between',
-                      width: '100%'
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div style={{
-                          width: '42px',
-                          height: '42px',
-                          borderRadius: '10px',
-                          backgroundColor: 'rgba(255, 107, 0, 0.15)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: '#FF6B00',
-                          fontSize: '20px'
-                        }}>
-                          <FaFileAlt />
-                        </div>
-                        <div>
-                          <h3 style={{
-                            margin: 0,
-                            fontSize: '1rem',
-                            fontWeight: '600',
-                            color: 'white'
-                          }}>{doc.title}</h3>
-                          <p style={{
-                            margin: '3px 0 0',
-                            fontSize: '0.85rem',
-                            color: 'rgba(255, 255, 255, 0.7)'
-                          }}>{doc.fileName}</p>
-                        </div>
-                      </div>
-                      <div>
-                        <button style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#FF6B00',
-                          fontSize: '1.1rem',
-                          cursor: 'pointer',
-                          padding: '5px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          borderRadius: '8px',
-                          transition: 'background-color 0.2s'
-                        }} aria-label="Télécharger le document">
-                          <FaDownload />
-                        </button>
-                      </div>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%' }}>
+                      <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: 'white' }}>{doc.title}</h3>
+                      <span style={{ 
+                        marginLeft: '10px', 
+                        fontSize: '14px',
+                        color: 'rgba(255, 255, 255, 0.6)'
+                      }}>{doc.fileName}</span>
                     </div>
-                    <p style={{
-                      margin: '0',
-                      fontSize: '0.9rem',
-                      color: 'rgba(255, 255, 255, 0.8)',
-                      lineHeight: '1.4'
-                    }}>{doc.description}</p>
+                    <p style={{ margin: '0', fontSize: '0.9rem', color: 'rgba(255, 255, 255, 0.8)' }}>
+                      {doc.description}
+                    </p>
                     <div style={{
                       display: 'flex',
                       justifyContent: 'space-between',
@@ -2031,7 +2007,7 @@ export default function PraticienPage() {
                 ))
               )}
             </div>
-
+            
             {/* Bouton pour ajouter un document */}
             <button
               onClick={() => setShowDocumentModal(true)}
@@ -2116,7 +2092,7 @@ export default function PraticienPage() {
               onChange={(e) => setNewAppointmentTime(e.target.value)}
               style={{
                 width: '100%',
-                padding: '12px 16px',
+                padding: '12px 15px',
                 borderRadius: '12px',
                 border: '1px solid rgba(255, 107, 0, 0.3)',
                 backgroundColor: 'rgba(0, 38, 65, 0.25)',
@@ -2318,11 +2294,11 @@ export default function PraticienPage() {
                   WebkitAppearance: 'none',
                   appearance: 'none',
                   backgroundImage: !selectedAppointmentForPayment ? `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23FF6B00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")` : 'none',
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: !selectedAppointmentForPayment ? 'right 16px center' : 'center',
-                  paddingRight: selectedAppointmentForPayment ? '16px' : '40px',
-                  opacity: selectedAppointmentForPayment ? 0.8 : 1
-                }}
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: !selectedAppointmentForPayment ? 'right 16px center' : 'center',
+                paddingRight: selectedAppointmentForPayment ? '16px' : '40px',
+                opacity: selectedAppointmentForPayment ? 0.8 : 1
+              }}
               >
                 <option value="">Sélectionnez un rendez-vous...</option>
                 {pendingAppointments.map((app) => (
@@ -2346,9 +2322,9 @@ export default function PraticienPage() {
               gap: '12px'
             }}>
               <p style={{ 
-                margin: 0, 
-                fontSize: '14px', 
-                color: 'rgba(255, 255, 255, 0.9)'
+                margin: '0',
+                fontSize: '13px',
+                color: 'rgba(255, 255, 255, 0.95)'
               }}>
                 Aucun rendez-vous en attente de règlement avec ce praticien.
               </p>
@@ -2533,20 +2509,12 @@ export default function PraticienPage() {
               placeholder="NOM Prénom"
               style={{
                 width: '100%',
-                padding: '12px 16px',
-                borderRadius: '12px',
-                border: formErrors.cardHolder 
-                  ? '1px solid rgba(255, 0, 0, 0.5)' 
-                  : '1px solid rgba(255, 107, 0, 0.3)',
-                backgroundColor: 'rgba(0, 38, 65, 0.25)',
+                padding: '12px 15px',
+                background: 'rgba(0, 17, 13, 0.4)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '10px',
                 color: 'white',
-                fontSize: '15px',
-                boxShadow: formErrors.cardHolder 
-                  ? 'inset 0 2px 5px rgba(255, 0, 0, 0.1)' 
-                  : 'inset 0 2px 5px rgba(0, 0, 0, 0.1)',
-                backdropFilter: 'blur(5px)',
-                outline: 'none',
-                transition: 'all 0.2s ease'
+                fontSize: '15px'
               }}
             />
             {formErrors.cardHolder && (
@@ -2675,24 +2643,26 @@ export default function PraticienPage() {
             alignItems: 'center',
             gap: '12px'
           }}>
-            <div style={{ 
-              background: 'rgba(255, 107, 0, 0.2)', 
-              borderRadius: '50%', 
-              width: '32px', 
-              height: '32px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center' 
-            }}>
-              <FaLock size={14} color="#FF6B00" />
+            <div>
+              <div style={{ 
+                background: 'rgba(255, 107, 0, 0.2)', 
+                borderRadius: '50%', 
+                width: '32px', 
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center' 
+              }}>
+                <FaLock size={14} color="#FF6B00" />
+              </div>
+              <p style={{ 
+                margin: '0',
+                fontSize: '13px',
+                color: 'rgba(255, 255, 255, 0.8)'
+              }}>
+                Vos informations de paiement sont sécurisées. Nous utilisons un cryptage SSL pour protéger vos données.
+              </p>
             </div>
-            <p style={{ 
-              margin: '0',
-              fontSize: '13px',
-              color: 'rgba(255, 255, 255, 0.8)'
-            }}>
-              Vos informations de paiement sont sécurisées. Nous utilisons un cryptage SSL pour protéger vos données.
-            </p>
           </div>
           
           {formErrors.general && (
@@ -3027,3 +2997,7 @@ export default function PraticienPage() {
     </div>
   );
 }
+
+```
+
+```tsx

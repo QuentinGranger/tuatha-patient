@@ -1,14 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
-import { FaPlayCircle, FaExpand, FaVolumeMute, FaVolumeUp, FaTimes } from 'react-icons/fa';
+import React, { useState, useRef } from 'react';
+import { FaPlayCircle, FaExpand, FaVolumeMute, FaVolumeUp, FaTimes, FaChevronLeft, FaChevronRight, FaFilter } from 'react-icons/fa';
 
 interface Video {
   id: string;
   title: string;
   description: string;
-  thumbnail: string;
   url: string;
+  category: string;
 }
 
 interface VideoLibraryProps {
@@ -25,6 +25,8 @@ const VideoLibrary: React.FC<VideoLibraryProps> = ({
   const [activeVideo, setActiveVideo] = useState<Video | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const handleVideoClick = (video: Video) => {
     setActiveVideo(video);
@@ -33,6 +35,28 @@ const VideoLibrary: React.FC<VideoLibraryProps> = ({
   const closeVideo = () => {
     setActiveVideo(null);
     setIsPlaying(false);
+  };
+
+  // Extraire les catégories uniques des vidéos
+  const categories = ['all', ...Array.from(new Set(videos.map(video => video.category)))];
+  
+  // Filtrer les vidéos en fonction de la catégorie sélectionnée
+  const filteredVideos = selectedCategory === 'all' 
+    ? videos 
+    : videos.filter(video => video.category === selectedCategory);
+
+  // Fonction pour faire défiler horizontalement
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const { current } = scrollContainerRef;
+      const scrollAmount = 300; // Pixels to scroll
+      
+      if (direction === 'left') {
+        current.scrollLeft -= scrollAmount;
+      } else {
+        current.scrollLeft += scrollAmount;
+      }
+    }
   };
 
   return (
@@ -58,19 +82,134 @@ const VideoLibrary: React.FC<VideoLibraryProps> = ({
       </h2>
       <p style={{
         fontSize: '0.95rem',
-        marginBottom: '25px',
+        marginBottom: '20px',
         color: 'rgba(255, 255, 255, 0.8)'
       }}>
         {subtitle}
       </p>
 
+      {/* Filtres de catégories */}
       <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-        gap: '20px',
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '10px',
         marginBottom: '20px'
       }}>
-        {videos.map((video) => (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '5px',
+          color: 'rgba(255, 255, 255, 0.9)',
+          fontSize: '0.9rem',
+          marginRight: '5px'
+        }}>
+          <FaFilter size={14} />
+          <span>Filtrer:</span>
+        </div>
+        
+        {categories.map(category => (
+          <button
+            key={category}
+            onClick={() => setSelectedCategory(category)}
+            style={{
+              background: selectedCategory === category 
+                ? 'linear-gradient(145deg, #FF6B00, #FF9248)' 
+                : 'rgba(0, 17, 13, 0.4)',
+              border: 'none',
+              borderRadius: '20px',
+              padding: '6px 12px',
+              fontSize: '0.85rem',
+              color: 'white',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              fontWeight: selectedCategory === category ? 'bold' : 'normal',
+              boxShadow: selectedCategory === category 
+                ? '0 4px 10px rgba(255, 107, 0, 0.3)' 
+                : 'none'
+            }}
+          >
+            {category === 'all' ? 'Tous' : category}
+          </button>
+        ))}
+      </div>
+
+      {/* Contrôles de défilement */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '15px'
+      }}>
+        <button
+          onClick={() => scroll('left')}
+          style={{
+            background: 'rgba(0, 17, 13, 0.5)',
+            border: 'none',
+            borderRadius: '50%',
+            width: '36px',
+            height: '36px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            color: 'white',
+            cursor: 'pointer',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)'
+          }}
+        >
+          <FaChevronLeft />
+        </button>
+        <span style={{ 
+          fontSize: '0.9rem', 
+          color: 'rgba(255, 255, 255, 0.7)'
+        }}>
+          {filteredVideos.length} vidéo{filteredVideos.length !== 1 ? 's' : ''}
+        </span>
+        <button
+          onClick={() => scroll('right')}
+          style={{
+            background: 'rgba(0, 17, 13, 0.5)',
+            border: 'none',
+            borderRadius: '50%',
+            width: '36px',
+            height: '36px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            color: 'white',
+            cursor: 'pointer',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)'
+          }}
+        >
+          <FaChevronRight />
+        </button>
+      </div>
+
+      <div 
+        ref={scrollContainerRef}
+        style={{
+          display: 'flex',
+          overflowX: 'auto',
+          gap: '20px',
+          marginBottom: '20px',
+          padding: '5px 0',
+          scrollBehavior: 'smooth',
+          msOverflowStyle: 'none', // IE and Edge
+          scrollbarWidth: 'none', // Firefox
+          WebkitOverflowScrolling: 'touch', // iOS momentum scrolling
+          position: 'relative'
+        }}
+      >
+        <style jsx global>{`
+          div[data-video-scroller] {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+          div[data-video-scroller]::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
+        
+        {filteredVideos.map((video) => (
           <div 
             key={video.id} 
             onClick={() => handleVideoClick(video)}
@@ -82,7 +221,11 @@ const VideoLibrary: React.FC<VideoLibraryProps> = ({
               boxShadow: '0 4px 15px rgba(0, 0, 0, 0.3)',
               background: 'rgba(0, 17, 13, 0.5)',
               aspectRatio: '16/9',
+              minWidth: '280px',
+              maxWidth: '280px',
+              flex: '0 0 auto'
             }}
+            data-category={video.category}
           >
             <div style={{
               position: 'absolute',
@@ -90,9 +233,8 @@ const VideoLibrary: React.FC<VideoLibraryProps> = ({
               left: 0,
               width: '100%',
               height: '100%',
-              background: `url(${video.thumbnail}) no-repeat center center`,
+              background: 'rgba(0, 17, 13, 0.7)',
               backgroundSize: 'cover',
-              filter: 'brightness(0.7)'
             }} />
             
             <div style={{
@@ -120,6 +262,18 @@ const VideoLibrary: React.FC<VideoLibraryProps> = ({
                     fontWeight: 'bold',
                     color: 'white'
                   }}>{video.title}</h3>
+                  
+                  <span style={{
+                    display: 'inline-block',
+                    fontSize: '0.8rem',
+                    color: 'rgba(255, 255, 255, 0.8)',
+                    backgroundColor: 'rgba(255, 107, 0, 0.3)',
+                    borderRadius: '10px',
+                    padding: '2px 8px',
+                    marginTop: '5px'
+                  }}>
+                    {video.category}
+                  </span>
                 </div>
                 <div style={{
                   width: '40px',
@@ -253,14 +407,30 @@ const VideoLibrary: React.FC<VideoLibraryProps> = ({
             maxWidth: '900px',
             color: 'white',
           }}>
-            <h2 style={{ 
-              fontSize: '1.8rem', 
-              fontWeight: 'bold',
-              marginBottom: '10px',
-              color: '#FF6B00' 
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '10px'
             }}>
-              {activeVideo.title}
-            </h2>
+              <h2 style={{ 
+                fontSize: '1.8rem', 
+                fontWeight: 'bold',
+                margin: 0,
+                color: '#FF6B00' 
+              }}>
+                {activeVideo.title}
+              </h2>
+              <span style={{
+                fontSize: '0.9rem',
+                color: 'rgba(255, 255, 255, 0.8)',
+                backgroundColor: 'rgba(255, 107, 0, 0.3)',
+                borderRadius: '10px',
+                padding: '4px 10px'
+              }}>
+                {activeVideo.category}
+              </span>
+            </div>
             <p style={{ fontSize: '1rem', lineHeight: '1.6' }}>
               {activeVideo.description}
             </p>
