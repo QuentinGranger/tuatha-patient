@@ -1229,7 +1229,7 @@ export default function PraticienPage() {
             </div>
           </div>
           
-          <div style={{ 
+          <div style={{
             display: 'flex', 
             justifyContent: 'center', 
             marginTop: '20px' 
@@ -1297,7 +1297,7 @@ export default function PraticienPage() {
           : meal
       );
       
-      // Fermer la modale d'édition
+      // Fermer la modale
       setShowEditMealModal(false);
       setCurrentEditMeal(null);
     };
@@ -1746,153 +1746,27 @@ export default function PraticienPage() {
         {/* Afficher le suivi nutritionnel uniquement pour Jessica Jones */}
         {renderNutritionTracking()}
         
-        {/* Bouton pour partager un document */}
-        {practitioner?.id === 1 && (
-          <div style={{ 
-            marginTop: '40px',
-            marginBottom: '20px',
-            padding: '0 20px'
-          }}>
-            {/* Bouton pour ajouter un document */}
-            <div style={{
-              width: '100%',
-              background: 'rgba(0, 38, 65, 0.35)',
-              backdropFilter: 'blur(15px)',
-              WebkitBackdropFilter: 'blur(15px)',
-              borderRadius: '20px',
-              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
-              overflow: 'hidden',
-              color: 'white',
-              marginBottom: '25px',
-              padding: '20px'
-            }}>
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '15px'
-              }}>
-                <h3 style={{
-                  margin: 0,
-                  fontSize: '18px',
-                  fontWeight: 'bold',
-                  color: '#FF6B00'
-                }}>
-                  Documents partagés
-                </h3>
-                <button
-                  onClick={() => setShowDocumentModal(true)}
-                  style={{
-                    padding: '10px 15px',
-                    borderRadius: '12px',
-                    border: 'none',
-                    background: 'rgba(255, 107, 0, 0.2)',
-                    color: '#FF6B00',
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.05)'
-                  }}
-                >
-                  <FaFileUpload /> Partager un document
-                </button>
-              </div>
-              
-              {/* Liste des documents partagés */}
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px'
-              }}>
-                {sharedDocuments.map(doc => (
-                  <div 
-                    key={doc.id}
-                    style={{
-                      background: 'rgba(0, 17, 13, 0.4)',
-                      borderRadius: '12px',
-                      padding: '15px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '15px'
-                    }}
-                  >
-                    <div style={{ 
-                      width: '40px', 
-                      height: '40px', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center',
-                      marginRight: '10px',
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      borderRadius: '10px',
-                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
-                    }}>
-                      <FaFileAlt />
-                    </div>
-                    
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 'bold' }}>{doc.title}</div>
-                      <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)' }}>
-                        {doc.description}
-                      </div>
-                      <div style={{ 
-                        display: 'flex', 
-                        gap: '15px', 
-                        marginTop: '8px',
-                        fontSize: '12px',
-                        color: 'rgba(255, 255, 255, 0.5)'
-                      }}>
-                        <span>{doc.fileName}</span>
-                        <span>{new Date(doc.date).toLocaleDateString('fr-FR')}</span>
-                        <span>{doc.size}</span>
-                      </div>
-                    </div>
-                    
-                    <button
-                      style={{
-                        background: 'transparent',
-                        border: 'none',
-                        color: 'rgba(255, 255, 255, 0.7)',
-                        cursor: 'pointer',
-                        fontSize: '18px',
-                        padding: '5px',
-                        borderRadius: '5px'
-                      }}
-                      title="Télécharger"
-                    >
-                      <FaDownload />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            {/* Composition corporelle actuelle */}
-            <BodyComposition 
-              weight={20}
-              waistSize={42}
-              hydration={65}
-              bodyFat={18}
-              height={120}
-            />
-            
-            {/* Slider d'évolution des métriques */}
-            <div style={{ marginTop: '30px' }}>
-              <ProgressSlider data={progressData} />
-            </div>
-            
-            {/* Journal d'alertes */}
-            <div style={{ marginTop: '30px' }}>
-              <AlertJournal 
-                alerts={alerts}
-                onMarkAsRead={handleMarkAsRead}
-              />
-            </div>
-          </div>
-        )}
+        {/* Composition corporelle actuelle */}
+        <BodyComposition 
+          weight={20}
+          waistSize={42}
+          hydration={65}
+          bodyFat={18}
+          height={120}
+        />
         
+        {/* Slider d'évolution des métriques */}
+        <div style={{ marginTop: '30px' }}>
+          <ProgressSlider data={progressData} />
+        </div>
+        
+        {/* Journal d'alertes */}
+        <div style={{ marginTop: '30px' }}>
+          <AlertJournal 
+            alerts={alerts}
+            onMarkAsRead={handleMarkAsRead}
+          />
+        </div>
       </div>
       
       {/* Modale de prise de rendez-vous */}
@@ -1926,7 +1800,7 @@ export default function PraticienPage() {
                 padding: '12px 16px',
                 borderRadius: '12px',
                 border: '1px solid rgba(255, 107, 0, 0.3)',
-                background: 'rgba(0, 38, 65, 0.25)',
+                backgroundColor: 'rgba(0, 38, 65, 0.25)',
                 color: 'white',
                 fontSize: '15px',
                 boxShadow: 'inset 0 2px 5px rgba(0, 0, 0, 0.1)',
@@ -1956,7 +1830,7 @@ export default function PraticienPage() {
                 padding: '12px 16px',
                 borderRadius: '12px',
                 border: '1px solid rgba(255, 107, 0, 0.3)',
-                background: 'rgba(0, 38, 65, 0.25)',
+                backgroundColor: 'rgba(0, 38, 65, 0.25)',
                 color: 'white',
                 fontSize: '15px',
                 boxShadow: 'inset 0 2px 5px rgba(0, 0, 0, 0.1)',
@@ -2640,7 +2514,6 @@ export default function PraticienPage() {
                 overflow: 'hidden',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
                 gap: '8px'
               }}
             >
@@ -2752,7 +2625,8 @@ export default function PraticienPage() {
                 display: 'block',
                 marginBottom: '5px',
                 fontSize: '14px',
-                color: 'rgba(255, 255, 255, 0.8)'
+                color: 'rgba(255, 255, 255, 0.8)',
+                fontWeight: '500'
               }}
             >
               Titre du document
@@ -2783,7 +2657,8 @@ export default function PraticienPage() {
                 display: 'block',
                 marginBottom: '5px',
                 fontSize: '14px',
-                color: 'rgba(255, 255, 255, 0.8)'
+                color: 'rgba(255, 255, 255, 0.8)',
+                fontWeight: '500'
               }}
             >
               Description (optionnelle)
@@ -2863,145 +2738,157 @@ export default function PraticienPage() {
       <div style={{ 
         marginTop: '40px', 
         marginBottom: '40px',
-        width: '100%'
+        padding: '0 20px'
       }}>
-        <h2 style={{
-          fontSize: '1.5rem',
-          fontWeight: 'bold',
-          marginBottom: '15px',
-          color: 'white',
-          textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
-        }}>
-          Documents partagés
-        </h2>
-        <p style={{
-          fontSize: '0.95rem',
-          marginBottom: '25px',
-          color: 'rgba(255, 255, 255, 0.8)'
-        }}>
-          Partagez des documents importants avec votre praticien pour un meilleur suivi.
-        </p>
-
-        {/* Liste des documents partagés */}
         <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '15px',
           width: '100%',
-          marginBottom: '25px'
+          background: 'rgba(0, 38, 65, 0.35)',
+          backdropFilter: 'blur(15px)',
+          WebkitBackdropFilter: 'blur(15px)',
+          borderRadius: '20px',
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
+          overflow: 'hidden',
+          color: 'white',
+          padding: '25px'
         }}>
-          {sharedDocuments.map((doc) => (
-            <div key={doc.id} style={{
-              padding: '16px',
-              borderRadius: '14px',
-              backgroundColor: 'rgba(0, 38, 65, 0.25)',
-              backdropFilter: 'blur(10px)',
-              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '10px'
-            }}>
-              <div style={{
+          <h2 style={{
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            marginBottom: '15px',
+            color: '#FF6B00',
+            textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+          }}>
+            Documents partagés
+          </h2>
+          <p style={{
+            fontSize: '0.95rem',
+            marginBottom: '25px',
+            color: 'rgba(255, 255, 255, 0.8)'
+          }}>
+            Partagez des documents importants avec votre praticien pour un meilleur suivi.
+          </p>
+
+          {/* Liste des documents partagés */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '15px',
+            width: '100%',
+            marginBottom: '25px'
+          }}>
+            {sharedDocuments.map((doc) => (
+              <div key={doc.id} style={{
+                padding: '16px',
+                borderRadius: '14px',
+                backgroundColor: 'rgba(0, 17, 13, 0.4)',
+                backdropFilter: 'blur(10px)',
+                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
                 display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent: 'space-between',
-                width: '100%'
+                flexDirection: 'column',
+                gap: '10px'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{
-                    width: '42px',
-                    height: '42px',
-                    borderRadius: '10px',
-                    backgroundColor: 'rgba(255, 107, 0, 0.15)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#FF6B00',
-                    fontSize: '20px'
-                  }}>
-                    <FaFileAlt />
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  justifyContent: 'space-between',
+                  width: '100%'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{
+                      width: '42px',
+                      height: '42px',
+                      borderRadius: '10px',
+                      backgroundColor: 'rgba(255, 107, 0, 0.15)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#FF6B00',
+                      fontSize: '20px'
+                    }}>
+                      <FaFileAlt />
+                    </div>
+                    <div>
+                      <h3 style={{
+                        margin: 0,
+                        fontSize: '1rem',
+                        fontWeight: '600',
+                        color: 'white'
+                      }}>{doc.title}</h3>
+                      <p style={{
+                        margin: '3px 0 0',
+                        fontSize: '0.85rem',
+                        color: 'rgba(255, 255, 255, 0.7)'
+                      }}>{doc.fileName}</p>
+                    </div>
                   </div>
                   <div>
-                    <h3 style={{
-                      margin: 0,
-                      fontSize: '1rem',
-                      fontWeight: '600',
-                      color: 'white'
-                    }}>{doc.title}</h3>
-                    <p style={{
-                      margin: '3px 0 0',
-                      fontSize: '0.85rem',
-                      color: 'rgba(255, 255, 255, 0.7)'
-                    }}>{doc.fileName}</p>
+                    <button style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#FF6B00',
+                      fontSize: '1.1rem',
+                      cursor: 'pointer',
+                      padding: '5px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '8px',
+                      transition: 'background-color 0.2s'
+                    }} aria-label="Télécharger le document">
+                      <FaDownload />
+                    </button>
                   </div>
                 </div>
-                <div>
-                  <button style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#FF6B00',
-                    fontSize: '1.1rem',
-                    cursor: 'pointer',
-                    padding: '5px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: '8px',
-                    transition: 'background-color 0.2s'
-                  }} aria-label="Télécharger le document">
-                    <FaDownload />
-                  </button>
+                <p style={{
+                  margin: '0',
+                  fontSize: '0.9rem',
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  lineHeight: '1.4'
+                }}>{doc.description}</p>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '8px',
+                  fontSize: '0.8rem',
+                  color: 'rgba(255, 255, 255, 0.6)'
+                }}>
+                  <span>
+                    {new Date(doc.date).toLocaleDateString('fr-FR', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </span>
+                  <span>{doc.size}</span>
                 </div>
               </div>
-              <p style={{
-                margin: '0',
-                fontSize: '0.9rem',
-                color: 'rgba(255, 255, 255, 0.8)',
-                lineHeight: '1.4'
-              }}>{doc.description}</p>
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginTop: '8px',
-                fontSize: '0.8rem',
-                color: 'rgba(255, 255, 255, 0.6)'
-              }}>
-                <span>
-                  {new Date(doc.date).toLocaleDateString('fr-FR', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                  })}
-                </span>
-                <span>{doc.size}</span>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        {/* Bouton pour ajouter un document */}
-        <button
-          onClick={() => setShowDocumentModal(true)}
-          style={{
-            padding: '14px 20px',
-            borderRadius: '12px',
-            border: 'none',
-            background: 'linear-gradient(145deg, #FF6B00, #FF9248)',
-            color: 'white',
-            fontWeight: 'bold',
-            cursor: 'pointer',
-            boxShadow: '0 4px 15px rgba(255, 107, 0, 0.3)',
-            fontSize: '15px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            width: '100%',
-            justifyContent: 'center'
-          }}
-        >
-          <FaFileUpload /> Partager un document
-        </button>
+          {/* Bouton pour ajouter un document */}
+          <button
+            onClick={() => setShowDocumentModal(true)}
+            style={{
+              padding: '14px 20px',
+              borderRadius: '12px',
+              border: 'none',
+              background: 'linear-gradient(145deg, #FF6B00, #FF9248)',
+              color: 'white',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              boxShadow: '0 4px 15px rgba(255, 107, 0, 0.3)',
+              fontSize: '15px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              width: '100%',
+              justifyContent: 'center'
+            }}
+          >
+            <FaFileUpload /> Partager un document
+          </button>
+        </div>
       </div>
     </div>
   );
