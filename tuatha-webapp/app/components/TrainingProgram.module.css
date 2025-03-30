@@ -193,9 +193,10 @@
 }
 
 .expandedDay {
-  width: calc(100% - 30px);
-  max-width: 800px;
-  margin: 0 auto 20px;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto 30px;
+  flex-basis: 100%;
 }
 
 .dayCard:hover {
@@ -360,6 +361,7 @@
   animation: expandSession 0.4s cubic-bezier(0.2, 0, 0.2, 1);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 @keyframes expandSession {
@@ -508,31 +510,36 @@
 /* Styles du tableau de séries */
 .exerciseSets {
   margin-top: 15px;
-  border-radius: 6px;
+  border-radius: 10px;
   overflow: hidden;
+  background: rgba(0, 38, 65, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  width: 100%; /* Utiliser toute la largeur disponible */
 }
 
 .setsHeader {
   display: grid;
-  grid-template-columns: 0.5fr 1fr 1fr 1fr 1.5fr;
+  grid-template-columns: 60px 1fr 1fr 1fr 1.5fr;
   background: rgba(0, 0, 0, 0.3);
-  padding: 10px;
+  padding: 12px 15px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 0.9rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .setRow {
   display: grid;
-  grid-template-columns: 0.5fr 1fr 1fr 1fr 1.5fr;
-  padding: 12px 10px;
+  grid-template-columns: 60px 1fr 1fr 1fr 1.5fr;
+  padding: 14px 15px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   align-items: center;
   transition: all 0.2s;
 }
 
 .setRow:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .setRow:last-child {
@@ -540,31 +547,38 @@
 }
 
 .completedSet {
-  background: rgba(76, 175, 80, 0.1);
-}
-
-.completedSet:hover {
   background: rgba(76, 175, 80, 0.15);
 }
 
+.completedSet:hover {
+  background: rgba(76, 175, 80, 0.2);
+}
+
 .setNumber, .setWeight, .setReps, .setRpe {
-  font-size: 1rem;
+  font-size: 1.1rem;
 }
 
 .setNumber {
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .setInput {
   width: 100%;
   max-width: 70px;
   background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   color: white;
-  padding: 8px;
-  border-radius: 4px;
-  font-size: 0.95rem;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.setInput:focus {
+  border-color: rgba(255, 107, 0, 0.6);
+  box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.2);
+  outline: none;
 }
 
 .setActions {
@@ -666,6 +680,31 @@
 @media (max-width: 480px) {
   .dayStats {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .setsHeader {
+    font-size: 0.8rem;
+    padding: 10px 12px;
+  }
+  
+  .setRow {
+    padding: 12px;
+  }
+  
+  .setNumber, .setWeight, .setReps, .setRpe {
+    font-size: 0.95rem;
+  }
+  
+  .setInput {
+    max-width: 60px;
+    padding: 8px;
+  }
+  
+  .setActionButton {
+    width: 30px;
+    height: 30px;
   }
 }
 

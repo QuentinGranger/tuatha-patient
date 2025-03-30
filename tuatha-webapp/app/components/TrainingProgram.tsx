@@ -969,7 +969,93 @@ const TrainingProgram: React.FC<TrainingProgramProps> = ({ athleteId, athleteNam
                         </div>
                       </div>
                       
-                      {renderSets(exercise)}
+                      <div className={styles.exerciseSets}>
+                        <div className={styles.setsHeader}>
+                          <div>Série</div>
+                          <div>Charge (kg)</div>
+                          <div>Reps</div>
+                          <div>RPE</div>
+                          <div className={styles.setActions}>Actions</div>
+                        </div>
+                        {exercise.sets.map((set) => (
+                          <div 
+                            key={set.id} 
+                            className={`${styles.setRow} ${set.completed ? styles.completedSet : ''}`}
+                          >
+                            <div className={styles.setNumber}>{set.id.replace(`${exercise.id}-set`, '')}</div>
+                            
+                            {editMode ? (
+                              <div className={styles.setWeight}>
+                                <input 
+                                  type="number"
+                                  className={styles.setInput}
+                                  value={set.weight}
+                                  onChange={(e) => updateSetValue(exercise.id, set.id, 'weight', parseFloat(e.target.value))}
+                                />
+                              </div>
+                            ) : (
+                              <div className={styles.setWeight}>{set.weight}</div>
+                            )}
+                            
+                            {editMode ? (
+                              <div className={styles.setReps}>
+                                <input 
+                                  type="number"
+                                  className={styles.setInput}
+                                  value={set.reps}
+                                  onChange={(e) => updateSetValue(exercise.id, set.id, 'reps', parseInt(e.target.value))}
+                                />
+                              </div>
+                            ) : (
+                              <div className={styles.setReps}>{set.reps}</div>
+                            )}
+                            
+                            {editMode ? (
+                              <div className={styles.setRpe}>
+                                <input 
+                                  type="number"
+                                  className={styles.setInput}
+                                  value={set.rpe}
+                                  min="0"
+                                  max="10"
+                                  step="0.5"
+                                  onChange={(e) => updateSetValue(exercise.id, set.id, 'rpe', parseFloat(e.target.value))}
+                                />
+                              </div>
+                            ) : (
+                              <div className={styles.setRpe}>{set.rpe}</div>
+                            )}
+                            
+                            <div className={styles.setActions}>
+                              <button 
+                                className={`${styles.setActionButton} ${styles.completeButton} ${set.completed ? styles.active : ''}`}
+                                onClick={() => toggleSetCompletion(exercise.id, set.id)}
+                                title={set.completed ? "Annuler" : "Marquer comme terminé"}
+                              >
+                                <FaCheck />
+                              </button>
+                              
+                              <button 
+                                className={`${styles.setActionButton} ${styles.videoButton} ${selectedExerciseForVideo === exercise.id && selectedSetForVideo === set.id ? styles.recording : ''}`}
+                                onClick={() => handleVideoButtonClick(exercise.id, set.id)}
+                                title="Enregistrer une vidéo"
+                              >
+                                {selectedExerciseForVideo === exercise.id && selectedSetForVideo === set.id ? <FaStop /> : <FaVideo />}
+                              </button>
+                              
+                              {set.videoUrl && (
+                                <button 
+                                  className={`${styles.setActionButton} ${styles.playButton}`}
+                                  onClick={() => playVideo(set.videoUrl || '')}
+                                  title="Regarder la vidéo"
+                                >
+                                  <FaPlay />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   ))}
                 </div>

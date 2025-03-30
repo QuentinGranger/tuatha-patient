@@ -18,6 +18,7 @@ import RehabHistory from '@/app/components/RehabHistory';
 import RehabTable from '@/app/components/RehabTable';
 import TrainingCycle from '@/app/components/TrainingCycle';
 import TrainingProgram from '@/app/components/TrainingProgram';
+import VideoShare from '@/app/components/VideoShare';
 import jsPDF from 'jspdf';
 
 interface Practitioner {
@@ -1727,6 +1728,16 @@ export default function PraticienPage() {
           {practitioner?.id === 3 && isMounted && (
             <div style={{ marginTop: '25px' }}>
               <TrainingProgram
+                athleteName="Jean Dupont"
+                athleteId="P-12345"
+              />
+            </div>
+          )}
+          
+          {/* Composant de partage de vidéos pour Rocky Balboa */}
+          {practitioner?.id === 3 && isMounted && (
+            <div style={{ marginTop: '25px' }}>
+              <VideoShare
                 athleteName="Jean Dupont"
                 athleteId="P-12345"
               />
