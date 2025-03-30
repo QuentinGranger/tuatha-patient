@@ -471,25 +471,36 @@ export default function MesPros() {
       <div className={styles.professionalGrid}>
         {professionals.map((pro) => (
           <div className={styles.professionalCard} key={pro.id}>
-            <div className={styles.professionalImage} style={{
-              backgroundImage: `url("${pro.image}")`
-            }}></div>
-            <div className={styles.proInfo}>
-              <h3>{pro.name}</h3>
-              <p>{pro.title}</p>
-              <p className={styles.subtitle}>{pro.subtitle}</p>
-              <div className={styles.cardActions}>
-                <span className={styles.actionIcon} onClick={() => handleOpenChat(pro)}>
-                  <BsChatDots size={16} />
-                </span>
-                <span className={styles.actionIcon} onClick={() => handleVideoCall(pro)}>
-                  <BsCameraVideo size={16} />
-                </span>
-                <span className={styles.actionIcon} onClick={() => handleOpenAppointmentManager(pro)}>
-                  <BsCalendarEvent size={16} />
-                </span>
+            <Link href={`/praticien/${pro.id}`} className={styles.professionalLink}>
+              <div className={styles.professionalImage} style={{
+                backgroundImage: `url("${pro.image}")`
+              }}></div>
+              <div className={styles.proInfo}>
+                <h3>{pro.name}</h3>
+                <p>{pro.title}</p>
+                <p className={styles.subtitle}>{pro.subtitle}</p>
+                <div className={styles.cardActions}>
+                  <span className={styles.actionIcon} onClick={(e) => {
+                    e.preventDefault();
+                    handleOpenChat(pro);
+                  }}>
+                    <BsChatDots size={16} />
+                  </span>
+                  <span className={styles.actionIcon} onClick={(e) => {
+                    e.preventDefault();
+                    handleVideoCall(pro);
+                  }}>
+                    <BsCameraVideo size={16} />
+                  </span>
+                  <span className={styles.actionIcon} onClick={(e) => {
+                    e.preventDefault();
+                    handleOpenAppointmentManager(pro);
+                  }}>
+                    <BsCalendarEvent size={16} />
+                  </span>
+                </div>
               </div>
-            </div>
+            </Link>
           </div>
         ))}
       </div>
