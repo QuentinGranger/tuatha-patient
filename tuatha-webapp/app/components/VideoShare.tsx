@@ -65,31 +65,31 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
   const exampleVideos: VideoItem[] = [
     {
       id: '1',
-      url: '/img/video/sport/squat_performance.mp4',
+      url: '/img/video/sport/video1.mp4',
       title: 'Squat - Performance',
       date: '2025-03-28',
       exerciseName: 'Squat',
-      thumbnailUrl: '/img/video/thumbnails/squat.jpg',
+      thumbnailUrl: '/img/video/sport/video1.mp4',
       duration: 15,
       tags: ['Jambes', 'Force']
     },
     {
       id: '2',
-      url: '/img/video/sport/deadlift_technique.mp4',
+      url: '/img/video/sport/video2.mp4',
       title: 'Deadlift - Technique',
       date: '2025-03-27',
       exerciseName: 'Deadlift',
-      thumbnailUrl: '/img/video/thumbnails/deadlift.jpg',
+      thumbnailUrl: '/img/video/sport/video2.mp4',
       duration: 22,
       tags: ['Dos', 'Technique']
     },
     {
       id: '3',
-      url: '/img/video/sport/bench_press_pr.mp4',
+      url: '/img/video/sport/video3.mp4',
       title: 'Bench Press - PR',
       date: '2025-03-26',
       exerciseName: 'Bench Press',
-      thumbnailUrl: '/img/video/thumbnails/bench.jpg',
+      thumbnailUrl: '/img/video/sport/video3.mp4',
       duration: 18,
       tags: ['Poitrine', 'Record']
     }
@@ -340,6 +340,11 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
                   <img 
                     src={video.thumbnailUrl || '/img/video/default-thumbnail.jpg'} 
                     alt={video.title} 
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.onerror = null;
+                      target.src = '/img/video/default-thumbnail.jpg';
+                    }}
                   />
                   <span className={styles.videoDuration}>{formatTime(video.duration || 0)}</span>
                 </div>
