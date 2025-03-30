@@ -5,9 +5,11 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import Modal from '@/app/components/Modal';
 import Calendar from '../../components/Calendar';
-import { FaRegCreditCard, FaLock, FaCcVisa, FaCcMastercard, FaCcAmex, FaCcApplePay, FaCarrot, FaBreadSlice, FaAppleAlt, FaEgg, FaLeaf, FaShareAlt, FaDownload, FaFilePdf } from 'react-icons/fa';
+import { FaRegCreditCard, FaLock, FaCcVisa, FaCcMastercard, FaCcAmex, FaCcApplePay, FaCarrot, FaBreadSlice, FaAppleAlt, FaEgg, FaLeaf, FaShareAlt, FaDownload, FaFilePdf, FaFileUpload, FaFileAlt } from 'react-icons/fa';
 import MacroTracker from '@/app/components/MacroTracker';
 import BodyComposition from '@/app/components/BodyComposition';
+import ProgressSlider from '@/app/components/ProgressSlider';
+import AlertJournal, { Alert, AlertType } from '@/app/components/AlertJournal';
 import jsPDF from 'jspdf';
 
 interface Practitioner {
@@ -168,7 +170,7 @@ export default function PraticienPage() {
   const [showEditMealModal, setShowEditMealModal] = useState(false);
   const [currentEditMeal, setCurrentEditMeal] = useState<Meal | null>(null);
   const [editedFoods, setEditedFoods] = useState<Food[]>([]);
-  const [mealStatuses, setMealStatuses] = useState<{[key: number]: 'consumed' | 'skipped' | 'pending'}>({
+  const [mealStatuses, setMealStatuses] = useState<Record<number, 'pending' | 'consumed' | 'skipped'>>({
     1: 'pending',
     2: 'pending',
     3: 'pending',
@@ -178,9 +180,101 @@ export default function PraticienPage() {
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [currentSwipeMeal, setCurrentSwipeMeal] = useState<number | null>(null);
   const [swipeDistance, setSwipeDistance] = useState<number>(0);
+  const [isBioOpen, setIsBioOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [showDocumentModal, setShowDocumentModal] = useState(false);
+  const [documentFile, setDocumentFile] = useState<File | null>(null);
+  const [documentTitle, setDocumentTitle] = useState('');
+  const [documentDescription, setDocumentDescription] = useState('');
+  const [sharedDocuments, setSharedDocuments] = useState<Array<{
+    id: string;
+    title: string;
+    description: string;
+    fileName: string;
+    date: string;
+    size: string;
+  }>>([
+    {
+      id: '1',
+      title: 'Résultats d\'analyse sanguine',
+      description: 'Résultats de la dernière prise de sang du 15 mars 2025',
+      fileName: 'analyse_sang_15032025.pdf',
+      date: '2025-03-15',
+      size: '1.2 MB'
+    },
+    {
+      id: '2',
+      title: 'Carnet alimentaire semaine 10',
+      description: 'Journal détaillé des repas de la semaine 10',
+      fileName: 'carnet_alimentaire_semaine10.pdf',
+      date: '2025-03-10',
+      size: '0.8 MB'
+    }
+  ]);
+  const [alerts, setAlerts] = useState<Alert[]>([
+    {
+      id: '1',
+      type: AlertType.WARNING,
+      date: '2025-03-29T10:15:00',
+      title: 'Glycémie élevée détectée',
+      description: 'Votre glycémie a dépassé le seuil recommandé de 1.26 g/L à jeun. Il est conseillé de consulter votre professionnel de santé si cela persiste.',
+      metric: {
+        name: 'Glycémie',
+        value: 1.35,
+        unit: 'g/L',
+        trend: 'up',
+        threshold: 1.26
+      },
+      isRead: false,
+      action: {
+        label: 'Prendre RDV',
+        onClick: () => setShowAppointmentModal(true)
+      }
+    },
+    {
+      id: '2',
+      type: AlertType.INFO,
+      date: '2025-03-28T08:30:00',
+      title: 'Rappel: compléter votre journal alimentaire',
+      description: 'Votre nutritionniste a remarqué que vous n\'avez pas rempli votre journal alimentaire depuis 3 jours. Pensez à le mettre à jour régulièrement pour un meilleur suivi.',
+      isRead: true,
+      action: {
+        label: 'Mettre à jour',
+        onClick: () => setShowMealModal(true)
+      }
+    },
+    {
+      id: '3',
+      type: AlertType.SUCCESS,
+      date: '2025-03-26T16:45:00',
+      title: 'Objectif d\'hydratation atteint!',
+      description: 'Félicitations! Vous avez atteint votre objectif d\'hydratation quotidienne pendant 7 jours consécutifs. Continuez comme ça!',
+      metric: {
+        name: 'Hydratation',
+        value: 65,
+        unit: '%',
+        trend: 'up'
+      },
+      isRead: true
+    },
+    {
+      id: '4',
+      type: AlertType.WARNING,
+      date: '2025-03-24T14:20:00',
+      title: 'Baisse du taux de protéines',
+      description: 'Votre apport en protéines est inférieur à l\'objectif fixé. Essayez d\'incorporer plus de sources de protéines dans votre alimentation.',
+      metric: {
+        name: 'Protéines',
+        value: 52,
+        unit: 'g',
+        trend: 'down',
+        threshold: 80
+      },
+      isRead: false
+    }
+  ]);
   
   // État pour la modale de prise de rendez-vous
   const [newAppointmentDate, setNewAppointmentDate] = useState('');
@@ -330,8 +424,6 @@ export default function PraticienPage() {
     }
   }, [params.id]);
 
-  const [isBioOpen, setIsBioOpen] = useState(false);
-  
   // Effet pour charger les rendez-vous filtrés lors du montage du composant
   useEffect(() => {
     // Simuler un chargement asynchrone
@@ -461,13 +553,6 @@ export default function PraticienPage() {
             fatsGoal={60}
           />
           <div style={{ marginTop: '30px' }}>
-            <BodyComposition 
-              weight={20}
-              waistSize={42}
-              hydration={65}
-              bodyFat={18}
-              height={120}
-            />
           </div>
           <div style={{
             width: '100%',
@@ -1372,7 +1457,7 @@ export default function PraticienPage() {
             </button>
           </div>
           
-          <div style={{ 
+          <div style={{
             display: 'flex', 
             justifyContent: 'space-between',
             marginTop: '20px' 
@@ -1414,6 +1499,53 @@ export default function PraticienPage() {
     );
   };
 
+  // Données de démonstration pour les graphiques d'évolution
+  const progressData = {
+    weight: [
+      { date: '2025-01-01', value: 18.5 },
+      { date: '2025-01-15', value: 18.7 },
+      { date: '2025-02-01', value: 19.2 },
+      { date: '2025-02-15', value: 19.5 },
+      { date: '2025-03-01', value: 19.8 },
+      { date: '2025-03-15', value: 20.0 }
+    ],
+    waistSize: [
+      { date: '2025-01-01', value: 40 },
+      { date: '2025-01-15', value: 40.5 },
+      { date: '2025-02-01', value: 41 },
+      { date: '2025-02-15', value: 41.3 },
+      { date: '2025-03-01', value: 41.7 },
+      { date: '2025-03-15', value: 42 }
+    ],
+    hydration: [
+      { date: '2025-01-01', value: 60 },
+      { date: '2025-01-15', value: 58 },
+      { date: '2025-02-01', value: 62 },
+      { date: '2025-02-15', value: 63 },
+      { date: '2025-03-01', value: 64 },
+      { date: '2025-03-15', value: 65 }
+    ],
+    bodyFat: [
+      { date: '2025-01-01', value: 20 },
+      { date: '2025-01-15', value: 19.5 },
+      { date: '2025-02-01', value: 19 },
+      { date: '2025-02-15', value: 18.7 },
+      { date: '2025-03-01', value: 18.3 },
+      { date: '2025-03-15', value: 18 }
+    ]
+  };
+
+  // Données de démonstration pour les alertes
+  const handleMarkAsRead = (alertId: string) => {
+    setAlerts(prevAlerts => 
+      prevAlerts.map(alert => 
+        alert.id === alertId 
+          ? { ...alert, isRead: true } 
+          : alert
+      )
+    );
+  };
+
   if (!practitioner) {
     return (
       <div style={{ padding: '20px', color: 'white' }}>
@@ -1448,16 +1580,7 @@ export default function PraticienPage() {
           left: '15px',
           zIndex: 2
         }}>
-          <Link href="/mespros" style={{ 
-            color: 'white', 
-            textDecoration: 'none',
-            background: 'rgba(0, 0, 0, 0.5)',
-            padding: '8px 12px',
-            borderRadius: '20px',
-            display: 'flex',
-            alignItems: 'center',
-            fontSize: '14px'
-          }}>
+          <Link href="/mespros" style={{ color: 'white', textDecoration: 'none' }}>
             ← Retour
           </Link>
         </div>
@@ -1623,6 +1746,153 @@ export default function PraticienPage() {
         {/* Afficher le suivi nutritionnel uniquement pour Jessica Jones */}
         {renderNutritionTracking()}
         
+        {/* Bouton pour partager un document */}
+        {practitioner?.id === 1 && (
+          <div style={{ 
+            marginTop: '40px',
+            marginBottom: '20px',
+            padding: '0 20px'
+          }}>
+            {/* Bouton pour ajouter un document */}
+            <div style={{
+              width: '100%',
+              background: 'rgba(0, 38, 65, 0.35)',
+              backdropFilter: 'blur(15px)',
+              WebkitBackdropFilter: 'blur(15px)',
+              borderRadius: '20px',
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
+              overflow: 'hidden',
+              color: 'white',
+              marginBottom: '25px',
+              padding: '20px'
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '15px'
+              }}>
+                <h3 style={{
+                  margin: 0,
+                  fontSize: '18px',
+                  fontWeight: 'bold',
+                  color: '#FF6B00'
+                }}>
+                  Documents partagés
+                </h3>
+                <button
+                  onClick={() => setShowDocumentModal(true)}
+                  style={{
+                    padding: '10px 15px',
+                    borderRadius: '12px',
+                    border: 'none',
+                    background: 'rgba(255, 107, 0, 0.2)',
+                    color: '#FF6B00',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.05)'
+                  }}
+                >
+                  <FaFileUpload /> Partager un document
+                </button>
+              </div>
+              
+              {/* Liste des documents partagés */}
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px'
+              }}>
+                {sharedDocuments.map(doc => (
+                  <div 
+                    key={doc.id}
+                    style={{
+                      background: 'rgba(0, 17, 13, 0.4)',
+                      borderRadius: '12px',
+                      padding: '15px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '15px'
+                    }}
+                  >
+                    <div style={{ 
+                      width: '40px', 
+                      height: '40px', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      marginRight: '10px',
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      borderRadius: '10px',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
+                    }}>
+                      <FaFileAlt />
+                    </div>
+                    
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 'bold' }}>{doc.title}</div>
+                      <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)' }}>
+                        {doc.description}
+                      </div>
+                      <div style={{ 
+                        display: 'flex', 
+                        gap: '15px', 
+                        marginTop: '8px',
+                        fontSize: '12px',
+                        color: 'rgba(255, 255, 255, 0.5)'
+                      }}>
+                        <span>{doc.fileName}</span>
+                        <span>{new Date(doc.date).toLocaleDateString('fr-FR')}</span>
+                        <span>{doc.size}</span>
+                      </div>
+                    </div>
+                    
+                    <button
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        cursor: 'pointer',
+                        fontSize: '18px',
+                        padding: '5px',
+                        borderRadius: '5px'
+                      }}
+                      title="Télécharger"
+                    >
+                      <FaDownload />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Composition corporelle actuelle */}
+            <BodyComposition 
+              weight={20}
+              waistSize={42}
+              hydration={65}
+              bodyFat={18}
+              height={120}
+            />
+            
+            {/* Slider d'évolution des métriques */}
+            <div style={{ marginTop: '30px' }}>
+              <ProgressSlider data={progressData} />
+            </div>
+            
+            {/* Journal d'alertes */}
+            <div style={{ marginTop: '30px' }}>
+              <AlertJournal 
+                alerts={alerts}
+                onMarkAsRead={handleMarkAsRead}
+              />
+            </div>
+          </div>
+        )}
+        
       </div>
       
       {/* Modale de prise de rendez-vous */}
@@ -1715,7 +1985,7 @@ export default function PraticienPage() {
                 padding: '12px 16px',
                 borderRadius: '12px',
                 border: '1px solid rgba(255, 107, 0, 0.3)',
-                background: 'rgba(0, 38, 65, 0.25)',
+                backgroundColor: 'rgba(0, 38, 65, 0.25)',
                 color: 'white',
                 fontSize: '15px',
                 boxShadow: 'inset 0 2px 5px rgba(0, 0, 0, 0.1)',
@@ -1754,7 +2024,7 @@ export default function PraticienPage() {
                 padding: '12px 16px',
                 borderRadius: '12px',
                 border: '1px solid rgba(255, 107, 0, 0.3)',
-                background: 'rgba(0, 38, 65, 0.25)',
+                backgroundColor: 'rgba(0, 38, 65, 0.25)',
                 color: 'white',
                 fontSize: '15px',
                 boxShadow: 'inset 0 2px 5px rgba(0, 0, 0, 0.1)',
@@ -1908,8 +2178,9 @@ export default function PraticienPage() {
               borderRadius: '12px',
               border: '1px solid rgba(255, 107, 0, 0.2)',
               marginTop: '10px',
-              textAlign: 'center',
-              animation: 'fadeIn 0.5s ease-out'
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px'
             }}>
               <p style={{ 
                 margin: 0, 
@@ -2128,7 +2399,7 @@ export default function PraticienPage() {
           </div>
           
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: '15px' }}>
-            <div style={{ flex: 1 }}>
+            <div>
               <label style={{ 
                 display: 'block', 
                 marginBottom: '8px',
@@ -2179,7 +2450,7 @@ export default function PraticienPage() {
               )}
             </div>
             
-            <div style={{ flex: 1 }}>
+            <div>
               <label style={{ 
                 display: 'block', 
                 marginBottom: '8px',
@@ -2301,7 +2572,8 @@ export default function PraticienPage() {
                 display: 'flex',
                 alignItems: 'center', 
                 justifyContent: 'center',
-                animation: 'pulse 1.5s infinite'
+                color: '#00C853',
+                fontSize: '20px'
               }}>
                 <div style={{
                   width: '18px',
@@ -2407,6 +2679,330 @@ export default function PraticienPage() {
       
       {/* Modale d'édition de repas */}
       {renderEditMealModal()}
+      
+      {/* Modale pour partager un document */}
+      <Modal
+        isOpen={showDocumentModal}
+        onClose={() => setShowDocumentModal(false)}
+        title="Partager un document avec Jessica Jones"
+      >
+        <div style={{ padding: '20px', color: 'white' }}>
+          <p style={{ marginTop: 0, marginBottom: '20px', color: 'rgba(255, 255, 255, 0.8)' }}>
+            Vous pouvez partager des documents médicaux, analyses, ou autres informations importantes avec votre praticien.
+          </p>
+          
+          {/* Sélection de fichier */}
+          <div style={{ marginBottom: '20px' }}>
+            <label 
+              htmlFor="file-upload" 
+              style={{
+                display: 'block',
+                padding: '30px 20px',
+                border: '2px dashed rgba(255, 255, 255, 0.2)',
+                borderRadius: '12px',
+                textAlign: 'center',
+                cursor: 'pointer',
+                marginBottom: '10px',
+                background: 'rgba(0, 17, 13, 0.4)'
+              }}
+            >
+              <div style={{
+                fontSize: '24px',
+                color: '#FF6B00',
+                marginBottom: '10px'
+              }}>
+                <FaFileUpload />
+              </div>
+              {documentFile ? (
+                <>
+                  <div style={{ fontWeight: 'bold' }}>{documentFile.name}</div>
+                  <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)', marginTop: '5px' }}>
+                    {(documentFile.size / 1024 / 1024).toFixed(2)} MB
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={{ fontWeight: 'bold' }}>Cliquez pour sélectionner un fichier</div>
+                  <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)', marginTop: '5px' }}>
+                    ou glissez-déposez ici
+                  </div>
+                </>
+              )}
+            </label>
+            <input
+              id="file-upload"
+              type="file"
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  setDocumentFile(e.target.files[0]);
+                }
+              }}
+            />
+            <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)' }}>
+              Formats supportés: PDF, JPG, PNG, DOCX - Taille max: 10 MB
+            </div>
+          </div>
+          
+          {/* Titre du document */}
+          <div style={{ marginBottom: '15px' }}>
+            <label 
+              htmlFor="document-title" 
+              style={{
+                display: 'block',
+                marginBottom: '5px',
+                fontSize: '14px',
+                color: 'rgba(255, 255, 255, 0.8)'
+              }}
+            >
+              Titre du document
+            </label>
+            <input
+              id="document-title"
+              type="text"
+              value={documentTitle}
+              onChange={(e) => setDocumentTitle(e.target.value)}
+              placeholder="Ex: Résultats d'analyse sanguine"
+              style={{
+                width: '100%',
+                padding: '12px 15px',
+                background: 'rgba(0, 17, 13, 0.4)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '10px',
+                color: 'white',
+                fontSize: '15px'
+              }}
+            />
+          </div>
+          
+          {/* Description */}
+          <div style={{ marginBottom: '25px' }}>
+            <label 
+              htmlFor="document-description" 
+              style={{
+                display: 'block',
+                marginBottom: '5px',
+                fontSize: '14px',
+                color: 'rgba(255, 255, 255, 0.8)'
+              }}
+            >
+              Description (optionnelle)
+            </label>
+            <textarea
+              id="document-description"
+              value={documentDescription}
+              onChange={(e) => setDocumentDescription(e.target.value)}
+              placeholder="Ajoutez des détails sur ce document..."
+              style={{
+                width: '100%',
+                padding: '12px 15px',
+                background: 'rgba(0, 17, 13, 0.4)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '10px',
+                color: 'white',
+                fontSize: '15px',
+                minHeight: '100px',
+                resize: 'vertical'
+              }}
+            />
+          </div>
+          
+          {/* Bouton de partage */}
+          <button
+            onClick={() => {
+              if (documentFile && documentTitle) {
+                // Créer un nouveau document partagé
+                const newDoc = {
+                  id: (sharedDocuments.length + 1).toString(),
+                  title: documentTitle,
+                  description: documentDescription || 'Aucune description',
+                  fileName: documentFile.name,
+                  date: new Date().toISOString().split('T')[0],
+                  size: `${(documentFile.size / 1024 / 1024).toFixed(1)} MB`
+                };
+                
+                // Ajouter à la liste
+                setSharedDocuments(prev => [newDoc, ...prev]);
+                
+                // Réinitialiser le formulaire et fermer la modale
+                setDocumentFile(null);
+                setDocumentTitle('');
+                setDocumentDescription('');
+                setShowDocumentModal(false);
+              }
+            }}
+            disabled={!documentFile || !documentTitle}
+            style={{
+              width: '100%',
+              padding: '14px 20px',
+              borderRadius: '12px',
+              border: 'none',
+              background: documentFile && documentTitle 
+                ? 'linear-gradient(145deg, #FF6B00, #FF9248)'
+                : 'rgba(255, 255, 255, 0.1)',
+              color: 'white',
+              fontWeight: 'bold',
+              cursor: documentFile && documentTitle ? 'pointer' : 'not-allowed',
+              opacity: documentFile && documentTitle ? 1 : 0.6,
+              boxShadow: documentFile && documentTitle 
+                ? '0 4px 15px rgba(255, 107, 0, 0.3)'
+                : 'none',
+              fontSize: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '10px'
+            }}
+          >
+            <FaShareAlt /> Partager avec Jessica Jones
+          </button>
+        </div>
+      </Modal>
+      
+      {/* Composant de documents partagés */}
+      <div style={{ 
+        marginTop: '40px', 
+        marginBottom: '40px',
+        width: '100%'
+      }}>
+        <h2 style={{
+          fontSize: '1.5rem',
+          fontWeight: 'bold',
+          marginBottom: '15px',
+          color: 'white',
+          textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+        }}>
+          Documents partagés
+        </h2>
+        <p style={{
+          fontSize: '0.95rem',
+          marginBottom: '25px',
+          color: 'rgba(255, 255, 255, 0.8)'
+        }}>
+          Partagez des documents importants avec votre praticien pour un meilleur suivi.
+        </p>
+
+        {/* Liste des documents partagés */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '15px',
+          width: '100%',
+          marginBottom: '25px'
+        }}>
+          {sharedDocuments.map((doc) => (
+            <div key={doc.id} style={{
+              padding: '16px',
+              borderRadius: '14px',
+              backgroundColor: 'rgba(0, 38, 65, 0.25)',
+              backdropFilter: 'blur(10px)',
+              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                justifyContent: 'space-between',
+                width: '100%'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    width: '42px',
+                    height: '42px',
+                    borderRadius: '10px',
+                    backgroundColor: 'rgba(255, 107, 0, 0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#FF6B00',
+                    fontSize: '20px'
+                  }}>
+                    <FaFileAlt />
+                  </div>
+                  <div>
+                    <h3 style={{
+                      margin: 0,
+                      fontSize: '1rem',
+                      fontWeight: '600',
+                      color: 'white'
+                    }}>{doc.title}</h3>
+                    <p style={{
+                      margin: '3px 0 0',
+                      fontSize: '0.85rem',
+                      color: 'rgba(255, 255, 255, 0.7)'
+                    }}>{doc.fileName}</p>
+                  </div>
+                </div>
+                <div>
+                  <button style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#FF6B00',
+                    fontSize: '1.1rem',
+                    cursor: 'pointer',
+                    padding: '5px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '8px',
+                    transition: 'background-color 0.2s'
+                  }} aria-label="Télécharger le document">
+                    <FaDownload />
+                  </button>
+                </div>
+              </div>
+              <p style={{
+                margin: '0',
+                fontSize: '0.9rem',
+                color: 'rgba(255, 255, 255, 0.8)',
+                lineHeight: '1.4'
+              }}>{doc.description}</p>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: '8px',
+                fontSize: '0.8rem',
+                color: 'rgba(255, 255, 255, 0.6)'
+              }}>
+                <span>
+                  {new Date(doc.date).toLocaleDateString('fr-FR', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                  })}
+                </span>
+                <span>{doc.size}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Bouton pour ajouter un document */}
+        <button
+          onClick={() => setShowDocumentModal(true)}
+          style={{
+            padding: '14px 20px',
+            borderRadius: '12px',
+            border: 'none',
+            background: 'linear-gradient(145deg, #FF6B00, #FF9248)',
+            color: 'white',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            boxShadow: '0 4px 15px rgba(255, 107, 0, 0.3)',
+            fontSize: '15px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            width: '100%',
+            justifyContent: 'center'
+          }}
+        >
+          <FaFileUpload /> Partager un document
+        </button>
+      </div>
     </div>
   );
 }
