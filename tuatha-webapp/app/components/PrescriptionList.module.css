@@ -1,0 +1,238 @@
+.container {
+  margin-top: 25px;
+  width: 100%;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #FF6B00;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  margin-bottom: 25px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.prescriptionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+}
+
+.emptyState {
+  padding: 20px;
+  text-align: center;
+  background-color: rgba(0, 17, 13, 0.4);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.prescriptionCard {
+  background-color: rgba(0, 17, 13, 0.4);
+  backdrop-filter: blur(10px);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.prescriptionHeader {
+  padding: 16px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.headerRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background-color: rgba(255, 107, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FF6B00;
+  font-size: 20px;
+}
+
+.prescriptionInfo {
+  margin: 0;
+}
+
+.prescriptionName {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+}
+
+.prescriptionDate {
+  margin: 3px 0 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.statusBadge {
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  border-radius: 12px;
+}
+
+.statusActive {
+  background-color: rgba(76, 175, 80, 0.2);
+  color: #4CAF50;
+}
+
+.statusExpired {
+  background-color: rgba(244, 67, 54, 0.2);
+  color: #F44336;
+}
+
+.statusExpiring {
+  background-color: rgba(255, 152, 0, 0.2);
+  color: #FF9800;
+}
+
+.doctorInfo {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.expandedContent {
+  padding: 0 16px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 5px;
+}
+
+.medicationList {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: rgba(0, 38, 65, 0.25);
+  border-radius: 10px;
+}
+
+.medicationTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: #FF6B00;
+}
+
+.medicationItem {
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.medicationItem:last-child {
+  margin-bottom: 0;
+}
+
+.medicationHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.medicationName {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.medicationDuration {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.medicationDetails {
+  margin: 5px 0 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.refillButton {
+  flex: 1;
+  min-width: 100px;
+  padding: 10px;
+  background: rgba(255, 107, 0, 0.15);
+  border: 1px solid rgba(255, 107, 0, 0.3);
+  border-radius: 10px;
+  color: #FF6B00;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.actionButton {
+  flex: 1;
+  min-width: 100px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .actionButtons {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .refillButton, .actionButton {
+    width: 100%;
+  }
+  
+  .medicationHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .medicationDuration {
+    margin-top: 5px;
+  }
+}
