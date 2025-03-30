@@ -5,7 +5,10 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import Modal from '@/app/components/Modal';
 import Calendar from '../../components/Calendar';
-import { FaRegCreditCard, FaLock, FaCcVisa, FaCcMastercard, FaCcAmex, FaCcApplePay } from 'react-icons/fa';
+import { FaRegCreditCard, FaLock, FaCcVisa, FaCcMastercard, FaCcAmex, FaCcApplePay, FaCarrot, FaBreadSlice, FaAppleAlt, FaEgg, FaLeaf, FaShareAlt, FaDownload, FaFilePdf } from 'react-icons/fa';
+import MacroTracker from '@/app/components/MacroTracker';
+import BodyComposition from '@/app/components/BodyComposition';
+import jsPDF from 'jspdf';
 
 interface Practitioner {
   id: number;
@@ -40,7 +43,7 @@ const practitionerData: Record<string, Practitioner> = {
     lastName: "Jones",
     specialty: "Diététicienne - Nutritionniste",
     imageUrl: "/img/Jessica-Jones.jpg",
-    bio: "Bonjour, je suis Jessica Jones, diététicienne-nutritionniste avec plus de 8 ans d'expérience. Après une période difficile dans ma vie où j'ai dû reconstruire ma relation avec la nourriture, j'ai décidé de mettre mon expérience personnelle et ma force au service des autres. Je suis spécialisée dans les troubles alimentaires et la nutrition sportive. Mon approche est directe mais efficace - pas de promesses miraculeuses, juste des plans nutritionnels basés sur des preuves scientifiques et adaptés à votre réalité quotidienne. Je travaille souvent avec des athlètes, mais aussi avec des personnes souffrant de troubles alimentaires ou cherchant simplement à retrouver une relation saine avec leur alimentation. J'ai vécu à Hell's Kitchen pendant des années, ce qui m'a appris l'importance de rester ancrée dans la réalité et de comprendre les véritables défis de la vie quotidienne. Si vous cherchez quelqu'un qui vous dira la vérité sans détour et vous aidera réellement à atteindre vos objectifs, nous devrions travailler ensemble."
+    bio: "Bonjour, je suis Jessica Jones, diététicienne-nutritionniste avec plus de 8 ans d'expérience. Après une période difficile dans ma vie où j'ai dû reconstruire ma relation avec la nourriture, j'ai décidé de mettre mon expérience personnelle et ma force au service des autres. Je suis spécialisée dans les troubles alimentaires et la nutrition sportive. Ma méthode est directe mais efficace - pas de promesses miraculeuses, juste des plans nutritionnels basés sur des preuves scientifiques et adaptés à votre réalité quotidienne. Je travaille souvent avec des athlètes, mais aussi avec des personnes souffrant de troubles alimentaires ou cherchant simplement à retrouver une relation saine avec leur alimentation. J'ai vécu à Hell's Kitchen pendant des années, ce qui m'a appris l'importance de rester ancrée dans la réalité et de comprendre les véritables défis de la vie quotidienne. Si vous cherchez quelqu'un qui vous dira la vérité sans détour et vous aidera réellement à atteindre vos objectifs, nous devrions travailler ensemble."
   },
   "2": {
     id: 2,
@@ -157,22 +160,35 @@ const appointmentData: Appointment[] = [
 ];
 
 export default function PraticienPage() {
-  const params = useParams<{ id: string }>();
-  const id = params?.id as string;
-  const [practitioner, setPractitioner] = useState<Practitioner | undefined>(undefined);
+  const params = useParams();
+  const [practitioner, setPractitioner] = useState<Practitioner | null>(null);
+  const [showAppointmentModal, setShowAppointmentModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showMealModal, setShowMealModal] = useState(false);
+  const [showEditMealModal, setShowEditMealModal] = useState(false);
+  const [currentEditMeal, setCurrentEditMeal] = useState<Meal | null>(null);
+  const [editedFoods, setEditedFoods] = useState<Food[]>([]);
+  const [mealStatuses, setMealStatuses] = useState<{[key: number]: 'consumed' | 'skipped' | 'pending'}>({
+    1: 'pending',
+    2: 'pending',
+    3: 'pending',
+    4: 'pending'
+  });
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [currentSwipeMeal, setCurrentSwipeMeal] = useState<number | null>(null);
+  const [swipeDistance, setSwipeDistance] = useState<number>(0);
   const [isMounted, setIsMounted] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   
   // État pour la modale de prise de rendez-vous
-  const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   const [newAppointmentDate, setNewAppointmentDate] = useState('');
   const [newAppointmentTime, setNewAppointmentTime] = useState('14:00');
   const [newAppointmentDuration, setNewAppointmentDuration] = useState(30);
   const [newAppointmentType, setNewAppointmentType] = useState('Consultation standard');
   
   // État pour la modale de paiement
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [cardNumber, setCardNumber] = useState('');
   const [cardHolder, setCardHolder] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
@@ -308,10 +324,11 @@ export default function PraticienPage() {
 
   // Effet pour récupérer les données du praticien
   useEffect(() => {
+    const id = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : '';
     if (id && practitionerData[id]) {
       setPractitioner(practitionerData[id]);
     }
-  }, [id]);
+  }, [params.id]);
 
   const [isBioOpen, setIsBioOpen] = useState(false);
   
@@ -390,6 +407,1011 @@ export default function PraticienPage() {
     
     // Fermer la modale
     setShowAppointmentModal(false);
+  };
+
+  // Définition des types pour les aliments
+  interface Food {
+    name: string;
+    calories: number;
+    proteins: number;
+    carbs: number;
+    fats: number;
+    icon: React.ReactNode;
+  }
+
+  interface Meal {
+    id: number;
+    name: string;
+    time: string;
+    foods: Food[];
+  }
+
+  // Composant conditionnel pour afficher le suivi nutritionnel 
+  // uniquement pour Jessica Jones (praticien ID = 1)
+  const renderNutritionTracking = () => {
+    if (practitioner?.id === 1) {
+      const calculatedMacros = calculateMacros();
+      return (
+        <div>
+          <h2 style={{
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            marginTop: '30px',
+            marginBottom: '15px',
+            color: 'white',
+            textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+          }}>
+            Votre suivi nutritionnel
+          </h2>
+          <p style={{
+            fontSize: '0.95rem',
+            marginBottom: '25px',
+            color: 'rgba(255, 255, 255, 0.8)'
+          }}>
+            Suivez votre progression en temps réel avec Jessica Jones.
+          </p>
+          <MacroTracker
+            calories={calculatedMacros.calories}
+            caloriesGoal={1750}
+            proteins={calculatedMacros.proteins}
+            proteinsGoal={80}
+            carbs={calculatedMacros.carbs}
+            carbsGoal={200}
+            fats={calculatedMacros.fats}
+            fatsGoal={60}
+          />
+          <div style={{ marginTop: '30px' }}>
+            <BodyComposition 
+              weight={20}
+              waistSize={42}
+              hydration={65}
+              bodyFat={18}
+              height={120}
+            />
+          </div>
+          <div style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            marginTop: '20px',
+            gap: '15px',
+            flexWrap: 'wrap'
+          }}>
+            <button
+              onClick={() => setShowMealModal(true)}
+              style={{
+                padding: '12px 20px',
+                borderRadius: '12px',
+                border: 'none',
+                background: 'linear-gradient(145deg, #FF6B00, #FF9248)',
+                color: 'white',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                boxShadow: '0 4px 15px rgba(255, 107, 0, 0.3)',
+                fontSize: '15px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                flex: '1',
+                minWidth: '200px',
+                justifyContent: 'center'
+              }}
+            >
+              Mettre à jour mon journal alimentaire
+            </button>
+            
+            <div style={{ display: 'flex', gap: '15px' }}>
+              <button
+                onClick={downloadNutritionPDF}
+                style={{
+                  padding: '12px 20px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  background: 'rgba(0, 38, 65, 0.7)',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
+                  fontSize: '15px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  backdropFilter: 'blur(10px)',
+                  WebkitBackdropFilter: 'blur(10px)',
+                  flex: 1
+                }}
+              >
+                <FaFilePdf /> Télécharger PDF
+              </button>
+              
+              <button
+                onClick={shareNutritionPlan}
+                style={{
+                  padding: '12px 20px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  background: 'rgba(0, 17, 13, 0.7)',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
+                  fontSize: '15px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  backdropFilter: 'blur(10px)',
+                  WebkitBackdropFilter: 'blur(10px)',
+                  flex: 1
+                }}
+              >
+                <FaShareAlt /> Partager
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  // Fonction pour générer un PDF du plan nutritionnel
+  const generateNutritionPDF = () => {
+    // Calculer les macros actuelles
+    const macros = calculateMacros();
+    const currentDate = new Date().toLocaleDateString();
+    
+    // Créer un nouveau document PDF
+    const doc = new jsPDF();
+    
+    // Ajouter un titre
+    doc.setFontSize(20);
+    doc.setTextColor(255, 107, 0); // Couleur orange
+    doc.text(`Plan Nutritionnel de Baby Groot`, 105, 20, { align: 'center' });
+    doc.setFontSize(12);
+    doc.setTextColor(80, 80, 80);
+    doc.text(`Date: ${currentDate}`, 105, 30, { align: 'center' });
+    
+    // Ajouter un séparateur
+    doc.setDrawColor(255, 107, 0);
+    doc.setLineWidth(0.5);
+    doc.line(20, 35, 190, 35);
+    
+    // Résumé des macros
+    doc.setFontSize(14);
+    doc.setTextColor(0, 38, 65); // Bleu foncé
+    doc.text('Résumé des macronutriments', 20, 45);
+    
+    // Tableau des macros
+    doc.setFontSize(10);
+    doc.setTextColor(60, 60, 60);
+    doc.text(`Calories: ${macros.calories} / 1750 kcal (${Math.round((macros.calories / 1750) * 100)}%)`, 25, 55);
+    doc.text(`Protéines: ${macros.proteins} / 80g (${Math.round((macros.proteins / 80) * 100)}%)`, 25, 65);
+    doc.text(`Glucides: ${macros.carbs} / 200g (${Math.round((macros.carbs / 200) * 100)}%)`, 25, 75);
+    doc.text(`Lipides: ${macros.fats} / 60g (${Math.round((macros.fats / 60) * 100)}%)`, 25, 85);
+    
+    // Ajouter un séparateur
+    doc.line(20, 95, 190, 95);
+    
+    // Liste des repas
+    doc.setFontSize(14);
+    doc.setTextColor(0, 38, 65);
+    doc.text('Détail des repas', 20, 105);
+    
+    let yPosition = 115;
+    
+    meals.forEach((meal: Meal) => {
+      if (yPosition > 270) {
+        // Ajouter une nouvelle page si on dépasse la hauteur
+        doc.addPage();
+        yPosition = 20;
+      }
+      
+      const status = mealStatuses[meal.id] || 'pending';
+      const statusText = status === 'consumed' ? 'Consommé' : status === 'skipped' ? 'Non consommé' : 'En attente';
+      
+      doc.setFontSize(12);
+      doc.setTextColor(255, 107, 0);
+      doc.text(`${meal.name} (${meal.time})`, 25, yPosition);
+      
+      // Status du repas
+      doc.setFontSize(10);
+      doc.setTextColor(
+        status === 'consumed' ? 76 : status === 'skipped' ? 244 : 255,
+        status === 'consumed' ? 175 : status === 'skipped' ? 67 : 152,
+        status === 'consumed' ? 80 : status === 'skipped' ? 54 : 0
+      );
+      doc.text(`Statut: ${statusText}`, 130, yPosition);
+      
+      yPosition += 7;
+      
+      // Total calories du repas
+      doc.setTextColor(80, 80, 80);
+      doc.text(`Total: ${totalMealCalories(meal.foods)} kcal`, 25, yPosition);
+      
+      yPosition += 7;
+      
+      // Liste des aliments
+      doc.setFontSize(9);
+      meal.foods.forEach((food: Food) => {
+        doc.text(`• ${food.name}: ${food.calories} kcal (P: ${food.proteins}g, G: ${food.carbs}g, L: ${food.fats}g)`, 30, yPosition);
+        yPosition += 6;
+      });
+      
+      yPosition += 7;
+    });
+    
+    // Footer
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text(`Plan nutritionnel généré par Tuatha - Votre application de suivi de santé`, 105, 290, { align: 'center' });
+      doc.text(`Page ${i} / ${pageCount}`, 105, 295, { align: 'center' });
+    }
+    
+    // Sauvegarder le PDF
+    const pdfName = `plan-nutritionnel-babygroot-${new Date().toISOString().slice(0, 10)}.pdf`;
+    
+    // Retourner le blob du PDF pour téléchargement ou partage
+    const pdfBlob = doc.output('blob');
+    return { blob: pdfBlob, name: pdfName };
+  };
+  
+  // Fonction pour télécharger le PDF
+  const downloadNutritionPDF = () => {
+    const { blob, name } = generateNutritionPDF();
+    
+    // Créer un URL pour le blob
+    const url = URL.createObjectURL(blob);
+    
+    // Créer un lien de téléchargement et le déclencher
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    
+    // Nettoyer
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+  };
+  
+  // Fonction pour partager le plan nutritionnel
+  const shareNutritionPlan = async () => {
+    const { blob, name } = generateNutritionPDF();
+    
+    // Vérifier si l'API Web Share est disponible
+    if (navigator.share) {
+      try {
+        // Créer un fichier à partir du blob
+        const file = new File([blob], name, { type: 'application/pdf' });
+        
+        // Partager le fichier
+        await navigator.share({
+          title: 'Mon Plan Nutritionnel',
+          text: 'Voici mon plan nutritionnel généré par Tuatha',
+          files: [file]
+        });
+      } catch (error) {
+        console.error('Erreur lors du partage:', error);
+        // Fallback au téléchargement si le partage échoue
+        downloadNutritionPDF();
+      }
+    } else {
+      // Fallback pour les navigateurs qui ne supportent pas l'API Web Share
+      downloadNutritionPDF();
+    }
+  };
+
+  // Calcul des macronutriments en fonction des repas consommés
+  const calculateMacros = () => {
+    let totalCalories = 0;
+    let totalProteins = 0;
+    let totalCarbs = 0;
+    let totalFats = 0;
+    
+    // Parcourir tous les repas
+    meals.forEach(meal => {
+      // Ne compter que les repas consommés
+      if (mealStatuses[meal.id] === 'consumed') {
+        meal.foods.forEach(food => {
+          totalCalories += food.calories;
+          totalProteins += food.proteins;
+          totalCarbs += food.carbs;
+          totalFats += food.fats;
+        });
+      }
+    });
+    
+    return {
+      calories: totalCalories,
+      proteins: totalProteins,
+      carbs: totalCarbs,
+      fats: totalFats
+    };
+  };
+
+  const totalMealCalories = (foods: Food[]): number => {
+    return foods.reduce((total: number, food: Food) => total + food.calories, 0);
+  };
+
+  // Fonctions pour la gestion du swipe
+  const handleTouchStart = (e: React.TouchEvent, mealId: number) => {
+    setTouchStart(e.targetTouches[0].clientX);
+    setCurrentSwipeMeal(mealId);
+    setSwipeDistance(0);
+  };
+  
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchStart) return;
+    
+    const currentX = e.targetTouches[0].clientX;
+    setTouchEnd(currentX);
+    
+    // Calculer la distance de swipe pour l'animation
+    const distance = touchStart - currentX;
+    setSwipeDistance(distance);
+  };
+  
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd || !currentSwipeMeal) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50; // swipe vers la gauche (marquer comme consommé)
+    const isRightSwipe = distance < -50; // swipe vers la droite (marquer comme non consommé)
+    
+    if (isLeftSwipe) {
+      // Marquer comme non consommé
+      setMealStatuses(prev => ({
+        ...prev,
+        [currentSwipeMeal]: 'skipped'
+      }));
+    } else if (isRightSwipe) {
+      // Marquer comme consommé
+      setMealStatuses(prev => ({
+        ...prev,
+        [currentSwipeMeal]: 'consumed'
+      }));
+    }
+    
+    // Réinitialiser les valeurs
+    setTouchStart(null);
+    setTouchEnd(null);
+    setCurrentSwipeMeal(null);
+    setSwipeDistance(0);
+  };
+  
+  // Interactions par clic pour les navigateurs de bureau
+  const markMealStatus = (mealId: number, status: 'consumed' | 'skipped' | 'pending') => {
+    setMealStatuses(prev => ({
+      ...prev,
+      [mealId]: status
+    }));
+  };
+
+  // Données des repas pour Baby Groot
+  const meals: Meal[] = [
+    {
+      id: 1,
+      name: "Petit déjeuner",
+      time: "07:30",
+      foods: [
+        { name: "Terre fertile enrichie", calories: 150, proteins: 5, carbs: 20, fats: 2, icon: <FaCarrot style={{ color: '#FF6B00' }} /> },
+        { name: "Eau de rosée du matin", calories: 0, proteins: 0, carbs: 0, fats: 0, icon: <span style={{ fontSize: '18px', color: '#4A88F2' }}>💧</span> },
+        { name: "Granola solaire", calories: 250, proteins: 8, carbs: 40, fats: 10, icon: <FaBreadSlice style={{ color: '#C78C19' }} /> }
+      ]
+    },
+    {
+      id: 2,
+      name: "Déjeuner",
+      time: "12:30",
+      foods: [
+        { name: "Mix protéiné forestier", calories: 350, proteins: 30, carbs: 15, fats: 12, icon: <FaLeaf style={{ color: '#00C853' }} /> },
+        { name: "Lumière solaire concentrée", calories: 100, proteins: 0, carbs: 25, fats: 0, icon: <span style={{ fontSize: '18px', color: '#FFD700' }}>☀️</span> },
+        { name: "Noix du jardin", calories: 200, proteins: 8, carbs: 5, fats: 18, icon: <span style={{ fontSize: '18px', color: '#A0522D' }}>🌰</span> }
+      ]
+    },
+    {
+      id: 3,
+      name: "Collation",
+      time: "16:00",
+      foods: [
+        { name: "Nectar de fleur d'étoile", calories: 120, proteins: 1, carbs: 30, fats: 0, icon: <span style={{ fontSize: '18px', color: '#E91E63' }}>🌸</span> },
+        { name: "Algues de croissance", calories: 80, proteins: 5, carbs: 10, fats: 1, icon: <span style={{ fontSize: '18px', color: '#009688' }}>🌿</span> }
+      ]
+    },
+    {
+      id: 4,
+      name: "Dîner",
+      time: "19:30",
+      foods: [
+        { name: "Racines colorées", calories: 180, proteins: 4, carbs: 35, fats: 2, icon: <FaCarrot style={{ color: '#FF5722' }} /> },
+        { name: "Champignons luminescents", calories: 120, proteins: 8, carbs: 10, fats: 4, icon: <span style={{ fontSize: '18px', color: '#9C27B0' }}>🍄</span> },
+        { name: "Bourgeons de saison", calories: 200, proteins: 12, carbs: 15, fats: 8, icon: <FaAppleAlt style={{ color: '#8BC34A' }} /> }
+      ]
+    }
+  ];
+
+  // Modale du journal alimentaire
+  const renderMealJournalModal = () => {
+    const handleEditMeal = (meal: Meal) => {
+      setCurrentEditMeal(meal);
+      setEditedFoods([...meal.foods]);
+      setShowEditMealModal(true);
+    };
+    
+    return (
+      <Modal
+        isOpen={showMealModal}
+        onClose={() => setShowMealModal(false)}
+        title="Journal alimentaire de Baby Groot"
+      >
+        <div style={{ color: 'white', maxHeight: '70vh', overflowY: 'auto', padding: '10px 5px' }}>
+          <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+            <p style={{ fontSize: '15px', color: 'rgba(255, 255, 255, 0.8)' }}>
+              Date: 30 mars 2025
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginTop: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <div style={{ 
+                  width: '12px', 
+                  height: '12px', 
+                  borderRadius: '50%', 
+                  backgroundColor: '#4CAF50' 
+                }}></div>
+                <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)' }}>Consommé</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <div style={{ 
+                  width: '12px', 
+                  height: '12px', 
+                  borderRadius: '50%', 
+                  backgroundColor: '#F44336' 
+                }}></div>
+                <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)' }}>Non consommé</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <div style={{ 
+                  width: '12px', 
+                  height: '12px', 
+                  borderRadius: '50%', 
+                  backgroundColor: '#FF9800' 
+                }}></div>
+                <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)' }}>En attente</span>
+              </div>
+            </div>
+            <p style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.6)', marginTop: '10px' }}>
+              <i>Glissez vers la gauche pour marquer comme non consommé ✗<br />
+              Glissez vers la droite pour marquer comme consommé ✓</i>
+            </p>
+          </div>
+          
+          {meals.map((meal: Meal) => {
+            const status = mealStatuses[meal.id] || 'pending';
+            let statusColor = '';
+            let statusText = '';
+            let statusIcon = null;
+            
+            // Définir la couleur et le texte selon le statut
+            if (status === 'consumed') {
+              statusColor = 'rgba(76, 175, 80, 0.3)';
+              statusText = 'Consommé';
+              statusIcon = '✓';
+            } else if (status === 'skipped') {
+              statusColor = 'rgba(244, 67, 54, 0.3)';
+              statusText = 'Non consommé';
+              statusIcon = '✗';
+            } else {
+              statusColor = 'rgba(255, 152, 0, 0.3)';
+              statusText = 'En attente';
+              statusIcon = '⏱️';
+            }
+            
+            // Calculer le décalage de la carte pendant le swipe
+            const isCurrentSwipe = currentSwipeMeal === meal.id;
+            const translateX = isCurrentSwipe ? -swipeDistance : 0;
+            
+            // Calculer l'opacité des indicateurs de swipe
+            const leftIndicatorOpacity = isCurrentSwipe && swipeDistance > 0 ? Math.min(swipeDistance / 100, 1) : 0;
+            const rightIndicatorOpacity = isCurrentSwipe && swipeDistance < 0 ? Math.min(-swipeDistance / 100, 1) : 0;
+            
+            return (
+              <div 
+                key={meal.id} 
+                style={{
+                  marginBottom: '25px',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}
+              >
+                {/* Indicateurs de swipe (à l'extérieur de la carte) */}
+                <div style={{
+                  position: 'absolute',
+                  left: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'rgba(244, 67, 54, 0.9)',
+                  borderRadius: '50%',
+                  width: '40px',
+                  height: '40px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontSize: '20px',
+                  opacity: rightIndicatorOpacity,
+                  transition: isCurrentSwipe ? 'none' : 'opacity 0.3s ease',
+                  zIndex: 1
+                }}>
+                  ✗
+                </div>
+                
+                <div style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'rgba(76, 175, 80, 0.9)',
+                  borderRadius: '50%',
+                  width: '40px',
+                  height: '40px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontSize: '20px',
+                  opacity: leftIndicatorOpacity,
+                  transition: isCurrentSwipe ? 'none' : 'opacity 0.3s ease',
+                  zIndex: 1
+                }}>
+                  ✓
+                </div>
+                
+                {/* Carte du repas */}
+                <div 
+                  style={{
+                    background: `rgba(0, 38, 65, 0.25)`,
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
+                    borderRadius: '15px',
+                    padding: '15px',
+                    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    transition: isCurrentSwipe ? 'none' : 'all 0.3s ease',
+                    transform: `translateX(${translateX}px)`,
+                    backgroundColor: 
+                      (isCurrentSwipe && swipeDistance < 0) ? 'rgba(244, 67, 54, 0.2)' : // Rouge quand on swipe vers la gauche
+                      (isCurrentSwipe && swipeDistance > 0) ? 'rgba(76, 175, 80, 0.2)' : // Vert quand on swipe vers la droite
+                      status === 'consumed' ? 'rgba(76, 175, 80, 0.3)' : 
+                      status === 'skipped' ? 'rgba(244, 67, 54, 0.3)' : 
+                      'rgba(255, 152, 0, 0.3)',
+                    zIndex: 2
+                  }}
+                  onTouchStart={(e) => handleTouchStart(e, meal.id)}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                >
+                  {/* Indicateur de statut avec animation */}
+                  <div style={{
+                    position: 'absolute',
+                    top: '0',
+                    left: '0',
+                    width: '100%',
+                    height: '100%',
+                    background: 
+                      (isCurrentSwipe && swipeDistance < 0) ? 'rgba(244, 67, 54, 0.3)' : // Rouge quand on swipe vers la gauche
+                      (isCurrentSwipe && swipeDistance > 0) ? 'rgba(76, 175, 80, 0.3)' : // Vert quand on swipe vers la droite
+                      statusColor,
+                    opacity: 0.5,
+                    zIndex: 0,
+                    pointerEvents: 'none',
+                    transition: isCurrentSwipe ? 'none' : 'background 0.3s ease'
+                  }}></div>
+                  
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    marginBottom: '12px',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                    paddingBottom: '8px',
+                    position: 'relative',
+                    zIndex: 1
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <h3 style={{ 
+                        fontSize: '18px', 
+                        fontWeight: 'bold',
+                        margin: 0,
+                        color: '#FF6B00'
+                      }}>{meal.name}</h3>
+                      <span style={{ 
+                        marginLeft: '10px', 
+                        fontSize: '14px',
+                        color: 'rgba(255, 255, 255, 0.6)'
+                      }}>{meal.time}</span>
+                    </div>
+                    <div style={{
+                      background: 'rgba(255, 107, 0, 0.2)',
+                      padding: '5px 10px',
+                      borderRadius: '20px',
+                      fontSize: '14px',
+                      fontWeight: 'bold'
+                    }}>
+                      {totalMealCalories(meal.foods)} kcal
+                    </div>
+                  </div>
+                  
+                  <div>
+                    {meal.foods.map((food: Food) => (
+                      <div key={food.name} style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        padding: '8px 0',
+                        borderBottom: food === meal.foods[meal.foods.length - 1] ? 'none' : '1px solid rgba(255, 255, 255, 0.05)'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <div style={{ 
+                            width: '30px', 
+                            height: '30px', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center',
+                            marginRight: '10px',
+                            background: 'rgba(0, 17, 13, 0.5)',
+                            borderRadius: '8px',
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
+                          }}>
+                            {food.icon}
+                          </div>
+                          <span>{food.name}</span>
+                        </div>
+                        <div style={{ 
+                          display: 'flex', 
+                          flexDirection: 'column', 
+                          alignItems: 'flex-end',
+                          fontSize: '13px'
+                        }}>
+                          <span style={{ fontWeight: 'bold' }}>{food.calories} kcal</span>
+                          <span style={{ 
+                            color: 'rgba(255, 255, 255, 0.6)', 
+                            fontSize: '11px' 
+                          }}>
+                            P: {food.proteins}g • G: {food.carbs}g • L: {food.fats}g
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Boutons de contrôle manuel */}
+                  <div style={{ 
+                    marginTop: '15px', 
+                    display: 'flex', 
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}>
+                    <button 
+                      onClick={() => handleEditMeal(meal)}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        border: 'none',
+                        padding: '8px 15px',
+                        borderRadius: '8px',
+                        color: 'white',
+                        cursor: 'pointer',
+                        backdropFilter: 'blur(5px)',
+                        WebkitBackdropFilter: 'blur(5px)',
+                        fontSize: '14px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      Modifier
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+          
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between',
+            margin: '30px 0 20px',
+            padding: '15px',
+            background: 'rgba(255, 107, 0, 0.15)',
+            borderRadius: '12px',
+            boxShadow: 'inset 0 0 0 1px rgba(255, 107, 0, 0.2)'
+          }}>
+            <div>
+              <span style={{ 
+                fontSize: '16px', 
+                fontWeight: 'bold' 
+              }}>Total journalier</span>
+            </div>
+            <div style={{ 
+              fontWeight: 'bold',
+              fontSize: '16px',
+              color: '#FF6B00'
+            }}>
+              {calculateMacros().calories} kcal
+            </div>
+          </div>
+          
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            marginTop: '20px' 
+          }}>
+            <button 
+              onClick={() => setShowMealModal(false)}
+              style={{
+                background: 'linear-gradient(145deg, #FF6B00, #FF9248)',
+                color: 'white',
+                fontWeight: 'bold',
+                padding: '12px 24px',
+                borderRadius: '12px',
+                border: 'none',
+                boxShadow: '0 4px 15px rgba(255, 107, 0, 0.3)',
+                cursor: 'pointer',
+                fontSize: '15px'
+              }}
+            >
+              Enregistrer mon journal
+            </button>
+          </div>
+        </div>
+      </Modal>
+    );
+  };
+
+  // Modale d'édition d'un repas
+  const renderEditMealModal = () => {
+    if (!currentEditMeal) return null;
+    
+    const updateFoodItem = (index: number, field: keyof Food, value: any) => {
+      const updatedFoods = [...editedFoods];
+      updatedFoods[index] = {
+        ...updatedFoods[index],
+        [field]: field === 'calories' || field === 'proteins' || field === 'carbs' || field === 'fats' 
+          ? parseInt(value) || 0 
+          : value
+      };
+      setEditedFoods(updatedFoods);
+    };
+    
+    const addNewFood = () => {
+      const newFood: Food = {
+        name: "Nouvel aliment",
+        calories: 0,
+        proteins: 0,
+        carbs: 0,
+        fats: 0,
+        icon: <FaLeaf style={{ color: '#4CAF50' }} />
+      };
+      setEditedFoods([...editedFoods, newFood]);
+    };
+    
+    const removeFood = (index: number) => {
+      const updatedFoods = [...editedFoods];
+      updatedFoods.splice(index, 1);
+      setEditedFoods(updatedFoods);
+    };
+    
+    const saveChanges = () => {
+      // Mettre à jour le repas avec les aliments modifiés
+      const updatedMeals = meals.map(meal => 
+        meal.id === currentEditMeal.id 
+          ? { ...meal, foods: editedFoods } 
+          : meal
+      );
+      
+      // Fermer la modale d'édition
+      setShowEditMealModal(false);
+      setCurrentEditMeal(null);
+    };
+    
+    return (
+      <Modal
+        isOpen={showEditMealModal}
+        onClose={() => setShowEditMealModal(false)}
+        title={`Modifier ${currentEditMeal.name} (${currentEditMeal.time})`}
+      >
+        <div style={{ color: 'white', maxHeight: '70vh', overflowY: 'auto', padding: '10px 5px' }}>
+          {editedFoods.map((food: Food, index: number) => (
+            <div key={index} style={{
+              marginBottom: '15px',
+              background: 'rgba(0, 38, 65, 0.25)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              borderRadius: '12px',
+              padding: '15px',
+              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1)'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <input
+                  type="text"
+                  value={food.name}
+                  onChange={(e) => updateFoodItem(index, 'name', e.target.value)}
+                  style={{
+                    background: 'rgba(0, 0, 0, 0.2)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '8px',
+                    padding: '8px 12px',
+                    color: 'white',
+                    width: '70%',
+                    fontSize: '14px',
+                    outline: 'none'
+                  }}
+                />
+                <button
+                  onClick={() => removeFood(index)}
+                  style={{
+                    background: 'rgba(255, 59, 48, 0.2)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 12px',
+                    color: 'white',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Supprimer
+                </button>
+              </div>
+              
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '10px' }}>
+                <div style={{ flex: '1 1 45%', minWidth: '120px' }}>
+                  <label style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)', display: 'block', marginBottom: '5px' }}>
+                    Calories
+                  </label>
+                  <input
+                    type="number"
+                    value={food.calories}
+                    onChange={(e) => updateFoodItem(index, 'calories', e.target.value)}
+                    style={{
+                      background: 'rgba(0, 0, 0, 0.2)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: '8px',
+                      padding: '8px 12px',
+                      color: 'white',
+                      width: '100%',
+                      fontSize: '14px',
+                      outline: 'none'
+                    }}
+                  />
+                </div>
+                
+                <div style={{ flex: '1 1 45%', minWidth: '120px' }}>
+                  <label style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)', display: 'block', marginBottom: '5px' }}>
+                    Protéines (g)
+                  </label>
+                  <input
+                    type="number"
+                    value={food.proteins}
+                    onChange={(e) => updateFoodItem(index, 'proteins', e.target.value)}
+                    style={{
+                      background: 'rgba(0, 0, 0, 0.2)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: '8px',
+                      padding: '8px 12px',
+                      color: 'white',
+                      width: '100%',
+                      fontSize: '14px',
+                      outline: 'none'
+                    }}
+                  />
+                </div>
+                
+                <div style={{ flex: '1 1 45%', minWidth: '120px' }}>
+                  <label style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)', display: 'block', marginBottom: '5px' }}>
+                    Glucides (g)
+                  </label>
+                  <input
+                    type="number"
+                    value={food.carbs}
+                    onChange={(e) => updateFoodItem(index, 'carbs', e.target.value)}
+                    style={{
+                      background: 'rgba(0, 0, 0, 0.2)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: '8px',
+                      padding: '8px 12px',
+                      color: 'white',
+                      width: '100%',
+                      fontSize: '14px',
+                      outline: 'none'
+                    }}
+                  />
+                </div>
+                
+                <div style={{ flex: '1 1 45%', minWidth: '120px' }}>
+                  <label style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)', display: 'block', marginBottom: '5px' }}>
+                    Lipides (g)
+                  </label>
+                  <input
+                    type="number"
+                    value={food.fats}
+                    onChange={(e) => updateFoodItem(index, 'fats', e.target.value)}
+                    style={{
+                      background: 'rgba(0, 0, 0, 0.2)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: '8px',
+                      padding: '8px 12px',
+                      color: 'white',
+                      width: '100%',
+                      fontSize: '14px',
+                      outline: 'none'
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+          
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+            <button
+              onClick={addNewFood}
+              style={{
+                background: 'rgba(76, 175, 80, 0.2)',
+                border: '1px dashed rgba(76, 175, 80, 0.5)',
+                borderRadius: '8px',
+                padding: '8px 15px',
+                color: 'white',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              + Ajouter un aliment
+            </button>
+          </div>
+          
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between',
+            marginTop: '20px' 
+          }}>
+            <button 
+              onClick={() => setShowEditMealModal(false)}
+              style={{
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: 'none',
+                padding: '10px 20px',
+                borderRadius: '10px',
+                color: 'white',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+            >
+              Annuler
+            </button>
+            
+            <button 
+              onClick={saveChanges}
+              style={{
+                background: 'linear-gradient(145deg, #FF6B00, #FF9248)',
+                color: 'white',
+                fontWeight: 'bold',
+                padding: '10px 20px',
+                borderRadius: '10px',
+                border: 'none',
+                boxShadow: '0 4px 15px rgba(255, 107, 0, 0.3)',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              Enregistrer les modifications
+            </button>
+          </div>
+        </div>
+      </Modal>
+    );
   };
 
   if (!practitioner) {
@@ -521,7 +1543,7 @@ export default function PraticienPage() {
             borderBottom: '1px solid rgba(255, 107, 0, 0.3)',
             paddingBottom: '10px'
           }}>
-            Vos rendez-vous avec {practitioner.firstName}
+            Vos rendez-vous avec {practitioner?.firstName}
           </h2>
           
           {/* Calendrier filtré par praticien */}
@@ -562,19 +1584,15 @@ export default function PraticienPage() {
                 handleAddAppointment(formattedDate);
               }}
               style={{
+                padding: '12px 20px',
+                borderRadius: '12px',
+                border: 'none',
                 background: 'linear-gradient(145deg, #FF6B00, #FF9248)',
                 color: 'white',
-                border: 'none',
-                borderRadius: '12px',
-                padding: '12px 20px',
-                fontSize: '16px',
                 fontWeight: 'bold',
                 cursor: 'pointer',
                 boxShadow: '0 4px 12px rgba(255, 107, 0, 0.3)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '100%',
+                flex: '1',
                 transition: 'all 0.2s ease'
               }}
             >
@@ -593,10 +1611,7 @@ export default function PraticienPage() {
                 fontWeight: 'bold',
                 cursor: 'pointer',
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '100%',
+                flex: '1',
                 transition: 'all 0.2s ease'
               }}
             >
@@ -604,6 +1619,10 @@ export default function PraticienPage() {
             </button>
           </div>
         </div>
+        
+        {/* Afficher le suivi nutritionnel uniquement pour Jessica Jones */}
+        {renderNutritionTracking()}
+        
       </div>
       
       {/* Modale de prise de rendez-vous */}
@@ -883,11 +1902,14 @@ export default function PraticienPage() {
           )}
           
           {pendingAppointments.length === 0 && (
-            <div style={{
-              padding: '12px 15px',
-              background: 'rgba(255, 107, 0, 0.15)',
+            <div style={{ 
+              padding: '12px 15px', 
+              background: 'rgba(255, 107, 0, 0.15)', 
               borderRadius: '12px',
-              marginBottom: '5px'
+              border: '1px solid rgba(255, 107, 0, 0.2)',
+              marginTop: '10px',
+              textAlign: 'center',
+              animation: 'fadeIn 0.5s ease-out'
             }}>
               <p style={{ 
                 margin: 0, 
@@ -942,7 +1964,7 @@ export default function PraticienPage() {
             {selectedAppointmentForPayment && (
               <p style={{ 
                 margin: '5px 0 0', 
-                fontSize: '12px', 
+                fontSize: '12px',
                 color: 'rgba(255, 255, 255, 0.7)',
                 fontStyle: 'italic'
               }}>
@@ -994,7 +2016,7 @@ export default function PraticienPage() {
             {selectedAppointmentForPayment && (
               <p style={{ 
                 margin: '5px 0 0', 
-                fontSize: '12px', 
+                fontSize: '12px',
                 color: 'rgba(255, 255, 255, 0.7)',
                 fontStyle: 'italic'
               }}>
@@ -1046,7 +2068,7 @@ export default function PraticienPage() {
             {formErrors.cardNumber && (
               <p style={{ 
                 margin: '5px 0 0', 
-                fontSize: '12px', 
+                fontSize: '12px',
                 color: 'rgba(255, 120, 120, 1)',
                 fontStyle: 'italic'
               }}>
@@ -1096,7 +2118,7 @@ export default function PraticienPage() {
             {formErrors.cardHolder && (
               <p style={{ 
                 margin: '5px 0 0', 
-                fontSize: '12px', 
+                fontSize: '12px',
                 color: 'rgba(255, 120, 120, 1)',
                 fontStyle: 'italic'
               }}>
@@ -1148,7 +2170,7 @@ export default function PraticienPage() {
               {formErrors.expiryDate && (
                 <p style={{ 
                   margin: '5px 0 0', 
-                  fontSize: '12px', 
+                  fontSize: '12px',
                   color: 'rgba(255, 120, 120, 1)',
                   fontStyle: 'italic'
                 }}>
@@ -1199,7 +2221,7 @@ export default function PraticienPage() {
               {formErrors.cvv && (
                 <p style={{ 
                   margin: '5px 0 0', 
-                  fontSize: '12px', 
+                  fontSize: '12px',
                   color: 'rgba(255, 120, 120, 1)',
                   fontStyle: 'italic'
                 }}>
@@ -1379,6 +2401,12 @@ export default function PraticienPage() {
           </div>
         </div>
       </Modal>
+      
+      {/* Modale du journal alimentaire */}
+      {renderMealJournalModal()}
+      
+      {/* Modale d'édition de repas */}
+      {renderEditMealModal()}
     </div>
   );
 }
