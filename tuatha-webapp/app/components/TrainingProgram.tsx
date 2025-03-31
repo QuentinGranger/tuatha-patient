@@ -841,6 +841,29 @@ const TrainingProgram: React.FC<TrainingProgramProps> = ({ athleteId, athleteNam
     );
   };
   
+  const handleVideoButtonClick = (exerciseId: string, setId: string) => {
+    if (selectedExerciseForVideo === exerciseId && selectedSetForVideo === setId) {
+      // Arrêter l'enregistrement en cours
+      stopVideoRecording();
+      setSelectedExerciseForVideo(null);
+      setSelectedSetForVideo(null);
+    } else {
+      // Démarrer un nouvel enregistrement
+      startVideoRecording(exerciseId, setId);
+      setSelectedExerciseForVideo(exerciseId);
+      setSelectedSetForVideo(setId);
+    }
+  };
+
+  const playVideo = (videoUrl: string) => {
+    // Option 1: Ouvrir la vidéo dans une nouvelle fenêtre/onglet
+    window.open(videoUrl, '_blank');
+    
+    // Option 2: Vous pourriez également implémenter un lecteur modal ici
+    // setVideoToPlay(videoUrl);
+    // setShowVideoPlayer(true);
+  };
+  
   return (
     <div className={styles.trainingProgram}>
       <h1>Programme d'entraînement</h1>

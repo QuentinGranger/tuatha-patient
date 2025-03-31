@@ -12,6 +12,7 @@
   flex-direction: column;
   color: white;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow: hidden;
 }
 
 .header {
@@ -22,6 +23,7 @@
   background: rgba(0, 38, 65, 0.8);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 20;
 }
 
 .header h1 {
@@ -63,49 +65,114 @@
   flex-direction: column;
   overflow: hidden;
   padding: 0;
+  position: relative;
 }
 
 /* Section principale vidéo */
 .videoSection {
-  flex: 0 0 auto;
   position: relative;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  max-height: 50vh;
-}
-
-.mainVideo {
-  width: 100%;
-  height: 100%;
-  position: relative;
+  flex: 1;
+  background: #000000;
   display: flex;
   flex-direction: column;
 }
 
-.videoPlayer {
+.mainVideo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
   width: 100%;
-  height: auto;
-  object-fit: contain;
-  background: rgba(0, 0, 0, 0.7);
-  max-height: 40vh;
+  overflow: hidden;
+  background: #000000;
 }
 
+.videoPlayer {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  background: #000000;
+  height: calc(100vh - 200px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.videoPlayer video {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+/* Style pour les vidéos verticales */
+.verticalVideo video {
+  height: calc(100vh - 250px);
+  max-width: 100%;
+  width: auto;
+  object-fit: contain;
+}
+
+/* Titre sous la vidéo, exactement à la largeur de la vidéo */
+.videoInfo {
+  position: relative;
+  padding: 18px 20px;
+  background: rgba(0, 38, 65, 0.9);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+  margin-top: 0;
+  z-index: 10;
+  color: white;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+  align-self: stretch;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.videoInfo h2 {
+  margin: 0 0 5px 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.videoMeta {
+  display: flex;
+  gap: 20px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+/* Barre de progression en bas */
 .videoControls {
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
-  padding: 15px;
+  padding: 10px 15px;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
   opacity: 1;
   transition: opacity 0.3s;
+  z-index: 15;
+}
+
+.controlsHidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .timelineContainer {
-  margin-bottom: 10px;
+  width: 100%;
+  margin-bottom: 2px;
 }
 
 .timeline {
@@ -136,18 +203,36 @@
   margin-top: 5px;
 }
 
+/* Boutons de contrôle au centre */
 .controlButtons {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 15px;
+  background: rgba(67, 85, 99, 0.85);
+  padding: 12px 24px;
+  border-radius: 50px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  transition: opacity 0.3s, transform 0.3s;
+  z-index: 20;
+}
+
+.controlsHidden .controlButtons {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.9);
+  pointer-events: none;
 }
 
 .controlButton {
-  background: rgba(0, 38, 65, 0.8);
+  background: rgba(16, 41, 59, 0.9);
   border: none;
-  width: 36px;
-  height: 36px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -155,20 +240,21 @@
   cursor: pointer;
   color: white;
   transition: all 0.2s;
+  font-size: 1.2rem;
 }
 
 .controlButton:hover {
-  background: rgba(255, 107, 0, 0.7);
+  background: rgba(26, 51, 69, 0.95);
   transform: scale(1.05);
 }
 
 .shareButton {
-  background: rgba(255, 107, 0, 0.7);
+  background: rgba(222, 110, 63, 0.9);
   position: relative;
 }
 
 .shareButton:hover {
-  background: rgba(255, 107, 0, 0.9);
+  background: rgba(242, 130, 83, 1);
 }
 
 .shareWrapper {
@@ -177,7 +263,7 @@
 
 .shareMenu {
   position: absolute;
-  bottom: 50px;
+  bottom: 60px;
   right: -5px;
   background: rgba(0, 38, 65, 0.95);
   backdrop-filter: blur(10px);
@@ -185,7 +271,7 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   width: 220px;
-  z-index: 10;
+  z-index: 30;
   border: 1px solid rgba(255, 255, 255, 0.1);
   animation: shareMenuAppear 0.2s ease-out;
 }
@@ -224,48 +310,13 @@
   font-size: 1.2rem;
 }
 
-.videoInfo {
-  padding: 15px;
-  background: rgba(0, 38, 65, 0.6);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.videoInfo h2 {
-  margin: 0 0 5px 0;
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-
-.videoMeta {
-  display: flex;
-  gap: 15px;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.9rem;
-  margin-bottom: 10px;
-}
-
-.videoTags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.tag {
-  background: rgba(255, 107, 0, 0.3);
-  color: rgba(255, 255, 255, 0.9);
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  backdrop-filter: blur(5px);
-}
-
 /* Bibliothèque vidéo */
 .videoLibrary {
-  flex: 1;
+  flex: 0 0 auto;
   overflow-y: auto;
   padding: 15px;
   background: rgba(0, 17, 13, 0.7);
+  max-height: 30vh;
 }
 
 .videoLibrary h2 {
@@ -336,6 +387,44 @@
   font-size: 0.7rem;
 }
 
+/* Boutons d'action sur les miniatures, toujours visibles pour mobile */
+.videoItemActions {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 5;
+  opacity: 1;
+}
+
+.videoItem:hover .videoItemActions {
+  opacity: 1;
+}
+
+.videoItemAction {
+  background: rgba(0, 38, 65, 0.8);
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  transition: all 0.2s;
+  backdrop-filter: blur(3px);
+  font-size: 0.8rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.videoItemAction:hover, .videoItemAction:active {
+  background: rgba(255, 107, 0, 0.8);
+  transform: scale(1.1);
+}
+
 .videoItemInfo {
   padding: 8px;
   flex: 1;
@@ -354,40 +443,6 @@
   margin: 0;
   font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.7);
-}
-
-.videoItemActions {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  display: flex;
-  gap: 5px;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.videoItem:hover .videoItemActions {
-  opacity: 1;
-}
-
-.videoItemAction {
-  background: rgba(0, 0, 0, 0.6);
-  border: none;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: white;
-  transition: all 0.2s;
-  backdrop-filter: blur(5px);
-  font-size: 0.8rem;
-}
-
-.videoItemAction:hover {
-  background: rgba(255, 107, 0, 0.7);
 }
 
 .notification {
@@ -428,6 +483,105 @@
   }
 }
 
+/* Boîte de dialogue de confirmation de suppression */
+.deleteConfirmOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 17, 13, 0.8);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  animation: overlayAppear 0.3s ease;
+}
+
+@keyframes overlayAppear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.deleteConfirmDialog {
+  background: rgba(0, 38, 65, 0.95);
+  border-radius: 12px;
+  padding: 25px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: dialogAppear 0.3s ease;
+  color: white;
+}
+
+@keyframes dialogAppear {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.deleteConfirmDialog h3 {
+  margin: 0 0 15px 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: white;
+}
+
+.deleteConfirmDialog p {
+  margin: 0 0 20px 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.deleteConfirmButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+}
+
+.cancelButton {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.cancelButton:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.confirmButton {
+  background: rgba(255, 107, 0, 0.8);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.confirmButton:hover {
+  background: rgba(255, 107, 0, 1);
+}
+
 .noVideoSelected {
   display: flex;
   justify-content: center;
@@ -436,4 +590,86 @@
   min-height: 200px;
   background: rgba(0, 0, 0, 0.4);
   color: rgba(255, 255, 255, 0.7);
+}
+
+/* Modal d'édition */
+.editModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 17, 13, 0.8);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  animation: overlayAppear 0.3s ease;
+}
+
+.editModalDialog {
+  background: rgba(0, 38, 65, 0.95);
+  border-radius: 12px;
+  padding: 25px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: dialogAppear 0.3s ease;
+  color: white;
+}
+
+.editModalDialog h3 {
+  margin: 0 0 20px 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: white;
+}
+
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formGroup label {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+.editInput, .editTextarea {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 10px 12px;
+  color: white;
+  font-size: 1rem;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.editInput:focus, .editTextarea:focus {
+  outline: none;
+  border-color: rgba(255, 107, 0, 0.6);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.editTextarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.editFormButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 10px;
 }
