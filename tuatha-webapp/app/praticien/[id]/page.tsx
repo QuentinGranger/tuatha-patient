@@ -1718,7 +1718,7 @@ export default function PraticienPage() {
           {practitioner?.id === 3 && isMounted && (
             <div style={{ marginTop: '25px' }}>
               <TrainingCycle
-                athleteName="Jean Dupont"
+                athleteName="Baby Groot"
                 athleteId="P-12345"
               />
             </div>
@@ -1728,7 +1728,7 @@ export default function PraticienPage() {
           {practitioner?.id === 3 && isMounted && (
             <div style={{ marginTop: '25px' }}>
               <TrainingProgram
-                athleteName="Jean Dupont"
+                athleteName="Baby Groot"
                 athleteId="P-12345"
               />
             </div>
@@ -1738,7 +1738,7 @@ export default function PraticienPage() {
           {practitioner?.id === 3 && isMounted && (
             <div style={{ marginTop: '25px' }}>
               <VideoShare
-                athleteName="Jean Dupont"
+                athleteName="Baby Groot"
                 athleteId="P-12345"
               />
             </div>
@@ -1748,7 +1748,7 @@ export default function PraticienPage() {
           {practitioner.id === 4 && isMounted && (
             <div style={{ marginTop: '25px' }}>
               <RehabProgress
-                patientName="Jean Dupont"
+                patientName="Baby Groot"
                 injury="Entorse grave de la cheville gauche"
                 startDate="2025-02-10"
                 estimatedEndDate="2025-05-15"
@@ -1854,7 +1854,7 @@ export default function PraticienPage() {
           {practitioner.id === 4 && isMounted && (
             <div style={{ marginTop: '25px' }}>
               <RehabHistory
-                patientName="Jean Dupont"
+                patientName="Baby Groot"
                 patientId="P-12345"
               />
             </div>
@@ -1864,7 +1864,7 @@ export default function PraticienPage() {
           {practitioner.id === 4 && isMounted && (
             <div style={{ marginTop: '25px' }}>
               <RehabTable
-                patientName="Jean Dupont"
+                patientName="Baby Groot"
                 patientId="P-12345"
               />
             </div>

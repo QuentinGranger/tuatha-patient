@@ -19,8 +19,11 @@ import {
   FaExclamationTriangle,
   FaDumbbell,
   FaStopwatch,
-  FaRunning
+  FaRunning,
+  FaCommentDots
 } from 'react-icons/fa';
+import SessionDebrief from './SessionDebrief';
+import Portal from './Portal';
 
 // Types
 interface ExerciseSet {
@@ -71,6 +74,16 @@ interface TrainingUnit {
     muscularSoreness: number; // 1-10
     overallFeeling: number; // 1-10
     notes: string;
+  };
+  sessionDebrief?: {
+    id: string;
+    date: string;
+    mood: 'great' | 'good' | 'neutral' | 'tired' | 'bad';
+    painLevel: 0 | 1 | 2 | 3 | 4 | 5;
+    progress: number; // 0-100
+    feedback: string;
+    goals: string[];
+    achievements: string[];
   };
   coachNotes?: string;
 }
@@ -475,6 +488,16 @@ const TrainingProgram: React.FC<TrainingProgramProps> = ({ athleteId, athleteNam
   const [selectedExerciseForVideo, setSelectedExerciseForVideo] = useState<string | null>(null);
   const [selectedSetForVideo, setSelectedSetForVideo] = useState<string | null>(null);
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
+  const [sessionDebrief, setSessionDebrief] = useState<{
+    id: string;
+    date: string;
+    mood: 'great' | 'good' | 'neutral' | 'tired' | 'bad';
+    painLevel: 0 | 1 | 2 | 3 | 4 | 5;
+    progress: number; // 0-100
+    feedback: string;
+    goals: string[];
+    achievements: string[];
+  } | null>(null);
   
   // États pour le calculateur
   const [oneRepMax, setOneRepMax] = useState<number>(100);
@@ -864,6 +887,94 @@ const TrainingProgram: React.FC<TrainingProgramProps> = ({ athleteId, athleteNam
     // setShowVideoPlayer(true);
   };
   
+  const handleSessionDebrief = () => {
+    const unit = getActiveTrainingUnit();
+    if (unit) {
+      const debrief = unit.sessionDebrief;
+      if (debrief) {
+        setSessionDebrief(debrief);
+      } else {
+        setSessionDebrief({
+          id: unit.id,
+          date: new Date().toISOString(),
+          mood: 'neutral',
+          painLevel: 0,
+          progress: 0,
+          feedback: '',
+          goals: [],
+          achievements: []
+        });
+      }
+    }
+  };
+  
+  const updateSessionDebrief = (field: keyof typeof sessionDebrief, value: any) => {
+    setSessionDebrief(prevDebrief => ({ ...prevDebrief, [field]: value }));
+  };
+  
+  const saveSessionDebrief = () => {
+    const unit = getActiveTrainingUnit();
+    if (unit && sessionDebrief) {
+      setTrainingData(prevData => {
+        const newData = [...prevData];
+        const weekIndex = newData.findIndex(week => week.id === activeWeekId);
+        
+        if (weekIndex === -1) return prevData;
+        
+        const unitIndex = newData[weekIndex].trainingUnits.findIndex(unit => unit.id === activeTrainingUnitId);
+        
+        if (unitIndex === -1) return prevData;
+        
+        newData[weekIndex].trainingUnits[unitIndex].sessionDebrief = sessionDebrief;
+        
+        return newData;
+      });
+    }
+  };
+
+  const [activeWeekIndex, setActiveWeekIndex] = useState(0);
+  const [showDebriefModal, setShowDebriefModal] = useState(false);
+  const [selectedSession, setSelectedSession] = useState<TrainingUnit | null>(null);
+  const [debrief, setDebrief] = useState<any>(null);
+
+  const getAllTrainingSessions = () => {
+    return exampleTrainingData.flatMap(week => 
+      week.trainingUnits.map(unit => ({
+        id: unit.id,
+        name: unit.name,
+        date: unit.date,
+        status: unit.status
+      }))
+    );
+  };
+
+  const trainingSessions = getAllTrainingSessions();
+
+  const handleSaveDebrief = (data: any) => {
+    console.log('Débrief sauvegardé:', data);
+    // Ici on pourrait mettre à jour les données de la séance avec le débrief
+    const updatedTrainingUnits = exampleTrainingData.map(week => {
+      return {
+        ...week,
+        trainingUnits: week.trainingUnits.map(unit => {
+          if (unit.id === data.sessionId) {
+            return {
+              ...unit,
+              sessionDebrief: data
+            };
+          }
+          return unit;
+        })
+      };
+    });
+    
+    // Fermer la modale
+    setShowDebriefModal(false);
+    
+    // Notification de succès
+    alert('Débrief enregistré avec succès!');
+  };
+
   return (
     <div className={styles.trainingProgram}>
       <h1>Programme d'entraînement</h1>
@@ -904,13 +1015,19 @@ const TrainingProgram: React.FC<TrainingProgramProps> = ({ athleteId, athleteNam
             <FaCalculator />
             Calculateur
           </button>
+          
+          <div className={styles.trainingActions}>
+            <button className={styles.debriefButton} onClick={() => setShowDebriefModal(true)}>
+              Compléter une session de débrief
+            </button>
+          </div>
         </div>
       </div>
       
       <div className={styles.weekDays}>
         {getActiveWeek().trainingUnits.map((unit) => (
           <div 
-            key={unit.id}
+            key={unit.id} 
             className={`${styles.dayCard} ${activeTrainingUnitId === unit.id ? styles.activeDay : ''} ${styles[unit.status]} ${isDayExpanded(unit.id) ? styles.expandedDay : ''}`}
             onClick={() => handleDayClick(unit.id)}
           >
@@ -948,6 +1065,23 @@ const TrainingProgram: React.FC<TrainingProgramProps> = ({ athleteId, athleteNam
                 <div className={styles.statLabel}>Exercices</div>
               </div>
             </div>
+            {unit.sessionDebrief && (
+              <div className={styles.debriefCompleted} title="Débrief complété">
+                <div className={styles.debriefMood}>
+                  {unit.sessionDebrief.mood === 'great' && "😄"}
+                  {unit.sessionDebrief.mood === 'good' && "🙂"}
+                  {unit.sessionDebrief.mood === 'neutral' && "😐"}
+                  {unit.sessionDebrief.mood === 'tired' && "😓"}
+                  {unit.sessionDebrief.mood === 'bad' && "😞"}
+                </div>
+                <div className={styles.debriefProgress}>
+                  <div 
+                    className={styles.debriefProgressBar} 
+                    style={{width: `${unit.sessionDebrief.progress}%`}}
+                  ></div>
+                </div>
+              </div>
+            )}
             <button 
               className={styles.expandButton}
               onClick={(e) => {
@@ -958,6 +1092,19 @@ const TrainingProgram: React.FC<TrainingProgramProps> = ({ athleteId, athleteNam
             >
               {isDayExpanded(unit.id) ? <FaMinus /> : <FaPlus />}
             </button>
+            {unit.status === 'completed' && (
+              <button 
+                className={styles.debriefButton}
+                onClick={(e) => {
+                  e.stopPropagation(); // Éviter de sélectionner la séance
+                  handleDayClick(unit.id);
+                  handleSessionDebrief();
+                }}
+                title="Débrief de séance"
+              >
+                <FaCommentDots />
+              </button>
+            )}
             {isDayExpanded(unit.id) && (
               <div className={styles.sessionDetail}>
                 <div className={styles.sessionDetailHeader}>
@@ -1187,6 +1334,22 @@ const TrainingProgram: React.FC<TrainingProgramProps> = ({ athleteId, athleteNam
             </button>
           </div>
         </div>
+      )}
+      
+      {/* Débrief de séance */}
+      {showDebriefModal && (
+        <Portal>
+          <div className={styles.modalOverlay}>
+            <div className={styles.modalContainer}>
+              <SessionDebrief 
+                athleteName={athleteName}
+                onClose={() => setShowDebriefModal(false)}
+                onSave={handleSaveDebrief}
+                trainingSessions={trainingSessions}
+              />
+            </div>
+          </div>
+        </Portal>
       )}
     </div>
   );

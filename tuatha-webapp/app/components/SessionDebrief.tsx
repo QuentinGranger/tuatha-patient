@@ -10,6 +10,15 @@ interface SessionDebriefProps {
   athleteName?: string;
   onClose?: () => void;
   onSave?: (data: SessionDebriefData) => void;
+  debrief?: SessionDebriefData;
+  updateDebrief?: (field: keyof SessionDebriefData, value: any) => void;
+  saveDebrief?: () => void;
+  trainingSessions?: Array<{
+    id: string;
+    name: string;
+    date: string;
+    status: string;
+  }>;
 }
 
 export interface SessionDebriefData {
@@ -39,14 +48,27 @@ const SessionDebrief: React.FC<SessionDebriefProps> = ({
   sessionId, 
   athleteName = 'Baby Groot',
   onClose, 
-  onSave 
+  onSave,
+  debrief,
+  updateDebrief,
+  saveDebrief,
+  trainingSessions
 }) => {
-  const [formData, setFormData] = useState<SessionDebriefData>({
-    ...initialData,
-    sessionId
-  });
+  const [formData, setFormData] = useState<SessionDebriefData>(
+    debrief || {
+      ...initialData,
+      sessionId: sessionId || `session_${Date.now()}`
+    }
+  );
   const [saved, setSaved] = useState(false);
   const [showThanks, setShowThanks] = useState(false);
+  const [selectedSession, setSelectedSession] = useState<string>(sessionId || "");
+
+  useEffect(() => {
+    if (sessionId && sessionId !== selectedSession) {
+      setSelectedSession(sessionId);
+    }
+  }, [sessionId]);
 
   const moodEmojis = {
     great: '😄',
@@ -66,96 +88,126 @@ const SessionDebrief: React.FC<SessionDebriefProps> = ({
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    if (updateDebrief) {
+      updateDebrief(name as keyof SessionDebriefData, value);
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: parseInt(value, 10)
-    }));
+    
+    if (updateDebrief) {
+      updateDebrief(name as keyof SessionDebriefData, parseInt(value, 10));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: parseInt(value, 10)
+      }));
+    }
   };
 
   const handleMoodSelect = (mood: Mood) => {
-    setFormData(prev => ({
-      ...prev,
-      mood
-    }));
+    if (updateDebrief) {
+      updateDebrief('mood', mood);
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        mood
+      }));
+    }
   };
 
   const handlePainSelect = (pain: Pain) => {
-    setFormData(prev => ({
-      ...prev,
-      painLevel: pain
-    }));
+    if (updateDebrief) {
+      updateDebrief('painLevel', pain);
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        painLevel: pain
+      }));
+    }
   };
 
   const handleGoalChange = (index: number, value: string) => {
     const newGoals = [...formData.goals];
     newGoals[index] = value;
     
-    // Add a new empty goal if typing in the last one
     if (index === newGoals.length - 1 && value.trim() !== '') {
       newGoals.push('');
     }
     
-    // Remove empty goals (except the last one)
     const filteredGoals = newGoals.filter((goal, i) => 
       i === newGoals.length - 1 || goal.trim() !== ''
     );
     
-    setFormData(prev => ({
-      ...prev,
-      goals: filteredGoals
-    }));
+    if (updateDebrief) {
+      updateDebrief('goals', filteredGoals);
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        goals: filteredGoals
+      }));
+    }
   };
 
   const handleAchievementChange = (index: number, value: string) => {
     const newAchievements = [...formData.achievements];
     newAchievements[index] = value;
     
-    // Add a new empty achievement if typing in the last one
     if (index === newAchievements.length - 1 && value.trim() !== '') {
       newAchievements.push('');
     }
     
-    // Remove empty achievements (except the last one)
     const filteredAchievements = newAchievements.filter((achievement, i) => 
       i === newAchievements.length - 1 || achievement.trim() !== ''
     );
     
-    setFormData(prev => ({
-      ...prev,
-      achievements: filteredAchievements
-    }));
+    if (updateDebrief) {
+      updateDebrief('achievements', filteredAchievements);
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        achievements: filteredAchievements
+      }));
+    }
   };
 
-  const saveDebrief = () => {
-    // Filter out empty items before saving
-    const cleanData = {
-      ...formData,
-      goals: formData.goals.filter(goal => goal.trim() !== ''),
-      achievements: formData.achievements.filter(achievement => achievement.trim() !== '')
-    };
-    
-    if (onSave) {
-      onSave(cleanData);
-    }
-    
-    setSaved(true);
-    setShowThanks(true);
-    
-    // Hide the thank you message after 3 seconds
-    setTimeout(() => {
-      setShowThanks(false);
-      if (onClose) {
-        onClose();
+  const saveDebriefData = () => {
+    if (saveDebrief) {
+      saveDebrief();
+      setSaved(true);
+      setShowThanks(true);
+      
+      setTimeout(() => {
+        setShowThanks(false);
+      }, 3000);
+    } else {
+      const cleanData = {
+        ...formData,
+        goals: formData.goals.filter(goal => goal.trim() !== ''),
+        achievements: formData.achievements.filter(achievement => achievement.trim() !== '')
+      };
+      
+      if (onSave) {
+        onSave(cleanData);
       }
-    }, 3000);
+      
+      setSaved(true);
+      setShowThanks(true);
+      
+      setTimeout(() => {
+        setShowThanks(false);
+        if (onClose) {
+          onClose();
+        }
+      }, 3000);
+    }
   };
 
   return (
@@ -185,16 +237,29 @@ const SessionDebrief: React.FC<SessionDebriefProps> = ({
         ) : (
           <form className={styles.debriefForm}>
             <div className={styles.section}>
+              <h2>Sélectionnez la séance</h2>
+              <select
+                value={selectedSession}
+                onChange={(e) => setSelectedSession(e.target.value)}
+                className={styles.sessionSelector}
+              >
+                {trainingSessions && trainingSessions.map(session => (
+                  <option key={session.id} value={session.id}>{session.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className={styles.section}>
               <h2>Comment vous sentez-vous après cette séance?</h2>
               <div className={styles.moodSelector}>
                 {(Object.keys(moodEmojis) as Array<Mood>).map(mood => (
                   <button
                     key={mood}
                     type="button"
-                    className={`${styles.moodButton} ${formData.mood === mood ? styles.selectedMood : ''}`}
+                    className={`${styles.moodOption} ${formData.mood === mood ? styles.selected : ''}`}
                     onClick={() => handleMoodSelect(mood)}
                   >
-                    <span className={styles.moodEmoji}>
+                    <span className={styles.moodIcon}>
                       {moodEmojis[mood]}
                     </span>
                     <span className={styles.moodLabel}>
@@ -215,7 +280,7 @@ const SessionDebrief: React.FC<SessionDebriefProps> = ({
                     className={`${styles.painButton} ${formData.painLevel === level ? styles.selectedPain : ''}`}
                     onClick={() => handlePainSelect(level as Pain)}
                   >
-                    <span className={styles.painValue}>{level}</span>
+                    {level}
                     {level === 0 && <span className={styles.painLabel}>Aucune</span>}
                     {level === 5 && <span className={styles.painLabel}>Sévère</span>}
                   </button>
@@ -234,6 +299,7 @@ const SessionDebrief: React.FC<SessionDebriefProps> = ({
                   value={formData.progress}
                   onChange={handleSliderChange}
                   className={styles.slider}
+                  style={{ width: '100%' }}
                 />
                 <div className={styles.sliderLabels}>
                   <span>Minimal</span>
@@ -250,21 +316,21 @@ const SessionDebrief: React.FC<SessionDebriefProps> = ({
                 value={formData.feedback}
                 onChange={handleTextChange}
                 placeholder="Décrivez comment s'est passée votre séance..."
-                className={styles.feedbackInput}
+                className={styles.textarea}
               />
             </div>
 
             <div className={styles.section}>
               <h2>Objectifs pour la prochaine séance</h2>
-              <div className={styles.goalsList}>
+              <div className={styles.itemsList}>
                 {formData.goals.map((goal, index) => (
-                  <div key={`goal-${index}`} className={styles.goalItem}>
+                  <div key={`goal-${index}`} className={styles.itemRow}>
                     <input
                       type="text"
                       value={goal}
                       onChange={(e) => handleGoalChange(index, e.target.value)}
                       placeholder="Nouvel objectif"
-                      className={styles.goalInput}
+                      className={styles.itemInput}
                     />
                   </div>
                 ))}
@@ -273,15 +339,15 @@ const SessionDebrief: React.FC<SessionDebriefProps> = ({
 
             <div className={styles.section}>
               <h2>Réussites de cette séance</h2>
-              <div className={styles.achievementsList}>
+              <div className={styles.itemsList}>
                 {formData.achievements.map((achievement, index) => (
-                  <div key={`achievement-${index}`} className={styles.achievementItem}>
+                  <div key={`achievement-${index}`} className={styles.itemRow}>
                     <input
                       type="text"
                       value={achievement}
                       onChange={(e) => handleAchievementChange(index, e.target.value)}
                       placeholder="Nouvelle réussite"
-                      className={styles.achievementInput}
+                      className={styles.itemInput}
                     />
                   </div>
                 ))}
@@ -292,7 +358,7 @@ const SessionDebrief: React.FC<SessionDebriefProps> = ({
               <button 
                 type="button" 
                 className={styles.saveButton}
-                onClick={saveDebrief}
+                onClick={saveDebriefData}
               >
                 <FaSave /> Enregistrer
               </button>

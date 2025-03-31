@@ -25,6 +25,7 @@ import {
   FaTwitter
 } from 'react-icons/fa';
 import SessionDebrief from './SessionDebrief';
+import Portal from './Portal';
 
 type VideoShareProps = {
   videos?: VideoItem[];
@@ -64,6 +65,10 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingVideo, setEditingVideo] = useState<VideoItem | null>(null);
   const [showDebrief, setShowDebrief] = useState(false);
+
+  // Pour le suivi des miniatures
+  const processedVideosRef = useRef<Set<string>>(new Set());
+  const isMountedRef = useRef(true);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
@@ -114,127 +119,124 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
 
   const videoListData = videos.length > 0 ? videos : exampleVideos;
 
-  // Extraire la miniature d'une vidéo
-  const extractThumbnailFromVideo = async (videoUrl: string, videoId: string) => {
-    try {
-      // Vérifier si l'URL existe et si elle semble valide
-      if (!videoUrl || !videoUrl.trim()) {
-        console.log('URL de vidéo invalide ou vide, utilisation de la miniature par défaut');
-        return;
-      }
-
-      // Si on a déjà généré une miniature pour cette vidéo, ne pas recommencer
-      if (videoThumbnails[videoId]) {
-        return;
-      }
-
-      // Créer un élément vidéo temporaire
-      const video = document.createElement('video');
-      video.crossOrigin = 'anonymous';
-      video.muted = true;
+  // Fonction pour extraire une miniature (isolée du cycle de rendu)
+  const extractThumbnail = (videoUrl: string, videoId: string) => {
+    // Si cette vidéo a déjà été traitée, ignorer
+    if (processedVideosRef.current.has(videoId)) return;
+    
+    // Marquer comme traitée
+    processedVideosRef.current.add(videoId);
+    
+    // Utiliser une approche qui ne bloque pas le rendu
+    const videoElement = document.createElement('video');
+    videoElement.crossOrigin = 'anonymous';
+    videoElement.muted = true;
+    videoElement.src = videoUrl;
+    
+    // Gérer les événements
+    videoElement.onloadeddata = () => {
+      if (!isMountedRef.current) return;
       
-      let loadError = false;
-      
-      // Gérer les erreurs
-      video.onerror = () => {
-        loadError = true;
-        console.log('Impossible de charger la vidéo pour la miniature, utilisation de la miniature par défaut');
-      };
-      
-      // Définir la source après avoir configuré les gestionnaires d'événements
-      video.src = videoUrl;
-
-      // Si une erreur se produit rapidement, ne pas continuer
-      await new Promise(resolve => setTimeout(resolve, 100));
-      if (loadError) return;
-      
-      // Attendre que les métadonnées soient chargées avec un timeout
       try {
-        await Promise.race([
-          new Promise<void>((resolve) => {
-            video.onloadedmetadata = () => {
-              video.currentTime = 0.1; // Utiliser 0.1s au lieu de 0 pour éviter les frames noires
-              resolve();
-            };
-          }),
-          new Promise<void>((_, reject) => 
-            setTimeout(() => reject(new Error('Timeout lors du chargement des métadonnées')), 3000)
-          )
-        ]);
+        // Accéder à la première frame
+        videoElement.currentTime = 0.1;
       } catch (err) {
-        console.log('Timeout lors du chargement des métadonnées de la vidéo');
-        return;
+        console.error("Erreur lors du réglage du temps:", err);
       }
+    };
+    
+    videoElement.onseeked = () => {
+      if (!isMountedRef.current) return;
       
-      // Si les dimensions de la vidéo ne sont pas valides, ne pas continuer
-      if (!video.videoWidth || !video.videoHeight) {
-        console.log('Dimensions de vidéo invalides');
-        return;
-      }
-      
-      // Attendre que la vidéo se positionne à la frame demandée
       try {
-        await Promise.race([
-          new Promise<void>((resolve) => {
-            video.onseeked = () => resolve();
-          }),
-          new Promise<void>((_, reject) => 
-            setTimeout(() => reject(new Error('Timeout lors du positionnement de la vidéo')), 3000)
-          )
-        ]);
-      } catch (err) {
-        console.log('Timeout lors du positionnement de la vidéo');
-        return;
-      }
-      
-      // Créer un canvas et y dessiner la frame de la vidéo
-      try {
+        // Créer un canvas pour capturer l'image
         const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth || 640;
-        canvas.height = video.videoHeight || 360;
+        canvas.width = Math.max(videoElement.videoWidth, 160);
+        canvas.height = Math.max(videoElement.videoHeight, 90);
         
         const ctx = canvas.getContext('2d');
-        if (ctx && video.videoWidth > 0 && video.videoHeight > 0) {
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        if (ctx) {
+          // Dessiner la vidéo sur le canvas
+          ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
           
-          // Convertir le canvas en image base64
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          // Obtenir l'image
+          const thumbnail = canvas.toDataURL('image/jpeg', 0.8);
           
-          // Mettre à jour l'état des miniatures
-          setVideoThumbnails(prev => ({
-            ...prev,
-            [videoId]: dataUrl
-          }));
+          // Mettre à jour l'état SEULEMENT si l'image n'est pas vide
+          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+          let hasContent = false;
+          
+          // Vérifier si l'image a du contenu (pas juste noir)
+          for (let i = 0; i < imgData.length; i += 100) {
+            if (imgData[i] > 10 || imgData[i+1] > 10 || imgData[i+2] > 10) {
+              hasContent = true;
+              break;
+            }
+          }
+          
+          if (hasContent && isMountedRef.current) {
+            // Update seulement cette miniature spécifique
+            setVideoThumbnails(prev => ({
+              ...prev,
+              [videoId]: thumbnail
+            }));
+          }
         }
-      } catch (canvasErr) {
-        console.log('Erreur lors de la création de la miniature dans le canvas', canvasErr);
+      } catch (err) {
+        console.error("Erreur d'extraction:", err);
+      } finally {
+        // Nettoyer
+        videoElement.remove();
       }
-      
-      // Nettoyage
-      video.src = '';
-      
-    } catch (error) {
-      console.log('Erreur lors de l\'extraction de la miniature:', error);
-      // Continuer sans générer de miniature
-    }
+    };
+    
+    // Gérer les erreurs
+    videoElement.onerror = () => {
+      videoElement.remove();
+    };
+    
+    // Lancer le chargement
+    videoElement.load();
   };
 
+  // Initialiser les miniatures par défaut et démarrer l'extraction
   useEffect(() => {
-    // Extraction des miniatures lorsque les vidéos changent
-    videoListData.forEach(video => {
+    // Marquer comme monté
+    isMountedRef.current = true;
+    // Réinitialiser les vidéos traitées
+    processedVideosRef.current.clear();
+    
+    // Initialiser avec des valeurs par défaut
+    const initialThumbnails: Record<string, string> = {};
+    
+    videoListData.forEach((video) => {
+      // Utiliser l'URL fournie ou l'image par défaut
+      initialThumbnails[video.id] = video.thumbnailUrl || '/img/thumbnailDefault.png';
+      
+      // Démarrer l'extraction pour toutes les vidéos
+      // Cette opération est asynchrone et met à jour l'état quand elle est prête
       if (video.url) {
-        // Utiliser un setTimeout pour espacer les tentatives d'extraction
         setTimeout(() => {
-          extractThumbnailFromVideo(video.url, video.id);
-        }, 500 * Math.random()); // Ajouter un délai aléatoire pour éviter les chargements simultanés
+          if (isMountedRef.current) {
+            extractThumbnail(video.url, video.id);
+          }
+        }, 500 * parseInt(video.id)); // Décaler chaque extraction pour éviter les conflits
       }
     });
+    
+    // Définir les valeurs initiales
+    setVideoThumbnails(initialThumbnails);
+    
+    // Nettoyage
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, [videos.length]); // Ne dépend que du nombre de vidéos
 
-    // Masquer les contrôles après un délai
+  useEffect(() => {
     startControlsTimer();
 
     return () => {
-      // Nettoyage au démontage
       if (controlsTimerRef.current) {
         clearTimeout(controlsTimerRef.current);
       }
@@ -243,26 +245,40 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
 
   // Fonction pour démarrer le timer de disparition des contrôles
   const startControlsTimer = () => {
-    // Annuler tout timer existant
     if (controlsTimerRef.current) {
       clearTimeout(controlsTimerRef.current);
     }
-    
-    // Afficher les contrôles immédiatement
-    setControlsVisible(true);
-    
-    // Puis les masquer après 3 secondes
+
+    if (!isPlaying) return;
+
     controlsTimerRef.current = setTimeout(() => {
-      if (!shareMenuOpen && isPlaying) {
-        setControlsVisible(false);
-      }
+      setControlsVisible(false);
     }, 3000);
   };
 
-  // Afficher les contrôles au survol ou au clic
+  // Gestionnaire pour les mouvements de souris/toucher sur la vidéo
   const handleVideoInteraction = () => {
+    setControlsVisible(true);
     startControlsTimer();
   };
+
+  // Effet pour gérer l'affichage des contrôles
+  useEffect(() => {
+    if (isPlaying) {
+      startControlsTimer();
+    } else {
+      setControlsVisible(true);
+      if (controlsTimerRef.current) {
+        clearTimeout(controlsTimerRef.current);
+      }
+    }
+
+    return () => {
+      if (controlsTimerRef.current) {
+        clearTimeout(controlsTimerRef.current);
+      }
+    };
+  }, [isPlaying]); 
 
   useEffect(() => {
     if (videoListData.length > 0 && !activeVideo) {
@@ -281,7 +297,6 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
   const checkVideoOrientation = () => {
     if (videoRef.current) {
       const { videoWidth, videoHeight } = videoRef.current;
-      // Une vidéo est considérée verticale si sa hauteur est plus grande que sa largeur
       const vertical = videoHeight > videoWidth;
       setIsVerticalVideo(vertical);
     }
@@ -312,7 +327,6 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
       } else {
         videoRef.current.play();
         setIsPlaying(true);
-        // Redémarrer le timer quand on lance la lecture
         startControlsTimer();
       }
     }
@@ -365,27 +379,21 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
   };
 
   const handleShare = (platform: string) => {
-    // Logique à implémenter pour chaque plateforme
     switch (platform) {
       case 'instagram':
         showNotification('Préparation du partage vers Instagram...');
-        // Intégration API Instagram à implémenter
         break;
       case 'whatsapp':
         showNotification('Ouverture de WhatsApp...');
-        // Construire l'URL WhatsApp avec le lien vidéo
         break;
       case 'email':
         showNotification('Préparation d\'un e-mail...');
-        // Préparer un template d'email avec lien vidéo
         break;
       case 'coach':
         showNotification('Vidéo partagée avec votre coach');
-        // Logique d'envoi au coach dans le système
         break;
       case 'schedule':
         showNotification('Ajout à votre calendrier d\'entraînement');
-        // Intégration avec le planificateur d'entraînement
         break;
       case 'clipboard':
         navigator.clipboard.writeText(`${window.location.origin}/shared-video/${activeVideo?.id}`);
@@ -393,7 +401,6 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
         break;
       case 'download':
         showNotification('Téléchargement de la vidéo...');
-        // Logique de téléchargement
         break;
       default:
         break;
@@ -428,25 +435,21 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
     const newState = !shareMenuOpen;
     setShareMenuOpen(newState);
     
-    // Si on ouvre le menu de partage, les contrôles doivent rester visibles
     if (newState) {
       setControlsVisible(true);
       if (controlsTimerRef.current) {
         clearTimeout(controlsTimerRef.current);
       }
     } else {
-      // Sinon, on relance le timer de disparition
       startControlsTimer();
     }
   };
 
-  // Fonctions pour gérer les actions sur les vidéos
   const handleEditVideo = (videoId: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Éviter que le clic ne sélectionne la vidéo
-    // Trouver la vidéo à éditer
+    e.stopPropagation(); 
     const videoToEdit = videoListData.find(v => v.id === videoId);
     if (videoToEdit) {
-      setEditingVideo({...videoToEdit}); // Clone pour éviter de modifier directement
+      setEditingVideo({...videoToEdit}); 
       setShowEditModal(true);
     } else {
       showNotification(`Vidéo #${videoId} introuvable`);
@@ -454,18 +457,16 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
   };
 
   const handleDeleteVideo = (videoId: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Éviter que le clic ne sélectionne la vidéo
+    e.stopPropagation(); 
     setVideoToDelete(videoId);
     setShowDeleteConfirm(true);
   };
 
   const confirmDeleteVideo = () => {
     if (videoToDelete) {
-      // Supprimer réellement la vidéo de la liste
       const updatedList = videoListData.filter(v => v.id !== videoToDelete);
       setVideoList(updatedList);
       
-      // Si la vidéo active est supprimée, sélectionner une autre vidéo
       if (activeVideo && activeVideo.id === videoToDelete) {
         if (updatedList.length > 0) {
           setActiveVideo(updatedList[0]);
@@ -476,7 +477,6 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
       
       showNotification(`Vidéo supprimée avec succès`);
       
-      // Fermer la confirmation
       setShowDeleteConfirm(false);
       setVideoToDelete(null);
     }
@@ -487,7 +487,6 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
     setVideoToDelete(null);
   };
 
-  // Fonctions pour l'édition de vidéo
   const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (editingVideo) {
       setEditingVideo({
@@ -504,7 +503,6 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
       );
       setVideoList(updatedList);
       
-      // Mettre à jour la vidéo active si c'est celle qui est modifiée
       if (activeVideo && activeVideo.id === editingVideo.id) {
         setActiveVideo(editingVideo);
       }
@@ -516,6 +514,11 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
   };
 
   const cancelVideoEdit = () => {
+    setShowEditModal(false);
+    setEditingVideo(null);
+  };
+
+  const handleVideoEditClose = () => {
     setShowEditModal(false);
     setEditingVideo(null);
   };
@@ -661,12 +664,12 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
               >
                 <div className={styles.videoThumbnail}>
                   <img 
-                    src={videoThumbnails[video.id] || video.thumbnailUrl || '/img/video/default-thumbnail.jpg'} 
+                    src={videoThumbnails[video.id] || video.thumbnailUrl || '/img/thumbnailDefault.png'} 
                     alt={video.title} 
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.onerror = null;
-                      target.src = '/img/video/default-thumbnail.jpg';
+                      target.src = '/img/thumbnailDefault.png';
                     }}
                   />
                   <span className={styles.videoDuration}>{formatTime(video.duration || 0)}</span>
@@ -772,19 +775,21 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
 
       {/* Composant de débrief */}
       {showDebrief && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.debriefModal}>
-            <SessionDebrief 
-              sessionId={activeVideo?.id} 
-              athleteName="Baby Groot"
-              onClose={() => setShowDebrief(false)}
-              onSave={(data) => {
-                showNotification("Débrief enregistré avec succès");
-                setShowDebrief(false);
-              }}
-            />
+        <Portal selector="video-debrief-portal">
+          <div className={styles.modalOverlay}>
+            <div className={styles.debriefModal}>
+              <SessionDebrief 
+                sessionId={activeVideo?.id} 
+                athleteName={athleteName || "Baby Groot"}
+                onClose={() => setShowDebrief(false)}
+                onSave={(data) => {
+                  showNotification("Débrief enregistré avec succès");
+                  setShowDebrief(false);
+                }}
+              />
+            </div>
           </div>
-        </div>
+        </Portal>
       )}
     </div>
   );
