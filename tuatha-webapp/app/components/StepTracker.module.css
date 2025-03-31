@@ -1,0 +1,462 @@
+.stepTracker {
+  background: rgba(0, 38, 65, 0.35);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 15px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  margin-bottom: 20px;
+  color: white;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: rgba(0, 17, 13, 0.3);
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-bottom: 1px solid rgba(255, 255, 255, 0);
+}
+
+.header:hover {
+  background: rgba(0, 26, 20, 0.4);
+}
+
+.headerTitle {
+  display: flex;
+  align-items: center;
+}
+
+.stepsIcon {
+  color: #3498db;
+  font-size: 22px;
+  margin-right: 10px;
+  filter: drop-shadow(0 0 3px rgba(52, 152, 219, 0.5));
+  animation: step-animation 2s infinite;
+}
+
+@keyframes step-animation {
+  0% {
+    transform: translateX(-5px) rotate(-15deg);
+  }
+  50% {
+    transform: translateX(5px) rotate(15deg);
+  }
+  100% {
+    transform: translateX(-5px) rotate(-15deg);
+  }
+}
+
+.headerTitle h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.currentSteps {
+  display: flex;
+  align-items: baseline;
+}
+
+.stepsValue {
+  font-size: 24px;
+  font-weight: 700;
+  color: #3498db;
+}
+
+.stepsUnit {
+  margin-left: 4px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.expandButton {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.expandButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Contenu déplié */
+.contentExpanded {
+  padding: 15px;
+  background: rgba(0, 17, 13, 0.2);
+}
+
+/* Statistiques */
+.stepStats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+}
+
+.statIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(52, 152, 219, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  color: #3498db;
+}
+
+.statInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.statValue {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Objectif et progression */
+.goalContainer {
+  background: rgba(0, 17, 13, 0.1);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.goalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.goalInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.goalTitle {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 5px 0;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.goalValues {
+  display: flex;
+  align-items: baseline;
+}
+
+.currentValue {
+  font-size: 20px;
+  font-weight: 700;
+  color: #3498db;
+}
+
+.goalSeparator {
+  margin: 0 4px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.goalValue {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.goalUnit {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-left: 4px;
+}
+
+.goalAchieved {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #f1c40f;
+  animation: pulse 1.5s infinite;
+}
+
+.streakCount {
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.progressBarContainer {
+  height: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progressBar {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 8px;
+  transition: width 0.5s ease-in-out;
+}
+
+.progressText {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.progressTextOutside {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.progressLow {
+  background: linear-gradient(90deg, #e74c3c, #c0392b);
+}
+
+.progressNormal {
+  background: linear-gradient(90deg, #f39c12, #e67e22);
+}
+
+.progressGood {
+  background: linear-gradient(90deg, #2ecc71, #27ae60);
+}
+
+.progressComplete {
+  background: linear-gradient(90deg, #3498db, #2980b9);
+}
+
+/* Graphique des pas */
+.chartContainer {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.chartTitle {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.chart {
+  display: flex;
+  align-items: flex-end;
+  height: 180px;
+  gap: 2px;
+  overflow-x: auto;
+  padding-bottom: 20px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.chart::-webkit-scrollbar {
+  height: 4px;
+}
+
+.chart::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chart::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.barContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 24px;
+  position: relative;
+}
+
+.barValue {
+  font-size: 9px;
+  margin-bottom: 4px;
+  color: rgba(255, 255, 255, 0.7);
+  height: 14px;
+}
+
+.bar {
+  width: 6px;
+  border-radius: 3px 3px 0 0;
+  min-height: 4px;
+}
+
+.activeBar {
+  background: linear-gradient(180deg, #3498db, #2980b9);
+}
+
+.inactiveBar {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
+}
+
+.barLabel {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 4px;
+  transform: rotate(-45deg);
+  transform-origin: top left;
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+}
+
+/* Badges et récompenses */
+.achievementsContainer {
+  background: rgba(0, 17, 13, 0.1);
+  border-radius: 12px;
+  padding: 15px;
+}
+
+.achievementsTitle {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 15px;
+  color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.achievementsTitle::before {
+  content: '';
+  width: 4px;
+  height: 14px;
+  background: linear-gradient(180deg, #3498db, #2980b9);
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.achievementsList {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.achievementItem {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.achievementItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.achievementAchieved {
+  border-left: 3px solid #3498db;
+}
+
+.achievementLocked {
+  border-left: 3px solid rgba(255, 255, 255, 0.2);
+  opacity: 0.6;
+}
+
+.achievementIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  font-size: 16px;
+}
+
+.achievementAchieved .achievementIcon {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);
+}
+
+.achievementLocked .achievementIcon {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.achievementInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.achievementName {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.achievementDescription {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Media queries pour la responsivité */
+@media (max-width: 400px) {
+  .stepStats {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .achievementsList {
+    grid-template-columns: 1fr;
+  }
+  
+  .barContainer {
+    min-width: 20px;
+  }
+}
+
+@media (min-width: 401px) and (max-width: 600px) {
+  .stepStats {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .barContainer {
+    min-width: 22px;
+  }
+}
+
+@media (min-width: 768px) {
+  .achievementsList {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .barContainer {
+    min-width: 28px;
+  }
+}

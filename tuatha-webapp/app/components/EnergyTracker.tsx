@@ -195,6 +195,8 @@ const EnergyTracker: React.FC<EnergyTrackerProps> = ({
 
   // Calcul du pourcentage par catégorie
   const getCategoryPercentage = (type: 'rest' | 'daily' | 'exercise' | 'work' | 'meal') => {
+    // Vérifier que totalCaloriesBurned n'est pas 0 pour éviter la division par zéro
+    if (totalCaloriesBurned === 0) return 0;
     return Math.round((caloriesByCategory[type] / totalCaloriesBurned) * 100);
   };
 
@@ -243,7 +245,11 @@ const EnergyTracker: React.FC<EnergyTrackerProps> = ({
     // Calculer les angles pour le graphique circulaire
     let currentAngle = 0;
     const segments = Object.entries(caloriesByCategory).map(([type, calories]) => {
-      const percentage = (calories / totalCaloriesBurned) * 100;
+      // S'assurer que les calories et le total sont des nombres valides
+      const safeCalories = isNaN(calories) ? 0 : calories;
+      const safeTotal = totalCaloriesBurned > 0 ? totalCaloriesBurned : 1; // Éviter division par 0
+      
+      const percentage = (safeCalories / safeTotal) * 100;
       const angle = 3.6 * percentage; // 3.6 degrés par pourcentage (360 / 100)
       
       const segment = {
@@ -261,17 +267,32 @@ const EnergyTracker: React.FC<EnergyTrackerProps> = ({
     return (
       <div className={styles.energyChartContainer}>
         <div className={styles.pieChart}>
-          {segments.map((segment, index) => (
-            <div
-              key={index}
-              className={styles.pieSegment}
-              style={{
-                backgroundColor: segment.color,
-                transform: `rotate(${segment.startAngle}deg)`,
-                clipPath: `polygon(50% 50%, 50% 0%, ${segment.endAngle - segment.startAngle > 180 ? '0% 0%, 0% 100%, 100% 100%, 100% 0%,' : ''} ${50 + 50 * Math.cos((segment.endAngle * Math.PI) / 180)}% ${50 + 50 * Math.sin((segment.endAngle * Math.PI) / 180)}%)`
-              }}
-            ></div>
-          ))}
+          {segments.map((segment, index) => {
+            // S'assurer que les angles sont des nombres valides
+            const startAngle = isNaN(segment.startAngle) ? 0 : segment.startAngle;
+            const endAngle = isNaN(segment.endAngle) ? 0 : segment.endAngle;
+            const angleDiff = endAngle - startAngle;
+            
+            // Calculer les coordonnées pour le clip-path
+            const endX = 50 + 50 * Math.cos((endAngle * Math.PI) / 180);
+            const endY = 50 + 50 * Math.sin((endAngle * Math.PI) / 180);
+            
+            // S'assurer que les coordonnées sont des nombres valides
+            const safeEndX = isNaN(endX) ? 50 : endX;
+            const safeEndY = isNaN(endY) ? 50 : endY;
+            
+            return (
+              <div
+                key={index}
+                className={styles.pieSegment}
+                style={{
+                  backgroundColor: segment.color,
+                  transform: `rotate(${startAngle}deg)`,
+                  clipPath: `polygon(50% 50%, 50% 0%, ${angleDiff > 180 ? '0% 0%, 0% 100%, 100% 100%, 100% 0%,' : ''} ${safeEndX}% ${safeEndY}%)`
+                }}
+              ></div>
+            );
+          })}
           <div className={styles.pieCenter}>
             <span className={styles.pieTotal}>{totalCaloriesBurned}</span>
             <span className={styles.pieUnit}>kcal</span>

@@ -1,41 +1,140 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+
+interface Meal {
+  id: string;
+  title: string;
+  time: string;
+  foods: Array<{
+    name: string;
+    calories: number;
+    proteins: number;
+    carbs: number;
+    fats: number;
+    quantity: number;
+    icon?: React.ReactNode;
+  }>;
+  completed?: boolean;
+}
 
 interface MacroTrackerProps {
-  calories: number;
-  caloriesGoal: number;
-  proteins: number;
-  proteinsGoal: number;
-  carbs: number;
-  carbsGoal: number;
-  fats: number;
-  fatsGoal: number;
+  // Nouvelles props
+  meals?: Meal[];
+  mealStatuses?: { [key: string]: boolean };
+  targetCalories?: number;
+  targetProteins?: number;
+  targetCarbs?: number;
+  targetFats?: number;
+  // Anciennes props pour compatibilité
+  calories?: number;
+  caloriesGoal?: number;
+  proteins?: number;
+  proteinsGoal?: number;
+  carbs?: number;
+  carbsGoal?: number;
+  fats?: number;
+  fatsGoal?: number;
 }
 
 const MacroTracker: React.FC<MacroTrackerProps> = ({
-  calories,
-  caloriesGoal,
-  proteins,
-  proteinsGoal,
-  carbs,
-  carbsGoal,
-  fats,
-  fatsGoal
+  // Nouvelles props
+  meals = [],
+  mealStatuses = {},
+  targetCalories = 2000,
+  targetProteins = 150,
+  targetCarbs = 200,
+  targetFats = 70,
+  // Anciennes props
+  calories: initialCalories,
+  caloriesGoal: initialCaloriesGoal,
+  proteins: initialProteins,
+  proteinsGoal: initialProteinsGoal,
+  carbs: initialCarbs,
+  carbsGoal: initialCarbsGoal,
+  fats: initialFats,
+  fatsGoal: initialFatsGoal
 }) => {
-  // Calculer les pourcentages
-  const caloriesPercentage = Math.min(100, (calories / caloriesGoal) * 100);
-  const proteinsPercentage = Math.min(100, (proteins / proteinsGoal) * 100);
-  const carbsPercentage = Math.min(100, (carbs / carbsGoal) * 100);
-  const fatsPercentage = Math.min(100, (fats / fatsGoal) * 100);
+  // Calculer les valeurs à partir des repas si disponibles
+  const {
+    calories,
+    proteins,
+    carbs,
+    fats,
+    caloriesGoal,
+    proteinsGoal,
+    carbsGoal,
+    fatsGoal
+  } = useMemo(() => {
+    if (meals && meals.length > 0) {
+      // Calculer les valeurs à partir des repas
+      let totalCalories = 0;
+      let totalProteins = 0;
+      let totalCarbs = 0;
+      let totalFats = 0;
+      
+      meals.forEach(meal => {
+        const isCompleted = mealStatuses?.[meal.id] ?? meal.completed ?? false;
+        
+        if (isCompleted) {
+          meal.foods.forEach(food => {
+            totalCalories += food.calories * food.quantity;
+            totalProteins += food.proteins * food.quantity;
+            totalCarbs += food.carbs * food.quantity;
+            totalFats += food.fats * food.quantity;
+          });
+        }
+      });
+      
+      return {
+        calories: Math.max(0, totalCalories || 0),
+        proteins: Math.max(0, totalProteins || 0),
+        carbs: Math.max(0, totalCarbs || 0),
+        fats: Math.max(0, totalFats || 0),
+        caloriesGoal: Math.max(1, targetCalories || 2000),
+        proteinsGoal: Math.max(1, targetProteins || 150),
+        carbsGoal: Math.max(1, targetCarbs || 200),
+        fatsGoal: Math.max(1, targetFats || 70)
+      };
+    } else {
+      // Utiliser les valeurs directement fournies
+      return {
+        calories: Math.max(0, initialCalories || 0),
+        proteins: Math.max(0, initialProteins || 0),
+        carbs: Math.max(0, initialCarbs || 0),
+        fats: Math.max(0, initialFats || 0),
+        caloriesGoal: Math.max(1, initialCaloriesGoal || targetCalories || 2000),
+        proteinsGoal: Math.max(1, initialProteinsGoal || targetProteins || 150),
+        carbsGoal: Math.max(1, initialCarbsGoal || targetCarbs || 200),
+        fatsGoal: Math.max(1, initialFatsGoal || targetFats || 70)
+      };
+    }
+  }, [
+    meals, 
+    mealStatuses, 
+    initialCalories, 
+    initialProteins, 
+    initialCarbs, 
+    initialFats,
+    targetCalories,
+    targetProteins,
+    targetCarbs,
+    targetFats
+  ]);
+  
+  // Calculer les pourcentages - s'assurer qu'ils ne sont pas NaN
+  const caloriesPercentage = caloriesGoal > 0 ? Math.min(100, Math.max(0, (calories / caloriesGoal) * 100)) : 0;
+  const proteinsPercentage = proteinsGoal > 0 ? Math.min(100, Math.max(0, (proteins / proteinsGoal) * 100)) : 0;
+  const carbsPercentage = carbsGoal > 0 ? Math.min(100, Math.max(0, (carbs / carbsGoal) * 100)) : 0;
+  const fatsPercentage = fatsGoal > 0 ? Math.min(100, Math.max(0, (fats / fatsGoal) * 100)) : 0;
   
   // Calculer les valeurs en pourcentage du total des calories
-  const proteinCalories = proteins * 4;
-  const carbCalories = carbs * 4;
-  const fatCalories = fats * 9;
-  const totalCalories = calories > 0 ? calories : (proteinCalories + carbCalories + fatCalories);
+  const proteinCalories = Math.max(0, proteins * 4 || 0);
+  const carbCalories = Math.max(0, carbs * 4 || 0);
+  const fatCalories = Math.max(0, fats * 9 || 0);
+  const totalCalories = Math.max(1, calories > 0 ? calories : (proteinCalories + carbCalories + fatCalories));
   
-  const proteinPercent = Math.round((proteinCalories / totalCalories) * 100) || 0;
-  const carbPercent = Math.round((carbCalories / totalCalories) * 100) || 0;
-  const fatPercent = Math.round((fatCalories / totalCalories) * 100) || 0;
+  const proteinPercent = totalCalories > 0 ? Math.round(Math.max(0, Math.min(100, (proteinCalories / totalCalories) * 100))) : 0;
+  const carbPercent = totalCalories > 0 ? Math.round(Math.max(0, Math.min(100, (carbCalories / totalCalories) * 100))) : 0;
+  const fatPercent = totalCalories > 0 ? Math.round(Math.max(0, Math.min(100, (fatCalories / totalCalories) * 100))) : 0;
 
   // Calculer les angles pour les cercles SVG
   const radius = 45;
@@ -60,7 +159,15 @@ const MacroTracker: React.FC<MacroTrackerProps> = ({
     title: string, 
     percent: number 
   }) => {
-    const dashOffset = circumference * (1 - percentage / 100);
+    // Vérifier et nettoyer toutes les valeurs numériques
+    const safePercentage = isNaN(percentage) ? 0 : Math.max(0, Math.min(100, percentage));
+    const safeValue = isNaN(value) ? 0 : value;
+    const safeTotal = isNaN(total) ? 1 : Math.max(1, total);
+    const safePercent = isNaN(percent) ? 0 : percent;
+    
+    // Calculer le dashoffset comme une chaîne (pour éviter NaN)
+    const calculatedOffset = circumference * (1 - safePercentage / 100);
+    const dashOffset = isNaN(calculatedOffset) ? '0' : calculatedOffset.toString();
     
     return (
       <div style={{
@@ -68,7 +175,8 @@ const MacroTracker: React.FC<MacroTrackerProps> = ({
         flexDirection: 'column',
         alignItems: 'center',
         width: '30%',
-        position: 'relative'
+        position: 'relative',
+        marginBottom: '30px'
       }}>
         <svg width="100" height="100" viewBox="0 0 120 120">
           {/* Fond du cercle */}
@@ -109,7 +217,7 @@ const MacroTracker: React.FC<MacroTrackerProps> = ({
               filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.5))'
             }}
           >
-            {value}g
+            {safeValue}g
           </text>
           <text 
             x="60" 
@@ -119,7 +227,7 @@ const MacroTracker: React.FC<MacroTrackerProps> = ({
             fill="rgba(255,255,255,0.7)" 
             style={{ fontSize: '12px' }}
           >
-            sur {total}g
+            sur {safeTotal}g
           </text>
         </svg>
         
@@ -131,8 +239,52 @@ const MacroTracker: React.FC<MacroTrackerProps> = ({
           color: color,
           textShadow: '0 1px 3px rgba(0,0,0,0.2)',
         }}>
-          {title} ({percent}%)
+          {title} ({safePercent}%)
         </div>
+      </div>
+    );
+  };
+
+  // Cercle de progression
+  const renderCircleProgress = () => {
+    // S'assurer que tous les pourcentages sont des nombres valides
+    const proteinPerc = isNaN(proteinsPercentage) ? 0 : proteinsPercentage;
+    const carbPerc = isNaN(carbsPercentage) ? 0 : carbsPercentage;
+    const fatPerc = isNaN(fatsPercentage) ? 0 : fatsPercentage;
+    
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-around',
+        width: '100%',
+        marginTop: '20px'
+      }}>
+        <CircleProgress 
+          percentage={proteinPerc} 
+          color="#2ecc71" 
+          value={proteins} 
+          total={proteinsGoal} 
+          title="Protéines" 
+          percent={proteinPercent} 
+        />
+        
+        <CircleProgress 
+          percentage={carbPerc} 
+          color="#3498db" 
+          value={carbs} 
+          total={carbsGoal} 
+          title="Glucides" 
+          percent={carbPercent} 
+        />
+        
+        <CircleProgress 
+          percentage={fatPerc} 
+          color="#e67e22" 
+          value={fats} 
+          total={fatsGoal} 
+          title="Lipides" 
+          percent={fatPercent} 
+        />
       </div>
     );
   };
@@ -198,41 +350,7 @@ const MacroTracker: React.FC<MacroTrackerProps> = ({
         </div>
         
         {/* 3 cercles séparés pour les macronutriments */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-around',
-          width: '100%',
-          marginBottom: '30px',
-          gap: '15px',
-          padding: '0 10px'
-        }}>
-          <CircleProgress 
-            percentage={proteinsPercentage}
-            color="#FF6B00"
-            value={proteins}
-            total={proteinsGoal}
-            title="Protéines"
-            percent={proteinPercent}
-          />
-          
-          <CircleProgress 
-            percentage={carbsPercentage}
-            color="#4A88F2"
-            value={carbs}
-            total={carbsGoal}
-            title="Glucides"
-            percent={carbPercent}
-          />
-          
-          <CircleProgress 
-            percentage={fatsPercentage}
-            color="#00C853"
-            value={fats}
-            total={fatsGoal}
-            title="Lipides"
-            percent={fatPercent}
-          />
-        </div>
+        {renderCircleProgress()}
         
         {/* Ligne décorative */}
         <div style={{

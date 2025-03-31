@@ -7,6 +7,8 @@ import NavHeader from '../components/NavHeader';
 import MacroTracker from '../components/MacroTracker';
 import HeartRateTracker from '../components/HeartRateTracker';
 import EnergyTracker from '../components/EnergyTracker';
+import StepTracker from '../components/StepTracker';
+import SleepTracker from '../components/SleepTracker';
 import { FaCarrot, FaBreadSlice, FaAppleAlt, FaEgg, FaLeaf } from 'react-icons/fa';
 
 // Type pour les aliments
@@ -267,38 +269,50 @@ export default function MaJournee() {
       </div>
 
       <div className={styles.content}>
-        {/* Section HeartRateTracker */}
-        <section className={styles.trackerSection}>
-          <h3 className={styles.sectionTitle}>Fréquence Cardiaque</h3>
-          <HeartRateTracker />
-        </section>
-        
-        {/* Section EnergyTracker */}
-        <section className={styles.trackerSection}>
-          <h3 className={styles.sectionTitle}>Énergie Dépensée</h3>
-          <EnergyTracker bmr={1650} weight={65} />
-        </section>
-
         {/* Section MacroTracker */}
         <section className={styles.macroSection}>
           <h3 className={styles.sectionTitle}>Suivi Nutritionnel</h3>
           <MacroTracker
-            calories={caloriesConsumed}
-            caloriesGoal={caloriesGoal}
-            proteins={proteinsConsumed}
-            proteinsGoal={proteinsGoal}
-            carbs={carbsConsumed}
-            carbsGoal={carbsGoal}
-            fats={fatsConsumed}
-            fatsGoal={fatsGoal}
+            meals={meals}
+            mealStatuses={mealStatuses}
+            targetCalories={2000}
+            targetProteins={150}
+            targetCarbs={200}
+            targetFats={70}
           />
         </section>
-        
+
         {/* Section des repas */}
         <section className={styles.mealsSection}>
-          <h3 className={styles.sectionTitle}>Repas du jour</h3>
+          <h3 className={styles.sectionTitle}>Mes Repas</h3>
           <div className={styles.mealsList}>
             {meals.map(meal => renderMeal(meal))}
+          </div>
+        </section>
+        
+        {/* Section des activités et suivi santé */}
+        <section className={styles.trackerSection}>
+          <h3 className={styles.sectionTitle}>Suivi d'Activité et Santé</h3>
+          
+          <div className={styles.trackerContainer}>
+            <HeartRateTracker />
+          </div>
+          
+          <div className={styles.trackerContainer}>
+            <EnergyTracker bmr={1650} weight={65} />
+          </div>
+          
+          <div className={styles.trackerContainer}>
+            <StepTracker dailyGoal={8000} weight={65} height={165} />
+          </div>
+        </section>
+
+        {/* Section du suivi du sommeil */}
+        <section className={styles.trackerSection}>
+          <h3 className={styles.sectionTitle}>Qualité du Sommeil</h3>
+          
+          <div className={styles.trackerContainer}>
+            <SleepTracker targetSleep={8} sleepScore={78} />
           </div>
         </section>
       </div>

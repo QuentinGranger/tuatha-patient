@@ -312,6 +312,18 @@
   margin-top: 3px;
 }
 
+.trackerSection {
+  margin-bottom: 30px;
+}
+
+.trackerContainer {
+  margin-bottom: 20px;
+}
+
+.trackerContainer:last-child {
+  margin-bottom: 0;
+}
+
 /* Contenu vide */
 .emptyContent {
   display: flex;

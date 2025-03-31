@@ -214,7 +214,7 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
-/* Styles pour la liste d'activités */
+/* Styles pour la liste d'activités - Design amélioré */
 .activitiesContainer {
   background: rgba(0, 17, 13, 0.1);
   border-radius: 12px;
@@ -243,10 +243,12 @@
 .activitiesList {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  max-height: 300px;
+  gap: 15px;
+  max-height: 400px;
   overflow-y: auto;
-  padding-right: 5px;
+  padding-right: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
 .activitiesList::-webkit-scrollbar {
@@ -263,60 +265,135 @@
 }
 
 .activityItem {
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  background: rgba(0, 17, 13, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.activityItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 .activityTime {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.timeText {
   font-size: 12px;
-  padding: 4px 10px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.durationBadge {
+  font-size: 11px;
   background: rgba(255, 255, 255, 0.1);
+  padding: 2px 8px;
+  border-radius: 10px;
   color: rgba(255, 255, 255, 0.7);
 }
 
 .activityContent {
   display: flex;
-  align-items: center;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.05);
+  justify-content: space-between;
+  padding: 12px;
+  position: relative;
+}
+
+.activityLeftPart {
+  display: flex;
+  align-items: flex-start;
+  flex: 1;
+  margin-right: 15px;
 }
 
 .activityIcon {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 12px;
   color: white;
+  font-size: 16px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .activityInfo {
-  flex: 1;
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 .activityName {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
 }
 
-.activityDuration {
+.activityDetails {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.activityMetrics {
+  display: flex;
+  gap: 15px;
+}
+
+.metricItem {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 4px 8px;
+  border-radius: 6px;
+  min-width: 50px;
+}
+
+.metricLabel {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 2px;
+}
+
+.metricValue {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .activityCalories {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  justify-content: center;
+  position: relative;
+  padding-left: 20px;
+}
+
+.caloriesBurnedBar {
+  position: absolute;
+  height: 4px;
+  background: linear-gradient(90deg, rgba(230, 126, 34, 0.2), rgba(230, 126, 34, 0.8));
+  bottom: -8px;
+  right: 0;
+  border-radius: 2px;
 }
 
 .caloriesValue {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
+  color: #e67e22;
 }
 
 .caloriesUnit {
@@ -326,23 +403,36 @@
 
 /* Styles spécifiques par type d'activité */
 .restActivity .activityIcon {
-  background: rgba(52, 152, 219, 0.7);
+  background: linear-gradient(135deg, #3498db, #2980b9);
 }
 
 .dailyActivity .activityIcon {
-  background: rgba(46, 204, 113, 0.7);
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
 }
 
 .exerciseActivity .activityIcon {
-  background: rgba(231, 76, 60, 0.7);
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
 }
 
 .workActivity .activityIcon {
-  background: rgba(243, 156, 18, 0.7);
+  background: linear-gradient(135deg, #f39c12, #d35400);
 }
 
 .mealActivity .activityIcon {
-  background: rgba(155, 89, 182, 0.7);
+  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+}
+
+/* Styles spécifiques par intensité */
+.lowIntensity {
+  border-left: 3px solid rgba(52, 152, 219, 0.7);
+}
+
+.mediumIntensity {
+  border-left: 3px solid rgba(243, 156, 18, 0.7);
+}
+
+.highIntensity {
+  border-left: 3px solid rgba(231, 76, 60, 0.7);
 }
 
 /* Media queries pour la responsivité */
