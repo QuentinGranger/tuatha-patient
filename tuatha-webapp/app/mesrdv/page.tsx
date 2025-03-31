@@ -8,7 +8,7 @@ import CalendarHeader from '../components/CalendarHeader';
 import WeekStrip from '../components/WeekStrip';
 import DailyTimeline, { TimelineEvent } from '../components/DailyTimeline';
 import { IoFilter, IoClose, IoCheckmark, IoCalendarOutline, IoTimeOutline, IoLocationOutline } from 'react-icons/io5';
-import { BsCalendarEvent, BsPlus, BsClock, BsGeoAlt, BsPerson, BsCardText } from 'react-icons/bs';
+import { BsCalendarEvent, BsPlus, BsClock, BsGeoAlt, BsPerson, BsCardText, BsStarFill, BsInfoCircle } from 'react-icons/bs';
 
 // Type pour les professionnels
 interface Professional {
@@ -85,9 +85,35 @@ export default function MesRDV() {
     type: ''
   });
   
+  // État pour la modale de détail du rendez-vous
+  const [showAppointmentDetails, setShowAppointmentDetails] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  
+  // État pour la modale de reprogrammation
+  const [showReschedule, setShowReschedule] = useState(false);
+  const [rescheduleDate, setRescheduleDate] = useState<Date>(new Date());
+  const [rescheduleTime, setRescheduleTime] = useState('');
+  
+  // État pour la modale d'évaluation
+  const [showRating, setShowRating] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [ratingComment, setRatingComment] = useState('');
+  
+  // État pour la modale de confirmation
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [confirmAction, setConfirmAction] = useState('');
+  const [confirmMessage, setConfirmMessage] = useState('');
+  
+  // État pour les notifications
+  const [notification, setNotification] = useState<{ type: 'success' | 'error' | 'info', message: string } | null>(null);
+  
   // Référence pour fermer l'overlay en cliquant à l'extérieur
   const filterOverlayRef = useRef<HTMLDivElement>(null);
   const addAppointmentRef = useRef<HTMLDivElement>(null);
+  const appointmentDetailsRef = useRef<HTMLDivElement>(null);
+  const rescheduleRef = useRef<HTMLDivElement>(null);
+  const ratingRef = useRef<HTMLDivElement>(null);
+  const confirmRef = useRef<HTMLDivElement>(null);
   
   // Liste des professionnels de l'utilisateur (la même que dans mespros)
   const professionals: Professional[] = [
@@ -226,16 +252,32 @@ export default function MesRDV() {
       if (addAppointmentRef.current && !addAppointmentRef.current.contains(event.target as Node)) {
         setShowAddAppointment(false);
       }
+      
+      if (appointmentDetailsRef.current && !appointmentDetailsRef.current.contains(event.target as Node)) {
+        setShowAppointmentDetails(false);
+      }
+      
+      if (rescheduleRef.current && !rescheduleRef.current.contains(event.target as Node)) {
+        setShowReschedule(false);
+      }
+      
+      if (ratingRef.current && !ratingRef.current.contains(event.target as Node)) {
+        setShowRating(false);
+      }
+      
+      if (confirmRef.current && !confirmRef.current.contains(event.target as Node)) {
+        setShowConfirm(false);
+      }
     };
     
-    if (showFilter || showAddAppointment) {
+    if (showFilter || showAddAppointment || showAppointmentDetails || showReschedule || showRating || showConfirm) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showFilter, showAddAppointment]);
+  }, [showFilter, showAddAppointment, showAppointmentDetails, showReschedule, showRating, showConfirm]);
 
   // Gestion du changement de date
   const handleDateChange = (date: Date) => {
@@ -335,14 +377,30 @@ export default function MesRDV() {
     // Validation des champs obligatoires
     if (!newAppointment.title || !newAppointment.date || !newAppointment.time || 
         !newAppointment.professionalId || !newAppointment.location) {
-      alert('Veuillez remplir tous les champs obligatoires');
+      setNotification({
+        type: 'error',
+        message: 'Veuillez remplir tous les champs obligatoires'
+      });
+      
+      // Faire disparaître la notification après 3 secondes
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
       return;
     }
     
     const professional = professionals.find(p => p.id === newAppointment.professionalId);
     
     if (!professional) {
-      alert('Professionnel non trouvé');
+      setNotification({
+        type: 'error',
+        message: 'Professionnel non trouvé'
+      });
+      
+      // Faire disparaître la notification après 3 secondes
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
       return;
     }
     
@@ -452,13 +510,138 @@ export default function MesRDV() {
     }
   };
 
+  // Gérer le clic sur un rendez-vous
+  const handleAppointmentClick = (appointment: Appointment) => {
+    setSelectedAppointment(appointment);
+    setShowAppointmentDetails(true);
+  };
+
+  // Fonctions pour gérer les actions sur les rendez-vous
+  const handleRescheduleAppointment = () => {
+    if (selectedAppointment) {
+      // Initialiser avec les valeurs actuelles
+      setRescheduleDate(new Date(selectedAppointment.date));
+      const [hours, minutes] = selectedAppointment.time.split(':');
+      setRescheduleTime(`${hours}:${minutes}`);
+      
+      // Ouvrir la modale de reprogrammation
+      setShowReschedule(true);
+      setShowAppointmentDetails(false);
+    }
+  };
+  
+  const handleCancelAppointment = () => {
+    if (selectedAppointment) {
+      setConfirmAction('cancel');
+      setConfirmMessage(`Êtes-vous sûr de vouloir annuler votre rendez-vous "${selectedAppointment.title}" avec ${selectedAppointment.professional.name} le ${new Date(selectedAppointment.date).toLocaleDateString('fr-FR')} à ${selectedAppointment.time} ?`);
+      setShowConfirm(true);
+      setShowAppointmentDetails(false);
+    }
+  };
+  
+  const handleRateAppointment = () => {
+    if (selectedAppointment) {
+      setRating(0);
+      setRatingComment('');
+      setShowRating(true);
+      setShowAppointmentDetails(false);
+    }
+  };
+  
+  const confirmCancelAppointment = () => {
+    if (selectedAppointment) {
+      // Simuler l'annulation du rendez-vous
+      const updatedAppointments = appointments.map(app => 
+        app.id === selectedAppointment.id 
+          ? { ...app, status: 'canceled' } 
+          : app
+      );
+      
+      setAppointments(updatedAppointments);
+      setShowConfirm(false);
+      
+      // Afficher une notification au lieu d'une alerte
+      setNotification({
+        type: 'success',
+        message: 'Le rendez-vous a été annulé avec succès.'
+      });
+      
+      // Faire disparaître la notification après 3 secondes
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+    }
+  };
+  
+  const confirmRescheduleAppointment = () => {
+    if (selectedAppointment && rescheduleTime) {
+      // Simuler la reprogrammation du rendez-vous
+      const updatedAppointments = appointments.map(app => 
+        app.id === selectedAppointment.id 
+          ? { 
+              ...app, 
+              date: rescheduleDate.toISOString().split('T')[0], 
+              time: rescheduleTime 
+            } 
+          : app
+      );
+      
+      setAppointments(updatedAppointments);
+      setShowReschedule(false);
+      
+      // Afficher une notification au lieu d'une alerte
+      setNotification({
+        type: 'success',
+        message: 'Le rendez-vous a été reprogrammé avec succès.'
+      });
+      
+      // Faire disparaître la notification après 3 secondes
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+    }
+  };
+  
+  const submitRating = () => {
+    if (selectedAppointment && rating > 0) {
+      // Simuler l'envoi de l'évaluation
+      setShowRating(false);
+      
+      // Afficher une notification au lieu d'une alerte
+      setNotification({
+        type: 'success',
+        message: `Votre évaluation de ${rating}/5 a été envoyée avec succès.`
+      });
+      
+      // Faire disparaître la notification après 3 secondes
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+    } else {
+      // Afficher une notification d'erreur au lieu d'une alerte
+      setNotification({
+        type: 'error',
+        message: 'Veuillez attribuer une note avant de soumettre votre évaluation.'
+      });
+      
+      // Faire disparaître la notification après 3 secondes
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+    }
+  };
+
   return (
     <main className={styles.container}>
       {/* Overlay flou quand filtre ouvert */}
-      {(showFilter || showAddAppointment) && (
+      {(showFilter || showAddAppointment || showAppointmentDetails || showReschedule || showRating || showConfirm) && (
         <div className={styles.blurOverlay} onClick={() => {
           setShowFilter(false);
           setShowAddAppointment(false);
+          setShowAppointmentDetails(false);
+          setShowReschedule(false);
+          setShowRating(false);
+          setShowConfirm(false);
         }}></div>
       )}
       
@@ -819,7 +1002,290 @@ export default function MesRDV() {
             </div>
           </div>
         )}
-
+        
+        {/* Modale de détail du rendez-vous */}
+        {showAppointmentDetails && selectedAppointment && (
+          <div className={styles.appointmentDetailsModal} ref={appointmentDetailsRef}>
+            <div className={styles.modalHeader}>
+              <h4>{selectedAppointment.title}</h4>
+              <button 
+                className={styles.closeButton} 
+                onClick={() => setShowAppointmentDetails(false)}
+              >
+                <IoClose size={20} />
+              </button>
+            </div>
+            
+            {/* En-tête avec couleur associée au type */}
+            <div 
+              className={styles.appointmentDetailsHeader}
+              style={{
+                backgroundColor: `${getColorByType(selectedAppointment.type || '')}20`,
+                borderBottom: `3px solid ${getColorByType(selectedAppointment.type || '')}`
+              }}
+            >
+              <div className={styles.appointmentType}>
+                {selectedAppointment.type || 'Rendez-vous'}
+              </div>
+              <div className={styles.appointmentStatus}>
+                {selectedAppointment.status === 'upcoming' && 'À venir'}
+                {selectedAppointment.status === 'past' && 'Passé'}
+                {selectedAppointment.status === 'canceled' && 'Annulé'}
+              </div>
+            </div>
+            
+            {/* Informations principales */}
+            <div className={styles.appointmentInfo}>
+              <div className={styles.infoRow}>
+                <div className={styles.infoLabel}>
+                  <IoCalendarOutline className={styles.infoIcon} />
+                  <span>Date et heure</span>
+                </div>
+                <div className={styles.infoValue}>
+                  {new Date(selectedAppointment.date).toLocaleDateString('fr-FR', { 
+                    weekday: 'long', 
+                    day: 'numeric', 
+                    month: 'long',
+                    year: 'numeric'
+                  })}
+                  {' à '}
+                  {selectedAppointment.time}
+                  {' ('}
+                  {selectedAppointment.duration} min
+                  {')'}
+                </div>
+              </div>
+              
+              <div className={styles.infoRow}>
+                <div className={styles.infoLabel}>
+                  <BsPerson className={styles.infoIcon} />
+                  <span>Professionnel</span>
+                </div>
+                <div className={styles.infoValue}>
+                  <div className={styles.proDetailsContainer}>
+                    <div className={styles.proImageContainer}>
+                      <img 
+                        src={selectedAppointment.professional.image} 
+                        alt={selectedAppointment.professional.name}
+                        className={styles.proImage}
+                      />
+                    </div>
+                    <div className={styles.proInfo}>
+                      <span className={styles.proName}>{selectedAppointment.professional.name}</span>
+                      <span className={styles.proTitle}>{selectedAppointment.professional.title}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className={styles.infoRow}>
+                <div className={styles.infoLabel}>
+                  <IoLocationOutline className={styles.infoIcon} />
+                  <span>Lieu</span>
+                </div>
+                <div className={styles.infoValue}>
+                  {selectedAppointment.location}
+                </div>
+              </div>
+              
+              {selectedAppointment.notes && (
+                <div className={styles.infoRow}>
+                  <div className={styles.infoLabel}>
+                    <BsCardText className={styles.infoIcon} />
+                    <span>Notes</span>
+                  </div>
+                  <div className={styles.infoValue}>
+                    {selectedAppointment.notes}
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Actions disponibles */}
+            <div className={styles.appointmentActions}>
+              {selectedAppointment.status === 'upcoming' && (
+                <>
+                  <button 
+                    className={styles.actionButton} 
+                    onClick={handleRescheduleAppointment}
+                  >
+                    <BsClock size={16} />
+                    <span>Reprogrammer</span>
+                  </button>
+                  <button 
+                    className={styles.dangerButton} 
+                    onClick={handleCancelAppointment}
+                  >
+                    <IoClose size={16} />
+                    <span>Annuler</span>
+                  </button>
+                </>
+              )}
+              
+              {selectedAppointment.status === 'past' && (
+                <button 
+                  className={styles.actionButton} 
+                  style={{width: '100%'}} 
+                  onClick={handleRateAppointment}
+                >
+                  <BsStarFill size={16} />
+                  <span>Évaluer</span>
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+        
+        {/* Modale de reprogrammation de rendez-vous */}
+        {showReschedule && selectedAppointment && (
+          <div className={styles.appointmentDetailsModal} ref={rescheduleRef}>
+            <div className={styles.modalHeader}>
+              <h4>Reprogrammer le rendez-vous</h4>
+              <button 
+                className={styles.closeButton} 
+                onClick={() => setShowReschedule(false)}
+              >
+                <IoClose size={20} />
+              </button>
+            </div>
+            
+            <div className={styles.appointmentInfo}>
+              <p>Vous reprogrammez : <strong>{selectedAppointment.title}</strong> avec <strong>{selectedAppointment.professional.name}</strong></p>
+              
+              <div className={styles.formGroup}>
+                <label>Nouvelle date</label>
+                <input 
+                  type="date" 
+                  value={rescheduleDate.toISOString().split('T')[0]} 
+                  onChange={(e) => setRescheduleDate(new Date(e.target.value))} 
+                  min={new Date().toISOString().split('T')[0]}
+                  className={styles.input}
+                />
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label>Nouvel horaire</label>
+                <input 
+                  type="time" 
+                  value={rescheduleTime} 
+                  onChange={(e) => setRescheduleTime(e.target.value)}
+                  min="08:00"
+                  max="20:00"
+                  className={styles.input}
+                />
+              </div>
+            </div>
+            
+            <div className={styles.appointmentActions}>
+              <button 
+                className={styles.actionButton} 
+                onClick={confirmRescheduleAppointment}
+              >
+                <IoCheckmark size={16} />
+                <span>Confirmer</span>
+              </button>
+              <button 
+                className={styles.dangerButton} 
+                onClick={() => setShowReschedule(false)}
+              >
+                <IoClose size={16} />
+                <span>Annuler</span>
+              </button>
+            </div>
+          </div>
+        )}
+        
+        {/* Modale d'évaluation de rendez-vous */}
+        {showRating && selectedAppointment && (
+          <div className={styles.appointmentDetailsModal} ref={ratingRef}>
+            <div className={styles.modalHeader}>
+              <h4>Évaluer le rendez-vous</h4>
+              <button 
+                className={styles.closeButton} 
+                onClick={() => setShowRating(false)}
+              >
+                <IoClose size={20} />
+              </button>
+            </div>
+            
+            <div className={styles.appointmentInfo}>
+              <p>Votre séance de <strong>{selectedAppointment.title}</strong> avec <strong>{selectedAppointment.professional.name}</strong></p>
+              
+              <div className={styles.ratingContainer}>
+                <div className={styles.ratingStars}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button 
+                      key={star}
+                      type="button"
+                      className={styles.starButton} 
+                      onClick={() => setRating(star)}
+                    >
+                      {star <= rating ? (
+                        <BsStarFill size={24} color="#FF6B00" />
+                      ) : (
+                        <BsStarFill size={24} color="rgba(255, 255, 255, 0.2)" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+                <div className={styles.ratingLabel}>
+                  {rating > 0 ? `${rating}/5` : "Notez votre expérience"}
+                </div>
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label>Commentaire (optionnel)</label>
+                <textarea 
+                  value={ratingComment} 
+                  onChange={(e) => setRatingComment(e.target.value)}
+                  placeholder="Partagez votre expérience..."
+                  className={styles.textarea}
+                  rows={4}
+                />
+              </div>
+            </div>
+            
+            <div className={styles.appointmentActions}>
+              <button 
+                className={styles.actionButton} 
+                onClick={submitRating}
+                style={{width: '100%'}}
+              >
+                <IoCheckmark size={16} />
+                <span>Envoyer mon évaluation</span>
+              </button>
+            </div>
+          </div>
+        )}
+        
+        {/* Modale de confirmation */}
+        {showConfirm && (
+          <div className={styles.confirmModal} ref={confirmRef}>
+            <div className={styles.confirmContent}>
+              <p>{confirmMessage}</p>
+              
+              <div className={styles.confirmActions}>
+                {confirmAction === 'cancel' && (
+                  <>
+                    <button 
+                      className={styles.actionButton} 
+                      onClick={() => setShowConfirm(false)}
+                    >
+                      Non, revenir
+                    </button>
+                    <button 
+                      className={styles.dangerButton} 
+                      onClick={confirmCancelAppointment}
+                    >
+                      Oui, annuler
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* Liste des rendez-vous */}
         <div className={styles.appointmentsContent}>
           {getDayAppointments(currentDate).length > 0 ? (
@@ -838,8 +1304,11 @@ export default function MesRDV() {
                 color: getColorByType(app.type || '')
               }))}
               onEventClick={(event) => {
-                // Action au clic sur un événement
-                console.log('Event clicked:', event);
+                // Trouver le rendez-vous correspondant
+                const appointment = getDayAppointments(currentDate).find(app => app.id === event.id);
+                if (appointment) {
+                  handleAppointmentClick(appointment);
+                }
               }}
             />
           ) : (
@@ -858,6 +1327,20 @@ export default function MesRDV() {
           )}
         </div>
       </div>
+      
+      {/* Notifications */}
+      {notification && (
+        <div className={`${styles.notification} ${styles[`notification${notification.type.charAt(0).toUpperCase() + notification.type.slice(1)}`]}`}>
+          <div className={styles.notificationIcon}>
+            {notification.type === 'success' && <IoCheckmark size={18} />}
+            {notification.type === 'error' && <IoClose size={18} />}
+            {notification.type === 'info' && <BsInfoCircle size={18} />}
+          </div>
+          <div className={styles.notificationMessage}>
+            {notification.message}
+          </div>
+        </div>
+      )}
     </main>
   );
 }

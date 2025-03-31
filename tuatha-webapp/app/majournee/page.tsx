@@ -4,8 +4,235 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from './page.module.css';
 import NavHeader from '../components/NavHeader';
+import MacroTracker from '../components/MacroTracker';
+import HeartRateTracker from '../components/HeartRateTracker';
+import EnergyTracker from '../components/EnergyTracker';
+import { FaCarrot, FaBreadSlice, FaAppleAlt, FaEgg, FaLeaf } from 'react-icons/fa';
+
+// Type pour les aliments
+interface Food {
+  name: string;
+  calories: number;
+  proteins: number;
+  carbs: number;
+  fats: number;
+  icon: React.ReactNode;
+}
+
+// Type pour les repas
+interface Meal {
+  id: number;
+  name: string;
+  time: string;
+  foods: Food[];
+}
 
 export default function MaJournee() {
+  // État pour les données nutritionnelles
+  const [caloriesConsumed, setCaloriesConsumed] = useState(1450);
+  const [caloriesGoal, setCaloriesGoal] = useState(2000);
+  const [proteinsConsumed, setProteinsConsumed] = useState(85);
+  const [proteinsGoal, setProteinsGoal] = useState(130);
+  const [carbsConsumed, setCarbsConsumed] = useState(160);
+  const [carbsGoal, setCarbsGoal] = useState(220);
+  const [fatsConsumed, setFatsConsumed] = useState(45);
+  const [fatsGoal, setFatsGoal] = useState(60);
+  
+  // État pour le suivi des repas
+  const [meals, setMeals] = useState<Meal[]>([
+    {
+      id: 1,
+      name: "Petit déjeuner",
+      time: "07:30",
+      foods: [
+        { name: "Œufs brouillés", calories: 140, proteins: 12, carbs: 1, fats: 10, icon: <FaEgg style={{ color: '#FFEB3B' }} /> },
+        { name: "Pain complet", calories: 80, proteins: 3, carbs: 15, fats: 1, icon: <FaBreadSlice style={{ color: '#8D6E63' }} /> },
+        { name: "Avocat", calories: 160, proteins: 2, carbs: 8, fats: 15, icon: <FaLeaf style={{ color: '#66BB6A' }} /> }
+      ]
+    },
+    {
+      id: 2,
+      name: "Déjeuner",
+      time: "12:30",
+      foods: [
+        { name: "Poulet grillé", calories: 200, proteins: 30, carbs: 0, fats: 8, icon: <span style={{ fontSize: '18px' }}>🍗</span> },
+        { name: "Riz complet", calories: 150, proteins: 3, carbs: 30, fats: 1, icon: <span style={{ fontSize: '18px' }}>🍚</span> },
+        { name: "Légumes variés", calories: 80, proteins: 4, carbs: 15, fats: 1, icon: <FaCarrot style={{ color: '#FF9800' }} /> }
+      ]
+    },
+    {
+      id: 3,
+      name: "Collation",
+      time: "16:00",
+      foods: [
+        { name: "Yaourt grec", calories: 130, proteins: 15, carbs: 6, fats: 4, icon: <span style={{ fontSize: '18px' }}>🥛</span> },
+        { name: "Fruits rouges", calories: 50, proteins: 1, carbs: 12, fats: 0, icon: <FaAppleAlt style={{ color: '#E57373' }} /> }
+      ]
+    },
+    {
+      id: 4,
+      name: "Dîner",
+      time: "19:30",
+      foods: [
+        { name: "Saumon", calories: 220, proteins: 25, carbs: 0, fats: 13, icon: <span style={{ fontSize: '18px' }}>🐟</span> },
+        { name: "Quinoa", calories: 120, proteins: 4, carbs: 21, fats: 2, icon: <span style={{ fontSize: '18px' }}>🌾</span> },
+        { name: "Salade verte", calories: 30, proteins: 2, carbs: 5, fats: 0, icon: <FaLeaf style={{ color: '#4CAF50' }} /> }
+      ]
+    }
+  ]);
+  
+  // État pour le statut des repas (consommé, en attente, sauté)
+  const [mealStatuses, setMealStatuses] = useState<Record<number, 'pending' | 'consumed' | 'skipped'>>({
+    1: 'consumed',
+    2: 'consumed',
+    3: 'pending',
+    4: 'pending'
+  });
+  
+  // État pour les repas dépliés/pliés
+  const [expandedMeals, setExpandedMeals] = useState<Record<number, boolean>>({
+    1: false,
+    2: false,
+    3: false,
+    4: false
+  });
+  
+  // Calculer la quantité de macronutriments consommés
+  const calculateMacros = () => {
+    let calories = 0;
+    let proteins = 0;
+    let carbs = 0;
+    let fats = 0;
+    
+    meals.forEach(meal => {
+      if (mealStatuses[meal.id] === 'consumed') {
+        meal.foods.forEach(food => {
+          calories += food.calories;
+          proteins += food.proteins;
+          carbs += food.carbs;
+          fats += food.fats;
+        });
+      }
+    });
+    
+    setCaloriesConsumed(calories);
+    setProteinsConsumed(proteins);
+    setCarbsConsumed(carbs);
+    setFatsConsumed(fats);
+  };
+  
+  // Mise à jour des macros lorsque le statut des repas change
+  useEffect(() => {
+    calculateMacros();
+  }, [mealStatuses]);
+  
+  // Gérer le changement de statut d'un repas
+  const handleMealStatusChange = (mealId: number, status: 'pending' | 'consumed' | 'skipped') => {
+    setMealStatuses(prev => ({
+      ...prev,
+      [mealId]: status
+    }));
+  };
+  
+  // Gérer l'expansion/réduction d'un repas
+  const toggleMealExpanded = (mealId: number) => {
+    setExpandedMeals(prev => ({
+      ...prev,
+      [mealId]: !prev[mealId]
+    }));
+  };
+  
+  // Afficher un repas avec ses aliments
+  const renderMeal = (meal: Meal) => {
+    const status = mealStatuses[meal.id];
+    const isExpanded = expandedMeals[meal.id];
+    
+    // Calculer les calories et macros pour ce repas spécifique
+    const mealCalories = meal.foods.reduce((sum, food) => sum + food.calories, 0);
+    const mealProteins = meal.foods.reduce((sum, food) => sum + food.proteins, 0);
+    const mealCarbs = meal.foods.reduce((sum, food) => sum + food.carbs, 0);
+    const mealFats = meal.foods.reduce((sum, food) => sum + food.fats, 0);
+    
+    return (
+      <div className={styles.mealCard} key={meal.id}>
+        <div 
+          className={styles.mealHeader}
+          onClick={() => toggleMealExpanded(meal.id)}
+        >
+          <div className={styles.mealInfo}>
+            <h3>{meal.name}</h3>
+            <span className={styles.mealTime}>{meal.time}</span>
+          </div>
+          
+          <div className={styles.mealSummary}>
+            <span className={styles.mealCalories}>{mealCalories} kcal</span>
+            <div className={styles.macroSummary}>
+              <span className={styles.proteinSummary}>P: {mealProteins}g</span>
+              <span className={styles.carbSummary}>G: {mealCarbs}g</span>
+              <span className={styles.fatSummary}>L: {mealFats}g</span>
+            </div>
+          </div>
+          
+          <div className={styles.mealControls}>
+            <div className={styles.mealStatus}>
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleMealStatusChange(meal.id, 'consumed');
+                }}
+                className={`${styles.statusButton} ${status === 'consumed' ? styles.activeStatus : ''}`}
+              >
+                <FaCarrot />
+              </button>
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleMealStatusChange(meal.id, 'pending');
+                }}
+                className={`${styles.statusButton} ${status === 'pending' ? styles.activeStatus : ''}`}
+              >
+                <FaAppleAlt />
+              </button>
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleMealStatusChange(meal.id, 'skipped');
+                }}
+                className={`${styles.statusButton} ${status === 'skipped' ? styles.activeStatus : ''}`}
+              >
+                <FaBreadSlice />
+              </button>
+            </div>
+            
+            <button 
+              className={styles.expandButton}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleMealExpanded(meal.id);
+              }}
+            >
+              {isExpanded ? '▲' : '▼'}
+            </button>
+          </div>
+        </div>
+        
+        <div className={`${styles.foodList} ${isExpanded ? styles.foodListVisible : ''} ${status === 'skipped' ? styles.skippedMeal : ''}`}>
+          {meal.foods.map((food, index) => (
+            <div className={styles.foodItem} key={index}>
+              <div className={styles.foodIcon}>{food.icon}</div>
+              <div className={styles.foodInfo}>
+                <span className={styles.foodName}>{food.name}</span>
+                <span className={styles.foodMacros}>
+                  {food.calories} kcal | P: {food.proteins}g | G: {food.carbs}g | L: {food.fats}g
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <main className={styles.container}>
       {/* Composant header commun */}
@@ -16,7 +243,7 @@ export default function MaJournee() {
         <div className={styles.greetingContainer}>
           <div className={styles.greeting}>
             <h2>Ma Journée</h2>
-            <p>Activités et tâches pour aujourd'hui</p>
+            <p>Nutrition et activités pour aujourd'hui</p>
           </div>
           <div className={styles.headerIcons}>
             <button className={styles.iconButton}>
@@ -39,15 +266,41 @@ export default function MaJournee() {
         </div>
       </div>
 
-      {/* Contenu vide */}
-      <div className={styles.emptyContent}>
-        <div className={styles.emptyIcon}>
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="white" opacity="0.6">
-            <path d="M11.5 2.75c.41 0 .75.34.75.75s-.34.75-.75.75h-5c-.96 0-1.71.53-1.71 1.5v10.5c0 .97.75 1.5 1.71 1.5h10c.96 0 1.71-.53 1.71-1.5v-5c0-.41.34-.75.75-.75s.75.34.75.75v5c0 1.79-1.42 3-3.21 3h-10c-1.79 0-3.21-1.21-3.21-3V5.75c0-1.79 1.42-3 3.21-3h5zm7.45 1.75c.78 0 1.41.64 1.41 1.42v.4c0 .37-.16.72-.43.96l-6.05 6.31c-.3.3-.78.3-1.06 0l-2.55-2.56a1.94 1.94 0 01-.4-.6c-.09-.23-.35-.2-.41.04-.27 1.04-.57 2.08-1.5 2.83v-.01c-.5.4-.96.24-1.25-.08a.958.958 0 01.04-1.21c.47-.59 1.12-1.69 1.51-3.34.08-.35.38-.64.74-.64h.01c.35 0 .69.19.88.5.03.06.07.11.09.17l.1.22c.05.1.12.19.2.27l1.27 1.28 5-5.22c.07-.08.16-.15.25-.2l.01-.01h.03c.12-.05.25-.08.38-.08h.02z"/>
-          </svg>
-        </div>
-        <h3 className={styles.emptyText}>Journée vide</h3>
-        <p className={styles.emptySubtext}>Vos activités et tâches pour la journée apparaîtront ici</p>
+      <div className={styles.content}>
+        {/* Section HeartRateTracker */}
+        <section className={styles.trackerSection}>
+          <h3 className={styles.sectionTitle}>Fréquence Cardiaque</h3>
+          <HeartRateTracker />
+        </section>
+        
+        {/* Section EnergyTracker */}
+        <section className={styles.trackerSection}>
+          <h3 className={styles.sectionTitle}>Énergie Dépensée</h3>
+          <EnergyTracker bmr={1650} weight={65} />
+        </section>
+
+        {/* Section MacroTracker */}
+        <section className={styles.macroSection}>
+          <h3 className={styles.sectionTitle}>Suivi Nutritionnel</h3>
+          <MacroTracker
+            calories={caloriesConsumed}
+            caloriesGoal={caloriesGoal}
+            proteins={proteinsConsumed}
+            proteinsGoal={proteinsGoal}
+            carbs={carbsConsumed}
+            carbsGoal={carbsGoal}
+            fats={fatsConsumed}
+            fatsGoal={fatsGoal}
+          />
+        </section>
+        
+        {/* Section des repas */}
+        <section className={styles.mealsSection}>
+          <h3 className={styles.sectionTitle}>Repas du jour</h3>
+          <div className={styles.mealsList}>
+            {meals.map(meal => renderMeal(meal))}
+          </div>
+        </section>
       </div>
     </main>
   );
