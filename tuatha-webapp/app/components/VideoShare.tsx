@@ -24,6 +24,7 @@ import {
   FaShareAlt,
   FaTwitter
 } from 'react-icons/fa';
+import SessionDebrief from './SessionDebrief';
 
 type VideoShareProps = {
   videos?: VideoItem[];
@@ -62,6 +63,7 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingVideo, setEditingVideo] = useState<VideoItem | null>(null);
+  const [showDebrief, setShowDebrief] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
@@ -521,13 +523,15 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
   return (
     <div className={styles.videoShareContainer}>
       <div className={styles.header}>
-        <h1>Bibliothèque Vidéo</h1>
-        {athleteName && athleteId && (
-          <div className={styles.athleteInfo}>
-            <span>{athleteName}</span>
-            <span className={styles.athleteId}>{athleteId}</span>
-          </div>
-        )}
+        <div className={styles.headerLeft}>
+          <h1>Bibliothèque Vidéo</h1>
+          {athleteName && athleteId && (
+            <div className={styles.athleteInfo}>
+              <span>Baby Groot</span>
+              <span className={styles.athleteId}>{/* Easter egg des Gardiens de la Galaxie */}12:1:1</span>
+            </div>
+          )}
+        </div>
         {onClose && (
           <button className={styles.closeButton} onClick={onClose}>
             ×
@@ -695,8 +699,20 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
             ))}
           </div>
         </div>
+
+        {/* Section de débrief de séance */}
+        <div className={styles.debriefSection}>
+          <h2>Débrief et Ressenti</h2>
+          <p>Comment s'est passée votre séance aujourd'hui?</p>
+          <button 
+            className={styles.debriefButton}
+            onClick={() => setShowDebrief(true)}
+          >
+            Compléter mon débrief
+          </button>
+        </div>
       </div>
-      
+
       {notification.show && (
         <div className={styles.notification}>
           {notification.message}
@@ -750,6 +766,23 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
                 <button onClick={saveVideoEdit} className={styles.confirmButton}>Enregistrer</button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Composant de débrief */}
+      {showDebrief && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.debriefModal}>
+            <SessionDebrief 
+              sessionId={activeVideo?.id} 
+              athleteName="Baby Groot"
+              onClose={() => setShowDebrief(false)}
+              onSave={(data) => {
+                showNotification("Débrief enregistré avec succès");
+                setShowDebrief(false);
+              }}
+            />
           </div>
         </div>
       )}
