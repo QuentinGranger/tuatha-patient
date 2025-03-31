@@ -5,7 +5,7 @@ import Link from 'next/link';
 import styles from './page.module.css';
 // Import des icônes
 import { BsCameraVideo, BsBell, BsChatDots, BsCalendarEvent } from 'react-icons/bs';
-import { FiUser, FiFileText, FiHelpCircle, FiLogOut, FiSettings } from 'react-icons/fi';
+import { FiChevronLeft, FiUser, FiSettings, FiFileText, FiCamera, FiHelpCircle, FiLogOut } from 'react-icons/fi';
 import { IoClose, IoChevronBack, IoChevronForward } from 'react-icons/io5';
 // Import des composants
 import ChatMessage, { Professional } from '../components/ChatMessage';
@@ -13,6 +13,7 @@ import VideoCall, { VideoCallStatus } from '../components/VideoCall';
 import AppointmentManager from '../components/AppointmentManager';
 import Calendar from '../components/Calendar';
 import NavHeader from '../components/NavHeader';
+import SwipeableNotification from '../components/SwipeableNotification';
 
 // Définition des types
 interface Appointment {
@@ -87,6 +88,72 @@ export default function MesPros() {
     }
   ];
   
+  // État pour la notification de collaboration entre médecins
+  const [showCollabNotification, setShowCollabNotification] = useState(true);
+  const [collabStatus, setCollabStatus] = useState<'pending' | 'accepted' | 'rejected'>('pending');
+  
+  // État pour l'édition du profil
+  const [showProfileEdit, setShowProfileEdit] = useState(false);
+  const [profileImage, setProfileImage] = useState("/img/BabyGroot.jpg");
+  const [showPrivacySettings, setShowPrivacySettings] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Données pour les professionnels de santé
+  const healthProfessionals = [
+    {
+      id: "1",
+      name: "Dr. Tony Stark",
+      specialty: "Kinésithérapeute",
+      image: "/img/TonyStark.jpg",
+      accessLevel: "full", // full, partial, none
+    },
+    {
+      id: "2",
+      name: "Dr. Beverly Crusher",
+      specialty: "Orthopédiste",
+      image: "/img/BeverlyCrusher.jpg",
+      accessLevel: "partial",
+    },
+    {
+      id: "3",
+      name: "Dr. Stephen Strange",
+      specialty: "Neurologue",
+      image: "/img/StephenStrange.jpg",
+      accessLevel: "none",
+    }
+  ];
+  
+  // Gestionnaire pour accepter la collaboration
+  const handleAcceptCollab = () => {
+    setCollabStatus('accepted');
+    // La notification reste visible avec son nouvel état
+  };
+  
+  // Gestionnaire pour refuser la collaboration
+  const handleRejectCollab = () => {
+    setCollabStatus('rejected');
+    // La notification reste visible avec son nouvel état
+  };
+
+  // Gestionnaire pour le changement de photo de profil
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setProfileImage(event.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  // Fonction pour déclencher le dialogue de sélection de fichier
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
+
   // Données de démonstration pour les rendez-vous
   const demoAppointments: Appointment[] = [
     {
@@ -267,7 +334,7 @@ export default function MesPros() {
     ));
     
     // Afficher un message de confirmation
-    alert("Votre rendez-vous a été annulé avec succès.");
+    // alert("Votre rendez-vous a été annulé avec succès.");
   };
   
   // Gestionnaire pour reprogrammer un rendez-vous
@@ -333,6 +400,17 @@ export default function MesPros() {
                   </div>
                   <div className={styles.notificationList}>
                     
+                    {showCollabNotification && (
+                      <SwipeableNotification
+                        title="Demande de collaboration"
+                        text="Dr. Beverly Crusher souhaite collaborer avec Dr. Tony Stark pour votre traitement"
+                        time="Il y a 30 minutes"
+                        onAccept={handleAcceptCollab}
+                        onReject={handleRejectCollab}
+                        status={collabStatus}
+                      />
+                    )}
+                    
                     <div className={styles.notificationItem}>
                       <div className={styles.notificationIcon}>
                         <BsChatDots size={14} />
@@ -379,13 +457,157 @@ export default function MesPros() {
                   <div className={styles.settingsHeader}>
                     <h4>Paramètres</h4>
                   </div>
+                  
+                  {/* Profil utilisateur */}
+                  <div className={styles.profileSummary}>
+                    <div className={styles.profileImage}>
+                      <img src={profileImage} alt="Profil" />
+                    </div>
+                    <div className={styles.profileInfo}>
+                      <h5 className={styles.profileName}>Baby Groot</h5>
+                      <p className={styles.profileDetails}>3 ans • À bord du Benatar</p>
+                      <p className={styles.profileStatus}>En pleine croissance</p>
+                    </div>
+                  </div>
+                  
                   <div className={styles.settingsList}>
-                    <div className={styles.settingsItem}>
+                    <div 
+                      className={`${styles.settingsItem} ${showProfileEdit ? styles.settingsItemActive : ''}`}
+                      onClick={() => setShowProfileEdit(!showProfileEdit)}
+                    >
                       <div className={styles.settingsIcon}>
                         <FiUser size={16} />
                       </div>
                       <div className={styles.settingsText}>Mon profil</div>
+                      <div className={styles.settingsChevron}>
+                        <IoChevronForward size={14} className={showProfileEdit ? styles.chevronDown : ''} />
+                      </div>
                     </div>
+                    
+                    {showProfileEdit && (
+                      <div className={styles.profileEditSection}>
+                        <div className={styles.profileEditHeader}>
+                          <h5>Modifier mon profil</h5>
+                        </div>
+                        
+                        <div className={styles.profileImageUpload}>
+                          <div className={styles.currentProfileImage}>
+                            <img src={profileImage} alt="Profil" />
+                            <div className={styles.imageOverlay} onClick={triggerFileInput}>
+                              <FiCamera size={18} />
+                            </div>
+                          </div>
+                          <input
+                            type="file"
+                            ref={fileInputRef}
+                            style={{ display: 'none' }}
+                            accept="image/*"
+                            onChange={handleImageChange}
+                          />
+                          <p className={styles.uploadHint} onClick={triggerFileInput}>Changer ma photo</p>
+                        </div>
+                        
+                        <div className={styles.profileForm}>
+                          <div className={styles.formGroup}>
+                            <label htmlFor="profileName">Nom</label>
+                            <input 
+                              type="text" 
+                              id="profileName" 
+                              className={styles.formInput} 
+                              defaultValue="Baby Groot" 
+                            />
+                          </div>
+                          
+                          <div className={styles.formRow}>
+                            <div className={styles.formGroup}>
+                              <label htmlFor="profileAge">Âge</label>
+                              <input 
+                                type="number" 
+                                id="profileAge" 
+                                className={styles.formInput} 
+                                defaultValue="3" 
+                              />
+                            </div>
+                            
+                            <div className={styles.formGroup}>
+                              <label htmlFor="profileLocation">Localisation</label>
+                              <input 
+                                type="text" 
+                                id="profileLocation" 
+                                className={styles.formInput} 
+                                defaultValue="À bord du Benatar" 
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className={styles.formGroup}>
+                            <label htmlFor="profileStatus">Statut</label>
+                            <input 
+                              type="text" 
+                              id="profileStatus" 
+                              className={styles.formInput} 
+                              defaultValue="En pleine croissance" 
+                            />
+                          </div>
+                          
+                          <div className={styles.formGroup}>
+                            <label htmlFor="profileBio">Bio</label>
+                            <textarea 
+                              id="profileBio" 
+                              className={styles.formTextarea} 
+                              defaultValue="Je s'appelle Groot. Je s'appelle Groot. Je s'appelle Groot!" 
+                              rows={3}
+                            />
+                          </div>
+                        </div>
+                        
+                        {/* Section de changement de mot de passe */}
+                        <div className={styles.passwordSection}>
+                          <h5 className={styles.sectionTitle}>Changer mon mot de passe</h5>
+                          
+                          <div className={styles.profileForm}>
+                            <div className={styles.formGroup}>
+                              <label htmlFor="currentPassword">Mot de passe actuel</label>
+                              <input 
+                                type="password" 
+                                id="currentPassword" 
+                                className={styles.formInput} 
+                                placeholder="••••••••" 
+                              />
+                            </div>
+                            
+                            <div className={styles.formGroup}>
+                              <label htmlFor="newPassword">Nouveau mot de passe</label>
+                              <input 
+                                type="password" 
+                                id="newPassword" 
+                                className={styles.formInput} 
+                                placeholder="••••••••" 
+                              />
+                              <small className={styles.passwordHint}>
+                                Minimum 8 caractères, dont un chiffre et un caractère spécial
+                              </small>
+                            </div>
+                            
+                            <div className={styles.formGroup}>
+                              <label htmlFor="confirmPassword">Confirmer le mot de passe</label>
+                              <input 
+                                type="password" 
+                                id="confirmPassword" 
+                                className={styles.formInput} 
+                                placeholder="••••••••" 
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Boutons d'action globaux en bas du formulaire */}
+                        <div className={styles.formActionsGlobal}>
+                          <button className={styles.secondaryButton}>Annuler</button>
+                          <button className={styles.primaryButton}>Sauvegarder</button>
+                        </div>
+                      </div>
+                    )}
                     
                     <div className={styles.settingsItem}>
                       <div className={styles.settingsIcon}>
@@ -398,15 +620,129 @@ export default function MesPros() {
                       </div>
                     </div>
                     
-                    <div className={styles.settingsItem}>
+                    <div 
+                      className={`${styles.settingsItem} ${showPrivacySettings ? styles.settingsItemActive : ''}`}
+                      onClick={() => setShowPrivacySettings(!showPrivacySettings)}
+                    >
                       <div className={styles.settingsIcon}>
                         <FiFileText size={16} />
                       </div>
                       <div className={styles.settingsText}>Confidentialité</div>
                       <div className={styles.settingsChevron}>
-                        <IoChevronForward size={14} />
+                        <IoChevronForward size={14} className={showPrivacySettings ? styles.chevronDown : ''} />
                       </div>
                     </div>
+
+                    {showPrivacySettings && (
+                      <div className={styles.privacySection}>
+                        <div className={styles.privacyHeader}>
+                          <h5>Gestion des autorisations</h5>
+                          <p className={styles.privacyDescription}>
+                            Choisissez quelles informations sont partagées entre vos professionnels de santé
+                          </p>
+                        </div>
+                        
+                        {/* Liste des professionnels */}
+                        <div className={styles.professionalsList}>
+                          {healthProfessionals.map(pro => (
+                            <div key={pro.id} className={styles.professionalCard}>
+                              <div className={styles.professionalInfo}>
+                                <div className={styles.professionalAvatar}>
+                                  <img src={pro.image} alt={pro.name} />
+                                </div>
+                                <div>
+                                  <h5 className={styles.professionalName}>{pro.name}</h5>
+                                  <p className={styles.professionalSpecialty}>{pro.specialty}</p>
+                                </div>
+                              </div>
+                              
+                              <div className={styles.accessControls}>
+                                <div className={styles.radioGroup}>
+                                  <div className={styles.radioOption}>
+                                    <input 
+                                      type="radio" 
+                                      id={`full-${pro.id}`} 
+                                      name={`access-${pro.id}`} 
+                                      defaultChecked={pro.accessLevel === "full"} 
+                                    />
+                                    <label htmlFor={`full-${pro.id}`}>Accès complet</label>
+                                  </div>
+                                  
+                                  <div className={styles.radioOption}>
+                                    <input 
+                                      type="radio" 
+                                      id={`partial-${pro.id}`} 
+                                      name={`access-${pro.id}`} 
+                                      defaultChecked={pro.accessLevel === "partial"} 
+                                    />
+                                    <label htmlFor={`partial-${pro.id}`}>Accès limité</label>
+                                  </div>
+                                  
+                                  <div className={styles.radioOption}>
+                                    <input 
+                                      type="radio" 
+                                      id={`none-${pro.id}`} 
+                                      name={`access-${pro.id}`} 
+                                      defaultChecked={pro.accessLevel === "none"} 
+                                    />
+                                    <label htmlFor={`none-${pro.id}`}>Aucun accès</label>
+                                  </div>
+                                </div>
+                                <button className={styles.infoButton} title="Plus d'informations">
+                                  <FiHelpCircle size={14} />
+                                </button>
+                              </div>
+                              
+                              <div className={styles.permissionDetails}>
+                                <h6>Détails des autorisations :</h6>
+                                <div className={styles.permissionOption}>
+                                  <input 
+                                    type="checkbox" 
+                                    id={`data-medical-${pro.id}`} 
+                                    defaultChecked={pro.accessLevel !== "none"} 
+                                  />
+                                  <label htmlFor={`data-medical-${pro.id}`}>Données médicales</label>
+                                </div>
+                                <div className={styles.permissionOption}>
+                                  <input 
+                                    type="checkbox" 
+                                    id={`data-training-${pro.id}`} 
+                                    defaultChecked={pro.accessLevel !== "none"} 
+                                  />
+                                  <label htmlFor={`data-training-${pro.id}`}>Données d'entraînement</label>
+                                </div>
+                                <div className={styles.permissionOption}>
+                                  <input 
+                                    type="checkbox" 
+                                    id={`data-sleep-${pro.id}`} 
+                                    defaultChecked={pro.accessLevel === "full"} 
+                                  />
+                                  <label htmlFor={`data-sleep-${pro.id}`}>Données de sommeil</label>
+                                </div>
+                                <div className={styles.permissionOption}>
+                                  <input 
+                                    type="checkbox" 
+                                    id={`data-collab-${pro.id}`} 
+                                    defaultChecked={pro.accessLevel === "full"} 
+                                  />
+                                  <label htmlFor={`data-collab-${pro.id}`}>Autoriser la collaboration</label>
+                                </div>
+                              </div>
+                              
+                              <div className={styles.cardFooter}>
+                                <button className={styles.secondaryButton}>Réinitialiser</button>
+                                <button className={styles.primaryButton}>Sauvegarder</button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        <div className={styles.privacyFooter}>
+                          <button className={styles.secondaryButton}>Annuler</button>
+                          <button className={styles.primaryButton}>Appliquer à tous</button>
+                        </div>
+                      </div>
+                    )}
                     
                     <div className={styles.settingsItem}>
                       <div className={styles.settingsIcon}>

@@ -9,6 +9,7 @@ import HeartRateTracker from '../components/HeartRateTracker';
 import EnergyTracker from '../components/EnergyTracker';
 import StepTracker from '../components/StepTracker';
 import SleepTracker from '../components/SleepTracker';
+import DailyTraining from '../components/DailyTraining';
 import { FaCarrot, FaBreadSlice, FaAppleAlt, FaEgg, FaLeaf } from 'react-icons/fa';
 
 // Type pour les aliments
@@ -261,7 +262,8 @@ export default function MaJournee() {
             <button className={styles.iconButton}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
                 <path d="M19.5 3h-15C3.12 3 2 4.12 2 5.5v11c0 1.39 1.11 2.5 2.5 2.5h4c.28 0 .5-.22.5-.5s-.22-.5-.5-.5H7v-2h10v2h-4c-.28 0-2.5.22-2.5.5s2.22.5 2.5.5h6.5c1.38 0 2.5-1.12 2.5-2.5v-11C22 4.12 20.88 3 19.5 3zM20 17c0 .28-.22.5-.5.5H19v-2H5v2h-.5c-.28 0-.5-.22-.5-.5v-3h16v3zm0-4H4V5.5c0-.28.22-.5.5-.5h15c.27 0 .5.22.5.5V13z"/>
-                <path d="M8.47 9.92c.33.13.73-.05.86-.39.12-.34-.05-.73-.39-.86-1.07-.42-2.3-.42-3.38 0-.32.13-.5.52-.36.85.1.25.35.41.6.41.08 0 .16-.02.23-.05.76-.3 1.7-.3 2.44 0zM18.44 8.67c-1.07-.42-2.3-.42-3.38 0-.34.13-.51.51-.39.85.14.34.52.51.86.39.76-.3 1.7-.3 2.44 0 .08.03.16.05.24.05.25 0 .49-.16.59-.4.14-.33-.04-.72-.36-.89z"/>
+                <path d="M8.47 9.92c.33.13.73-.05.86-.39.12-.34-.05-.73-.39-.86-1.07-.42-2.3-.42-3.38 0-.32.13-.5.52-.36.85.1.25.35.41.6.41.08 0 .16-.02.23-.05.76-.3 1.7-.3 2.44 0 .08.03.16.05.24.05.25 0 .49-.16.59-.4.14-.33-.04-.72-.36-.89z"/>
+                <path d="M18.44 8.67c-1.07-.42-2.3-.42-3.38 0-.34.13-.51.51-.39.85.14.34.52.51.86.39.76-.3 1.7-.3 2.44 0 .08.03.16.05.24.05.25 0 .49-.16.59-.4.14-.33-.04-.72-.36-.89z"/>
               </svg>
             </button>
           </div>
@@ -307,12 +309,17 @@ export default function MaJournee() {
           </div>
         </section>
 
-        {/* Section du suivi du sommeil */}
+        {/* Section du suivi du sommeil et de l'entrainement */}
         <section className={styles.trackerSection}>
-          <h3 className={styles.sectionTitle}>Qualité du Sommeil</h3>
+          <h3 className={styles.sectionTitle}>Qualité du Sommeil et Entrainement</h3>
           
-          <div className={styles.trackerContainer}>
-            <SleepTracker targetSleep={8} sleepScore={78} />
+          <div className={styles.horizontalTrackers}>
+            <div className={styles.halfTrackerContainer}>
+              <SleepTracker targetSleep={8} sleepScore={78} />
+            </div>
+            <div className={styles.halfTrackerContainer}>
+              <DailyTraining />
+            </div>
           </div>
         </section>
       </div>

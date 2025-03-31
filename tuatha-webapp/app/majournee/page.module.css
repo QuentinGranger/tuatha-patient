@@ -318,10 +318,32 @@
 
 .trackerContainer {
   margin-bottom: 20px;
+  width: 100%;
 }
 
-.trackerContainer:last-child {
-  margin-bottom: 0;
+/* Disposition pour les trackers - Mobile first */
+.horizontalTrackers {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.halfTrackerContainer {
+  width: 100%;
+}
+
+/* Media query pour les écrans plus larges */
+@media (min-width: 768px) {
+  .horizontalTrackers {
+    flex-direction: row;
+  }
+  
+  .halfTrackerContainer {
+    flex: 1;
+    min-width: 0;
+  }
 }
 
 /* Contenu vide */

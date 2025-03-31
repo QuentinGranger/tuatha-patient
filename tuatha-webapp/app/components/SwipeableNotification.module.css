@@ -1,0 +1,130 @@
+.swipeableNotificationContainer {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  margin-bottom: 10px;
+  touch-action: pan-y;
+}
+
+.notificationItem {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  padding: 12px 15px;
+  background: rgba(0, 17, 13, 0.4);
+  border-radius: 8px;
+  cursor: grab;
+  user-select: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+}
+
+.notificationItem:active {
+  cursor: grabbing;
+}
+
+.notificationIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  background: rgba(231, 76, 60, 0.2);
+  border-radius: 50%;
+  margin-right: 10px;
+  color: #e74c3c;
+}
+
+.notificationContent {
+  flex: 1;
+}
+
+.notificationTitle {
+  font-weight: 600;
+  font-size: 14px;
+  margin: 0 0 4px;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.notificationText {
+  font-size: 13px;
+  margin: 0 0 5px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.4;
+}
+
+.notificationTime {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+/* Indicateurs d'action */
+.actionIndicator {
+  position: absolute;
+  top: 50%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+  transition: opacity 0.2s ease;
+  z-index: 1;
+  transform: translateY(-50%);
+}
+
+.acceptIndicator {
+  right: 0;
+  color: #2ecc71;
+  background: linear-gradient(to left, rgba(46, 204, 113, 0.3), transparent);
+}
+
+.rejectIndicator {
+  left: 0;
+  color: #e74c3c;
+  background: linear-gradient(to right, rgba(231, 76, 60, 0.3), transparent);
+}
+
+/* Styles pour les différents états de la notification */
+.notificationAccepted {
+  background: rgba(46, 204, 113, 0.2);
+  border-left: 3px solid #2ecc71;
+  border-right: 3px solid #2ecc71;
+}
+
+.notificationRejected {
+  background: rgba(231, 76, 60, 0.2);
+  border-left: 3px solid #e74c3c;
+  border-right: 3px solid #e74c3c;
+}
+
+.statusIcon {
+  margin-left: 10px;
+  padding: 5px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notificationAccepted .statusIcon {
+  color: #2ecc71;
+}
+
+.notificationRejected .statusIcon {
+  color: #e74c3c;
+}
+
+/* Animation pour indiquer la possibilité de swipe */
+@keyframes pulseHint {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(5px); }
+  50% { transform: translateX(0); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
+.swipeHint {
+  animation: pulseHint 2s ease-in-out infinite;
+}

@@ -1,0 +1,211 @@
+.trainingWidget {
+  background: rgba(0, 38, 65, 0.35);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 15px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  margin-bottom: 20px;
+  color: white;
+  padding-bottom: 15px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.widgetHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: rgba(0, 17, 13, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.widgetTitle {
+  display: flex;
+  align-items: center;
+}
+
+.trainingIcon {
+  color: #e74c3c;
+  font-size: 22px;
+  margin-right: 10px;
+  filter: drop-shadow(0 0 3px rgba(231, 76, 60, 0.5));
+}
+
+.widgetTitle h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.widgetContent {
+  padding: 15px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Statistiques d'entrainement */
+.trainingStats {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
+}
+
+.statIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(231, 76, 60, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  color: #e74c3c;
+}
+
+.statInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.statValue {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Media query pour les écrans plus larges - Simplifiée car déjà en horizontal */
+@media (min-width: 576px) {
+  .trainingStats {
+    gap: 15px;
+  }
+}
+
+/* Liste des exercices */
+.exercisesList {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.exerciseItem {
+  background: rgba(0, 17, 13, 0.1);
+  border-radius: 12px;
+  padding: 12px;
+  transition: all 0.2s;
+}
+
+.exerciseItem:hover {
+  background: rgba(0, 17, 13, 0.2);
+}
+
+.exerciseItem.completed {
+  border-left: 3px solid #2ecc71;
+}
+
+.exerciseHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.exerciseName {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.exerciseDuration {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.exerciseProgress {
+  height: 5px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.exerciseProgressBar {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.exerciseDetails {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.exerciseIntensity {
+  display: flex;
+  align-items: center;
+}
+
+.intensityDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+/* Media queries pour la responsivité */
+@media (max-width: 768px) {
+  /* Aucun changement nécessaire */
+}
+
+/* Bouton d'action pour accéder à la page du praticien */
+.actionButtonContainer {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.actionButton {
+  background: linear-gradient(90deg, #e74c3c, #e67e22);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+}
+
+.actionButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(231, 76, 60, 0.4);
+}
+
+.buttonIcon {
+  margin-left: 10px;
+  font-size: 16px;
+}

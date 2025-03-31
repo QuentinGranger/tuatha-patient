@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { FaMoon, FaBed, FaChevronDown, FaChevronUp, FaClock, FaRegMoon, FaRegStar } from 'react-icons/fa';
+import React from 'react';
+import { FaMoon, FaBed, FaClock, FaRegMoon, FaRegStar } from 'react-icons/fa';
 import { IoMdMoon } from 'react-icons/io';
 import styles from './SleepTracker.module.css';
 
@@ -20,8 +20,6 @@ const SleepTracker: React.FC<SleepTrackerProps> = ({
   targetSleep = 8,
   sleepScore = 78
 }) => {
-  const [expanded, setExpanded] = useState(false);
-
   // Données de sommeil simulées
   const bedTime = "22:45";
   const wakeTime = "06:30";
@@ -64,188 +62,140 @@ const SleepTracker: React.FC<SleepTrackerProps> = ({
 
   const sleepQuality = getSleepQuality(sleepScore);
 
-  // Décompresser les phases de sommeil pour le graphique
-  const getPhaseColorClass = (type: string) => {
-    switch (type) {
-      case 'deep': return styles.deepSleep;
-      case 'light': return styles.lightSleep;
-      case 'rem': return styles.remSleep;
-      case 'awake': return styles.awakeSleep;
-      default: return '';
-    }
-  };
-
-  const toggleExpand = () => {
-    setExpanded(!expanded);
-  };
-
-  // Rendu du cercle de score de sommeil
-  const renderSleepScoreCircle = () => {
-    const circumference = 2 * Math.PI * 45; // rayon de 45
-    const dashOffset = (circumference * (1 - sleepScore / 100)).toString();
-    const scoreColor = sleepQuality.color;
-
-    return (
-      <div className={styles.sleepScoreContainer}>
-        <svg width="100%" height="100%" viewBox="0 0 120 120" className={styles.sleepScoreSvg}>
-          {/* Cercle de fond */}
-          <circle 
-            cx="60" 
-            cy="60" 
-            r="45" 
-            fill="rgba(0, 17, 13, 0.5)" 
-            stroke="rgba(255, 255, 255, 0.05)" 
-            strokeWidth="2"
-          />
-          
-          {/* Cercle de progression */}
-          <circle 
-            cx="60" 
-            cy="60" 
-            r="45" 
-            fill="none" 
-            stroke={scoreColor} 
-            strokeWidth="6" 
-            strokeDasharray={circumference} 
-            strokeDashoffset={dashOffset}
-            strokeLinecap="round"
-            transform="rotate(-90 60 60)"
-            className={styles.scoreProgress}
-          />
-          
-          {/* Score et label */}
-          <text 
-            x="60" 
-            y="55" 
-            textAnchor="middle" 
-            dominantBaseline="middle" 
-            className={styles.scoreValue}
-          >
-            {sleepScore}
-          </text>
-          <text 
-            x="60" 
-            y="75" 
-            textAnchor="middle" 
-            dominantBaseline="middle" 
-            className={styles.scoreLabel}
-          >
-            Score
-          </text>
-        </svg>
-        
-        <div className={styles.qualityLabel} style={{ color: scoreColor }}>
-          {sleepQuality.text}
+  return (
+    <div className={styles.sleepWidget}>
+      <div className={styles.widgetHeader}>
+        <div className={styles.widgetTitle}>
+          <IoMdMoon className={styles.sleepIcon} />
+          <h3>Qualité du Sommeil</h3>
         </div>
       </div>
-    );
-  };
-
-  // Rendu des statistiques de sommeil
-  const renderSleepStats = () => {
-    return (
-      <div className={styles.sleepStats}>
-        <div className={styles.statItem}>
-          <div className={styles.statIcon}>
-            <FaBed />
-          </div>
-          <div className={styles.statInfo}>
-            <span className={styles.statLabel}>Couché</span>
-            <span className={styles.statValue}>{bedTime}</span>
-          </div>
-        </div>
-        
-        <div className={styles.statItem}>
-          <div className={styles.statIcon}>
-            <FaClock />
-          </div>
-          <div className={styles.statInfo}>
-            <span className={styles.statLabel}>Durée</span>
-            <span className={styles.statValue}>
-              {Math.floor(totalSleepHours)}h{Math.round((totalSleepHours % 1) * 60)}
-            </span>
-          </div>
-        </div>
-        
-        <div className={styles.statItem}>
-          <div className={styles.statIcon}>
-            <FaRegMoon />
-          </div>
-          <div className={styles.statInfo}>
-            <span className={styles.statLabel}>Réveil</span>
-            <span className={styles.statValue}>{wakeTime}</span>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Rendu de la répartition des phases de sommeil
-  const renderSleepPhases = () => {
-    return (
-      <div className={styles.sleepPhasesContainer}>
-        <div className={styles.phaseTitle}>Répartition du sommeil</div>
-        
-        <div className={styles.phasesList}>
-          <div className={styles.phaseItem}>
-            <div className={`${styles.phaseColor} ${styles.deepPhase}`}></div>
-            <div className={styles.phaseName}>Sommeil profond</div>
-            <div className={styles.phaseValue}>{deepSleepPercent}%</div>
-            <div className={styles.phaseBar}>
-              <div 
-                className={`${styles.phaseProgress} ${styles.deepProgress}`}
-                style={{ width: `${deepSleepPercent}%` }}
-              ></div>
+      
+      <div className={styles.widgetContent}>
+        <div className={styles.scoreCircleContainer}>
+          {/* Cercle du score de sommeil */}
+          <div className={styles.scoreCircle}>
+            <svg viewBox="0 0 120 120" className={styles.scoreSvg}>
+              {/* Cercle de fond */}
+              <circle 
+                cx="60" 
+                cy="60" 
+                r="54" 
+                fill="rgba(0, 17, 13, 0.5)" 
+                stroke="rgba(255, 255, 255, 0.05)" 
+                strokeWidth="2"
+              />
+              
+              {/* Cercle de progression */}
+              <circle 
+                cx="60" 
+                cy="60" 
+                r="54" 
+                fill="none" 
+                stroke={sleepQuality.color} 
+                strokeWidth="6" 
+                strokeDasharray={2 * Math.PI * 54} 
+                strokeDashoffset={(2 * Math.PI * 54) * (1 - sleepScore / 100)} 
+                strokeLinecap="round"
+                transform="rotate(-90 60 60)"
+                className={styles.scoreProgress}
+              />
+              
+              {/* Valeur du score */}
+              <text 
+                x="60" 
+                y="52" 
+                textAnchor="middle" 
+                dominantBaseline="middle" 
+                className={styles.scoreValue}
+              >
+                {sleepScore}
+              </text>
+              
+              {/* Label du score */}
+              <text 
+                x="60" 
+                y="70" 
+                textAnchor="middle" 
+                dominantBaseline="middle" 
+                className={styles.scoreLabel}
+              >
+                Score
+              </text>
+            </svg>
+            
+            {/* Label de qualité */}
+            <div className={styles.qualityLabel} style={{ color: sleepQuality.color }}>
+              {sleepQuality.text}
             </div>
           </div>
           
-          <div className={styles.phaseItem}>
-            <div className={`${styles.phaseColor} ${styles.lightPhase}`}></div>
-            <div className={styles.phaseName}>Sommeil léger</div>
-            <div className={styles.phaseValue}>{lightSleepPercent}%</div>
-            <div className={styles.phaseBar}>
-              <div 
-                className={`${styles.phaseProgress} ${styles.lightProgress}`}
-                style={{ width: `${lightSleepPercent}%` }}
-              ></div>
+          {/* Statistiques de base - horizontalement */}
+          <div className={styles.horizontalStatsContainer}>
+            <div className={styles.horizontalStatItem}>
+              <div className={styles.statIcon}><FaBed /></div>
+              <div className={styles.statInfo}>
+                <span className={styles.statLabel}>Couché</span>
+                <span className={styles.statValue}>{bedTime}</span>
+              </div>
             </div>
-          </div>
-          
-          <div className={styles.phaseItem}>
-            <div className={`${styles.phaseColor} ${styles.remPhase}`}></div>
-            <div className={styles.phaseName}>Sommeil paradoxal</div>
-            <div className={styles.phaseValue}>{remSleepPercent}%</div>
-            <div className={styles.phaseBar}>
-              <div 
-                className={`${styles.phaseProgress} ${styles.remProgress}`}
-                style={{ width: `${remSleepPercent}%` }}
-              ></div>
+            
+            <div className={styles.horizontalStatItem}>
+              <div className={styles.statIcon}><FaClock /></div>
+              <div className={styles.statInfo}>
+                <span className={styles.statLabel}>Durée</span>
+                <span className={styles.statValue}>
+                  {Math.floor(totalSleepHours)}h{Math.round((totalSleepHours % 1) * 60)}
+                </span>
+              </div>
             </div>
-          </div>
-          
-          <div className={styles.phaseItem}>
-            <div className={`${styles.phaseColor} ${styles.awakePhase}`}></div>
-            <div className={styles.phaseName}>Éveillé</div>
-            <div className={styles.phaseValue}>{awakeSleepPercent}%</div>
-            <div className={styles.phaseBar}>
-              <div 
-                className={`${styles.phaseProgress} ${styles.awakeProgress}`}
-                style={{ width: `${awakeSleepPercent}%` }}
-              ></div>
+            
+            <div className={styles.horizontalStatItem}>
+              <div className={styles.statIcon}><FaRegMoon /></div>
+              <div className={styles.statInfo}>
+                <span className={styles.statLabel}>Réveil</span>
+                <span className={styles.statValue}>{wakeTime}</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    );
-  };
-
-  // Rendu du cycle de sommeil
-  const renderSleepCycle = () => {
-    return (
-      <div className={styles.cycleContainer}>
-        <div className={styles.cycleTitle}>Cycles de sommeil</div>
         
-        <div className={styles.cycleChart}>
+        {/* Graphique des phases de sommeil */}
+        <div className={styles.sleepPhasesGraph}>
+          <div className={styles.phaseHeader}>
+            <h4>Cycles de sommeil</h4>
+            <div className={styles.phasePercentContainer}>
+              <div className={styles.phasePercent}>
+                <span className={styles.phasePercentValue}>{deepSleepPercent}%</span>
+                <span className={styles.phasePercentLabel}>Profond</span>
+              </div>
+              <div className={styles.phasePercent}>
+                <span className={styles.phasePercentValue}>{lightSleepPercent}%</span>
+                <span className={styles.phasePercentLabel}>Léger</span>
+              </div>
+              <div className={styles.phasePercent}>
+                <span className={styles.phasePercentValue}>{remSleepPercent}%</span>
+                <span className={styles.phasePercentLabel}>Paradoxal</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className={styles.phasesVisual}>
+            {sleepPhases.map((phase, index) => (
+              <div 
+                key={index}
+                className={`${styles.phaseBlock} ${styles[phase.type + 'Phase']}`}
+                style={{ 
+                  width: `${(phase.duration / totalSleepMinutes) * 100}%`,
+                  height: phase.type === 'deep' ? '100%' : 
+                          phase.type === 'light' ? '70%' : 
+                          phase.type === 'rem' ? '85%' : '40%' 
+                }}
+                title={`${phase.type}: ${phase.startTime} (${phase.duration} min)`}
+              />
+            ))}
+          </div>
+          
           <div className={styles.timeLabels}>
             <span>23h</span>
             <span>1h</span>
@@ -253,103 +203,8 @@ const SleepTracker: React.FC<SleepTrackerProps> = ({
             <span>5h</span>
             <span>7h</span>
           </div>
-          
-          <div className={styles.cycleGraph}>
-            {sleepPhases.map((phase, index) => (
-              <div 
-                key={index}
-                className={`${styles.phaseBlock} ${getPhaseColorClass(phase.type)}`}
-                style={{ 
-                  width: `${(phase.duration / totalSleepMinutes) * 100}%`,
-                  height: phase.type === 'deep' ? '100%' : 
-                           phase.type === 'light' ? '70%' : 
-                           phase.type === 'rem' ? '85%' : '40%' 
-                }}
-                title={`${phase.type}: ${phase.startTime} (${phase.duration} min)`}
-              />
-            ))}
-          </div>
-          
-          <div className={styles.stageLegend}>
-            <div className={styles.stageLabel} style={{ bottom: '90%' }}>Éveillé</div>
-            <div className={styles.stageLabel} style={{ bottom: '70%' }}>Léger</div>
-            <div className={styles.stageLabel} style={{ bottom: '40%' }}>Paradoxal</div>
-            <div className={styles.stageLabel} style={{ bottom: '5%' }}>Profond</div>
-          </div>
         </div>
       </div>
-    );
-  };
-
-  // Rendu des suggestions pour améliorer le sommeil
-  const renderSleepTips = () => {
-    // Suggestions basées sur le score
-    const tips = [
-      "Maintenez des heures de sommeil régulières, même le week-end",
-      "Évitez la caféine 6 heures avant le coucher",
-      "Évitez les écrans 1 heure avant de dormir",
-      "Assurez-vous que votre chambre est fraîche, sombre et calme"
-    ];
-    
-    // Filtrer les suggestions selon le score
-    if (sleepScore < 70) {
-      tips.push("Essayez une routine relaxante avant le coucher");
-      tips.push("Limitez l'alcool et les repas copieux le soir");
-    }
-    
-    return (
-      <div className={styles.tipsContainer}>
-        <h4 className={styles.tipsTitle}>
-          <FaRegStar className={styles.tipsIcon} />
-          Recommandations
-        </h4>
-        <ul className={styles.tipsList}>
-          {tips.map((tip, index) => (
-            <li key={index} className={styles.tipItem}>{tip}</li>
-          ))}
-        </ul>
-      </div>
-    );
-  };
-
-  return (
-    <div className={styles.sleepTracker}>
-      <div className={styles.header} onClick={toggleExpand}>
-        <div className={styles.headerTitle}>
-          <IoMdMoon className={styles.sleepIcon} />
-          <h3>Suivi du Sommeil</h3>
-        </div>
-        
-        <div className={styles.sleepSummary}>
-          <span className={styles.sleepHours}>
-            {Math.floor(totalSleepHours)}h{Math.round((totalSleepHours % 1) * 60)}
-          </span>
-          <span className={styles.goalPercent}>{sleepGoalPercent}%</span>
-        </div>
-        
-        <button 
-          className={styles.expandButton} 
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleExpand();
-          }}
-        >
-          {expanded ? <FaChevronUp /> : <FaChevronDown />}
-        </button>
-      </div>
-      
-      {expanded && (
-        <div className={styles.contentExpanded}>
-          <div className={styles.upperContent}>
-            {renderSleepStats()}
-            {renderSleepScoreCircle()}
-          </div>
-          
-          {renderSleepPhases()}
-          {renderSleepCycle()}
-          {renderSleepTips()}
-        </div>
-      )}
     </div>
   );
 };

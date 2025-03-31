@@ -1,4 +1,4 @@
-.sleepTracker {
+.sleepWidget {
   background: rgba(0, 38, 65, 0.35);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
@@ -8,24 +8,19 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   margin-bottom: 20px;
   color: white;
+  padding-bottom: 15px;
 }
 
-.header {
+.widgetHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 15px;
   background: rgba(0, 17, 13, 0.3);
-  cursor: pointer;
-  transition: background-color 0.2s;
-  border-bottom: 1px solid rgba(255, 255, 255, 0);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.header:hover {
-  background: rgba(0, 26, 20, 0.4);
-}
-
-.headerTitle {
+.widgetTitle {
   display: flex;
   align-items: center;
 }
@@ -37,74 +32,96 @@
   filter: drop-shadow(0 0 3px rgba(155, 89, 182, 0.5));
 }
 
-.headerTitle h3 {
+.widgetTitle h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
 }
 
-.sleepSummary {
-  display: flex;
-  align-items: baseline;
-}
-
-.sleepHours {
-  font-size: 20px;
-  font-weight: 700;
-  color: #9b59b6;
-  margin-right: 8px;
-}
-
-.goalPercent {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.7);
-  padding: 2px 6px;
-  background: rgba(155, 89, 182, 0.3);
-  border-radius: 10px;
-}
-
-.expandButton {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.expandButton:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* Contenu déplié */
-.contentExpanded {
+.widgetContent {
   padding: 15px;
-  background: rgba(0, 17, 13, 0.2);
 }
 
-.upperContent {
-  display: flex;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Statistiques */
-.sleepStats {
+/* Conteneur du cercle de score et stats */
+.scoreCircleContainer {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Cercle de score */
+.scoreCircle {
+  width: 110px;
+  height: 110px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  margin-bottom: 15px;
+}
+
+.scoreSvg {
+  width: 100%;
+  height: 100%;
+}
+
+.scoreProgress {
+  transition: stroke-dashoffset 0.8s ease;
+}
+
+.scoreValue {
+  font-size: 28px;
+  font-weight: bold;
+  fill: white;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+}
+
+.scoreLabel {
+  font-size: 14px;
+  fill: rgba(255, 255, 255, 0.7);
+}
+
+.qualityLabel {
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 6px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  text-align: center;
+}
+
+/* Statistiques de base */
+.basicStats {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15px;
   flex: 1;
+  margin-left: 20px;
+}
+
+.basicStatsHorizontal {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
+  flex: 1;
+  margin-bottom: 15px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .statItem {
   display: flex;
   align-items: center;
+}
+
+.statItemHorizontal {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
 }
 
 .statIcon {
@@ -134,181 +151,74 @@
   font-weight: 600;
 }
 
-/* Cercle de score */
-.sleepScoreContainer {
-  width: 130px;
-  height: 130px;
+/* Statistiques horizontales */
+.horizontalStatsContainer {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.sleepScoreSvg {
-  width: 100%;
-  height: 100%;
-  transform: rotate(-90deg);
-}
-
-.scoreProgress {
-  transition: stroke-dashoffset 0.8s ease;
-}
-
-.scoreValue {
-  font-size: 24px;
-  font-weight: bold;
-  fill: white;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
-  transform: rotate(90deg);
-}
-
-.scoreLabel {
-  font-size: 12px;
-  fill: rgba(255, 255, 255, 0.7);
-  transform: rotate(90deg);
-}
-
-.qualityLabel {
-  font-size: 14px;
-  font-weight: 600;
-  margin-top: 6px;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-}
-
-/* Phases de sommeil */
-.sleepPhasesContainer {
-  background: rgba(0, 17, 13, 0.1);
-  border-radius: 12px;
-  padding: 15px;
-  margin-bottom: 20px;
-}
-
-.phaseTitle {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 15px;
-  color: rgba(255, 255, 255, 0.9);
-  display: flex;
-  align-items: center;
-}
-
-.phasesList {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.phaseItem {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.phaseColor {
-  width: 12px;
-  height: 12px;
-  border-radius: 3px;
-  margin-right: 10px;
-}
-
-.deepPhase {
-  background: #3498db;
-}
-
-.lightPhase {
-  background: #1abc9c;
-}
-
-.remPhase {
-  background: #9b59b6;
-}
-
-.awakePhase {
-  background: #e67e22;
-}
-
-.phaseName {
-  font-size: 14px;
-  flex: 1;
-  margin-right: 10px;
-  white-space: nowrap;
-}
-
-.phaseValue {
-  font-size: 14px;
-  font-weight: 600;
-  width: 40px;
-  text-align: right;
-  margin-right: 10px;
-}
-
-.phaseBar {
-  height: 6px;
-  flex: 1.5;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.phaseProgress {
-  height: 100%;
-  transition: width 0.3s ease;
-}
-
-.deepProgress {
-  background: linear-gradient(90deg, #3498db, #2980b9);
-}
-
-.lightProgress {
-  background: linear-gradient(90deg, #1abc9c, #16a085);
-}
-
-.remProgress {
-  background: linear-gradient(90deg, #9b59b6, #8e44ad);
-}
-
-.awakeProgress {
-  background: linear-gradient(90deg, #e67e22, #d35400);
-}
-
-/* Cycles de sommeil */
-.cycleContainer {
-  background: rgba(0, 17, 13, 0.1);
-  border-radius: 12px;
-  padding: 15px;
-  margin-bottom: 20px;
-}
-
-.cycleTitle {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 15px;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.cycleChart {
-  height: 140px;
-  position: relative;
-  margin-top: 10px;
-}
-
-.timeLabels {
-  display: flex;
+  flex-direction: row;
   justify-content: space-between;
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.5);
-  padding: 0 2px;
-  margin-bottom: 5px;
+  gap: 10px;
+  width: 100%;
 }
 
-.cycleGraph {
+.horizontalStatItem {
   display: flex;
-  height: 100px;
+  align-items: center;
+  flex: 1;
+}
+
+/* Graphique des phases */
+.sleepPhasesGraph {
+  background: rgba(0, 17, 13, 0.1);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.phaseHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.phaseHeader h4 {
+  font-size: 16px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.phasePercentContainer {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.phasePercent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.phasePercentValue {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.phasePercentLabel {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.phasesVisual {
+  display: flex;
+  height: 80px;
   background: rgba(0, 0, 0, 0.15);
   border-radius: 6px;
   overflow: hidden;
-  position: relative;
+  margin-bottom: 5px;
 }
 
 .phaseBlock {
@@ -323,113 +233,86 @@
   z-index: 2;
 }
 
-.deepSleep {
+.deepPhase {
   background: rgba(52, 152, 219, 0.7);
 }
 
-.lightSleep {
+.lightPhase {
   background: rgba(26, 188, 156, 0.7);
 }
 
-.remSleep {
+.remPhase {
   background: rgba(155, 89, 182, 0.7);
 }
 
-.awakeSleep {
+.awakePhase {
   background: rgba(230, 126, 34, 0.7);
 }
 
-.stageLegend {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 20px;
-  pointer-events: none;
-  display: none;
+.timeLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 0 2px;
 }
 
-.stageLabel {
-  position: absolute;
-  left: 5px;
-  font-size: 9px;
-  color: rgba(255, 255, 255, 0.6);
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-}
-
-/* Conseils pour le sommeil */
-.tipsContainer {
+/* Recommandations */
+.recommendations {
   background: rgba(0, 17, 13, 0.1);
   border-radius: 12px;
   padding: 15px;
 }
 
-.tipsTitle {
+.recommendations h4 {
   font-size: 16px;
   font-weight: 600;
-  margin: 0 0 15px;
+  margin: 0 0 12px;
   color: rgba(255, 255, 255, 0.9);
   display: flex;
   align-items: center;
 }
 
-.tipsIcon {
+.recommendationsIcon {
   color: #f1c40f;
-  margin-right: 6px;
+  margin-right: 8px;
 }
 
-.tipsList {
+.recommendationsList {
   margin: 0;
   padding-left: 20px;
 }
 
-.tipItem {
+.recommendationsList li {
   margin-bottom: 8px;
   font-size: 14px;
   line-height: 1.4;
   color: rgba(255, 255, 255, 0.8);
 }
 
-.tipItem:last-child {
+.recommendationsList li:last-child {
   margin-bottom: 0;
 }
 
-/* Media queries pour la responsivité */
-@media (max-width: 600px) {
-  .upperContent {
-    flex-direction: column;
-  }
-  
-  .sleepStats {
-    margin-bottom: 20px;
-  }
-  
-  .sleepScoreContainer {
-    margin: 0 auto;
-  }
-  
-  .phaseItem {
-    flex-wrap: wrap;
-  }
-  
-  .phaseName {
-    width: calc(100% - 60px);
-    margin-bottom: 3px;
-  }
-  
-  .phaseBar {
-    width: 100%;
-    margin-left: 22px;
-  }
-}
-
+/* Media queries pour la responsivité - Mobile first */
 @media (min-width: 768px) {
-  .phaseItem {
-    flex-wrap: nowrap;
+  .scoreCircleContainer {
+    flex-direction: row;
+    align-items: flex-start;
   }
   
-  .stageLegend {
-    display: block;
+  .scoreCircle {
+    margin-bottom: 0;
+  }
+  
+  .phaseHeader {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .phasePercentContainer {
+    margin-top: 0;
+    width: auto;
   }
 }

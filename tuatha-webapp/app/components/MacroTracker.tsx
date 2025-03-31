@@ -1,25 +1,28 @@
 import React, { useMemo } from 'react';
 
+interface Food {
+  name: string;
+  calories: number;
+  proteins: number;
+  carbs: number;
+  fats: number;
+  quantity?: number;
+  icon?: React.ReactNode;
+}
+
 interface Meal {
-  id: string;
-  title: string;
+  id: number;  
+  name: string;
   time: string;
-  foods: Array<{
-    name: string;
-    calories: number;
-    proteins: number;
-    carbs: number;
-    fats: number;
-    quantity: number;
-    icon?: React.ReactNode;
-  }>;
+  foods: Food[];
   completed?: boolean;
+  status?: 'pending' | 'consumed' | 'skipped'; // Ajout de la propriété manquante
 }
 
 interface MacroTrackerProps {
   // Nouvelles props
   meals?: Meal[];
-  mealStatuses?: { [key: string]: boolean };
+  mealStatuses?: Record<number, 'pending' | 'consumed' | 'skipped'>;  
   targetCalories?: number;
   targetProteins?: number;
   targetCarbs?: number;
@@ -72,14 +75,16 @@ const MacroTracker: React.FC<MacroTrackerProps> = ({
       let totalFats = 0;
       
       meals.forEach(meal => {
-        const isCompleted = mealStatuses?.[meal.id] ?? meal.completed ?? false;
+        // Vérifier si le repas est consommé selon le format de la page MaJournee
+        const isConsumed = meal.status === 'consumed';
         
-        if (isCompleted) {
+        if (isConsumed) {
           meal.foods.forEach(food => {
-            totalCalories += food.calories * food.quantity;
-            totalProteins += food.proteins * food.quantity;
-            totalCarbs += food.carbs * food.quantity;
-            totalFats += food.fats * food.quantity;
+            const quantity = food.quantity || 1;
+            totalCalories += food.calories * quantity;
+            totalProteins += food.proteins * quantity;
+            totalCarbs += food.carbs * quantity;
+            totalFats += food.fats * quantity;
           });
         }
       });
