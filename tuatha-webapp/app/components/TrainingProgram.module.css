@@ -448,6 +448,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow: hidden;
 }
 
 .exercise:hover {
@@ -458,23 +459,26 @@
 /* Styles de l'en-tête d'exercice */
 .exerciseHeader {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  flex-direction: column;
   margin-bottom: 15px;
-  flex-wrap: wrap;
-  gap: 10px;
+}
+
+.exerciseTitle {
+  margin-bottom: 10px;
 }
 
 .exerciseHeader h3 {
   font-size: 1.2rem;
   margin: 0;
   color: white;
+  margin-bottom: 8px;
 }
 
 .exerciseTags {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  margin-bottom: 10px;
 }
 
 .exerciseCategory {
@@ -510,36 +514,44 @@
 /* Styles du tableau de séries */
 .exerciseSets {
   margin-top: 15px;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
-  background: rgba(0, 38, 65, 0.3);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: rgba(0, 38, 65, 0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
-  width: 100%; /* Utiliser toute la largeur disponible */
+  -webkit-backdrop-filter: blur(10px);
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow-x: auto; /* Permet le défilement horizontal si nécessaire */
 }
 
 .setsHeader {
   display: grid;
   grid-template-columns: 60px 1fr 1fr 1fr 1.5fr;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 12px 15px;
+  background: rgba(0, 38, 65, 0.6);
+  padding: 14px 15px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.9);
   font-size: 0.9rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 500px; /* Assure une largeur minimale pour éviter trop de compression */
 }
 
 .setRow {
   display: grid;
   grid-template-columns: 60px 1fr 1fr 1fr 1.5fr;
-  padding: 14px 15px;
+  padding: 16px 15px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   align-items: center;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  min-width: 500px; /* Correspond à l'entête pour maintenir l'alignement */
 }
 
 .setRow:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.07);
+  transform: translateY(-1px);
 }
 
 .setRow:last-child {
@@ -547,11 +559,12 @@
 }
 
 .completedSet {
-  background: rgba(76, 175, 80, 0.15);
+  background: rgba(76, 175, 80, 0.08);
+  border-left: 3px solid rgba(76, 175, 80, 0.6);
 }
 
 .completedSet:hover {
-  background: rgba(76, 175, 80, 0.2);
+  background: rgba(76, 175, 80, 0.12);
 }
 
 .setNumber, .setWeight, .setReps, .setRpe {
@@ -559,121 +572,199 @@
 }
 
 .setNumber {
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.7);
+  font-weight: 700;
+  color: rgba(255, 107, 0, 0.85);
+  background: rgba(255, 107, 0, 0.1);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
 }
 
 .setInput {
   width: 100%;
-  max-width: 70px;
+  max-width: 80px;
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.15);
   color: white;
-  padding: 10px;
-  border-radius: 6px;
+  padding: 12px;
+  border-radius: 8px;
   font-size: 1rem;
   transition: all 0.2s;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .setInput:focus {
   border-color: rgba(255, 107, 0, 0.6);
-  box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.2);
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.2);
   outline: none;
 }
 
 .setActions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   justify-content: flex-end;
 }
 
 .setActionButton {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.2);
-  border: none;
-  color: rgba(255, 255, 255, 0.7);
+  background: rgba(0, 38, 65, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .setActionButton:hover {
-  background: rgba(0, 0, 0, 0.3);
-  color: white;
+  transform: translateY(-2px);
+  background: rgba(0, 38, 65, 0.6);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.setActionButton:active {
+  transform: translateY(0);
+}
+
+.completeButton {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .completeButton.active {
-  background: rgba(76, 175, 80, 0.2);
-  color: #4CAF50;
-}
-
-.completeButton.active:hover {
-  background: rgba(76, 175, 80, 0.3);
+  background: rgba(76, 175, 80, 0.4);
+  color: white;
+  border: 1px solid rgba(76, 175, 80, 0.6);
 }
 
 .videoButton {
-  background: rgba(33, 150, 243, 0.1);
-  color: rgba(33, 150, 243, 0.8);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .videoButton:hover {
-  background: rgba(33, 150, 243, 0.2);
-  color: #2196F3;
+  background: rgba(33, 150, 243, 0.3);
 }
 
 .videoButton.recording {
-  background: rgba(244, 67, 54, 0.2);
-  color: #F44336;
+  background: rgba(244, 67, 54, 0.4);
+  color: white;
   animation: pulse 1.5s infinite;
 }
 
 .playButton {
-  background: rgba(156, 39, 176, 0.1);
-  color: rgba(156, 39, 176, 0.8);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .playButton:hover {
-  background: rgba(156, 39, 176, 0.2);
-  color: #9C27B0;
-}
-
-.tonnageHighlight {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(255, 107, 0, 0.15);
-  padding: 10px 15px;
-  border-radius: 8px;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.tonnageHighlight strong {
-  color: #FF6B00;
-  font-size: 1.1rem;
-}
-
-.tonnageHighlight svg {
-  color: #FF6B00;
+  background: rgba(255, 193, 7, 0.3);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .dayCard {
-    width: 85vw;
-    max-width: 300px;
+  .trainingProgram {
+    padding: 15px;
   }
   
+  .weekGoal, .programActions {
+    margin-top: 15px;
+  }
+  
+  .dayCard {
+    padding: 15px;
+  }
+  
+  .exercise {
+    padding: 15px;
+  }
+  
+  .exerciseHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .exerciseTags {
+    margin-top: 10px;
+    margin-bottom: 5px;
+  }
+  
+  .exerciseSets {
+    margin-top: 10px;
+    border-radius: 8px;
+  }
+  
+  .setsHeader {
+    padding: 10px;
+    font-size: 0.75rem;
+  }
+  
+  .setRow {
+    padding: 12px 10px;
+  }
+  
+  .setNumber, .setWeight, .setReps, .setRpe {
+    font-size: 0.9rem;
+  }
+  
+  .setInput {
+    max-width: 60px;
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+  
+  .setActionButton {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .actionButton, .debriefButton {
+    font-size: 0.9rem;
+    padding: 8px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .setsHeader,
+  .setRow {
+    grid-template-columns: 50px 0.8fr 0.8fr 0.8fr 1.2fr;
+    min-width: 450px;
+  }
+  
+  .setActions {
+    gap: 5px;
+  }
+  
+  .setActionButton {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .exerciseHeader h3 {
+    font-size: 1.1rem;
+  }
+  
+  .exerciseCategory, .targetMuscle, .exerciseTag {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+  
+  .tonnageHighlight {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 768px) {
   .dayStats {
     grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .expandedDay {
-    width: 90%;
-    max-width: none;
   }
 }
 
@@ -993,32 +1084,38 @@
 }
 
 .debriefButton {
-  background: rgba(255, 107, 0, 0.15);
-  border: 1px solid rgba(255, 107, 0, 0.3);
+  background: rgba(0, 38, 65, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   color: white;
-  border-radius: 50%;
-  width: 34px;
-  height: 34px;
+  border-radius: 12px;
+  padding: 10px 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 8px;
+  gap: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  font-weight: 500;
+  font-size: 0.95rem;
 }
 
 .debriefButton:hover {
-  background: rgba(255, 107, 0, 0.35);
+  background: rgba(255, 107, 0, 0.25);
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 107, 0, 0.4);
 }
 
 .debriefButton:active {
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.debriefIcon {
+  font-size: 1.1rem;
+  color: rgba(255, 107, 0, 0.9);
 }
 
 .debriefCompleted {

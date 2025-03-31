@@ -20,6 +20,7 @@ import TrainingCycle from '@/app/components/TrainingCycle';
 import TrainingProgram from '@/app/components/TrainingProgram';
 import VideoShare from '@/app/components/VideoShare';
 import jsPDF from 'jspdf';
+import styles from './page.module.css';
 
 interface Practitioner {
   id: number;
@@ -1079,15 +1080,67 @@ export default function PraticienPage() {
           </div>
           
           {meals.map((meal: Meal) => (
-            <div key={meal.id} style={{
-              marginBottom: '25px',
-              background: 'rgba(0, 38, 65, 0.25)',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
-              borderRadius: '12px',
-              padding: '15px',
-              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1)'
-            }}>
+            <div key={meal.id} 
+              style={{
+                marginBottom: '25px',
+                background: 'rgba(0, 38, 65, 0.25)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                borderRadius: '12px',
+                padding: '15px',
+                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
+                position: 'relative',
+                transform: currentSwipeMeal === meal.id ? `translateX(${-swipeDistance}px)` : 'translateX(0)',
+                transition: currentSwipeMeal === meal.id ? 'none' : 'transform 0.3s ease-out',
+                cursor: 'grab',
+                overflow: 'hidden'
+              }}
+              onTouchStart={(e) => handleTouchStart(e, meal.id)}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
+              {/* Indicateurs de statut par glissement */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                bottom: 0,
+                width: '100%',
+                background: mealStatuses[meal.id] === 'consumed' ? 
+                  'rgba(76, 175, 80, 0.2)' : 
+                  mealStatuses[meal.id] === 'skipped' ? 
+                  'rgba(244, 67, 54, 0.2)' : 
+                  'transparent',
+                borderRadius: '12px',
+                zIndex: -1
+              }}>
+                {/* Indicateurs visuels du statut */}
+                {mealStatuses[meal.id] === 'consumed' && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    right: '20px',
+                    transform: 'translateY(-50%)',
+                    color: 'rgba(76, 175, 80, 0.8)',
+                    fontSize: '24px'
+                  }}>
+                    ✓
+                  </div>
+                )}
+                {mealStatuses[meal.id] === 'skipped' && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '20px',
+                    transform: 'translateY(-50%)',
+                    color: 'rgba(244, 67, 54, 0.8)',
+                    fontSize: '24px'
+                  }}>
+                    ✗
+                  </div>
+                )}
+              </div>
+              
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                 <h3 style={{ margin: 0, fontSize: '18px' }}>{meal.name}</h3>
                 <span style={{ 
@@ -1927,6 +1980,7 @@ export default function PraticienPage() {
                   {
                     id: '2',
                     title: 'Traitement anti-inflammatoire',
+                    description: 'Traitement anti-inflammatoire',
                     date: '2025-03-20',
                     doctor: 'Beverly Crusher',
                     medications: [
@@ -2146,9 +2200,221 @@ export default function PraticienPage() {
           onClose={() => setShowAppointmentModal(false)}
           title={`Prendre rendez-vous avec ${practitioner.firstName} ${practitioner.lastName}`}
         >
-          <div style={{ padding: '10px', color: 'white' }}>
-            {/* ... */}
+          <div style={{ padding: '20px', color: 'white' }}>
+            <div className={styles.appointmentForm}>
+              <div className={styles.formGroup}>
+                <label htmlFor="appointmentDate">Date</label>
+                <input
+                  id="appointmentDate"
+                  type="date"
+                  value={newAppointmentDate}
+                  onChange={(e) => setNewAppointmentDate(e.target.value)}
+                  className={styles.formControl}
+                />
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label htmlFor="appointmentTime">Heure</label>
+                <input
+                  id="appointmentTime"
+                  type="time"
+                  value={newAppointmentTime}
+                  onChange={(e) => setNewAppointmentTime(e.target.value)}
+                  className={styles.formControl}
+                />
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label htmlFor="appointmentDuration">Durée (minutes)</label>
+                <select
+                  id="appointmentDuration"
+                  value={newAppointmentDuration}
+                  onChange={(e) => setNewAppointmentDuration(parseInt(e.target.value))}
+                  className={styles.formControl}
+                >
+                  <option value={15}>15 minutes</option>
+                  <option value={30}>30 minutes</option>
+                  <option value={45}>45 minutes</option>
+                  <option value={60}>60 minutes</option>
+                  <option value={90}>90 minutes</option>
+                </select>
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label htmlFor="appointmentType">Type de consultation</label>
+                <select
+                  id="appointmentType"
+                  value={newAppointmentType}
+                  onChange={(e) => setNewAppointmentType(e.target.value)}
+                  className={styles.formControl}
+                >
+                  <option value="Consultation standard">Consultation standard</option>
+                  <option value="Premier rendez-vous">Premier rendez-vous</option>
+                  <option value="Suivi">Suivi</option>
+                  <option value="Urgence">Urgence</option>
+                </select>
+              </div>
+              
+              <div className={styles.formActions}>
+                <button 
+                  className={styles.cancelButton}
+                  onClick={() => setShowAppointmentModal(false)}
+                >
+                  Annuler
+                </button>
+                <button 
+                  className={styles.confirmButton}
+                  onClick={handleConfirmAppointment}
+                >
+                  Confirmer le rendez-vous
+                </button>
+              </div>
+            </div>
           </div>
+        </Modal>
+        
+        {/* Modale de paiement */}
+        <Modal
+          isOpen={showPaymentModal}
+          onClose={() => {
+            if (!paymentSuccess) {
+              setShowPaymentModal(false);
+              setPaymentSuccess(false);
+            }
+          }}
+          title="Paiement en ligne sécurisé"
+        >
+          {paymentSuccess ? (
+            <div className={styles.paymentSuccess}>
+              <FaRegCreditCard className={styles.successIcon} />
+              <h3>Paiement effectué avec succès !</h3>
+              <p>Votre transaction a été traitée. Un reçu a été envoyé à votre adresse email.</p>
+              <div className={styles.formActions}>
+                <button 
+                  className={styles.confirmButton}
+                  onClick={() => {
+                    setShowPaymentModal(false);
+                    setPaymentSuccess(false);
+                  }}
+                >
+                  Fermer
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className={styles.paymentForm}>
+              <div className={styles.paymentOptions}>
+                <FaCcVisa className={styles.paymentOption} title="Visa" />
+                <FaCcMastercard className={styles.paymentOption} title="Mastercard" />
+                <FaCcAmex className={styles.paymentOption} title="American Express" />
+                <FaCcApplePay className={styles.paymentOption} title="Apple Pay" />
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label>Montant</label>
+                <select
+                  className={styles.formControl}
+                  value={paymentAmount}
+                  onChange={(e) => setPaymentAmount(parseInt(e.target.value))}
+                >
+                  <option value={30}>Acompte - 30 €</option>
+                  <option value={50}>Consultation standard - 50 €</option>
+                  <option value={75}>Consultation longue - 75 €</option>
+                  <option value={100}>Forfait suivi mensuel - 100 €</option>
+                </select>
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label>Motif du paiement</label>
+                <select
+                  className={styles.formControl}
+                  value={paymentPurpose}
+                  onChange={(e) => setPaymentPurpose(e.target.value)}
+                >
+                  <option value="Consultation">Consultation</option>
+                  <option value="Suivi">Suivi</option>
+                  <option value="Acompte">Acompte</option>
+                  <option value="Forfait">Forfait</option>
+                </select>
+              </div>
+              
+              <div className={styles.cardField}>
+                <label>Numéro de carte</label>
+                <input
+                  type="text"
+                  className={styles.formControl}
+                  placeholder="1234 5678 9012 3456"
+                  value={cardNumber}
+                  onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                  maxLength={19}
+                />
+                <FaRegCreditCard className={styles.cardIcon} />
+                {formErrors.cardNumber && <div className={styles.fieldError}>{formErrors.cardNumber}</div>}
+              </div>
+              
+              <div className={styles.cardField}>
+                <label>Nom du titulaire</label>
+                <input
+                  type="text"
+                  className={styles.formControl}
+                  placeholder="NOM PRÉNOM"
+                  value={cardHolder}
+                  onChange={(e) => setCardHolder(e.target.value.toUpperCase())}
+                />
+                {formErrors.cardHolder && <div className={styles.fieldError}>{formErrors.cardHolder}</div>}
+              </div>
+              
+              <div className={styles.cardRow}>
+                <div className={styles.cardField}>
+                  <label>Date d'expiration</label>
+                  <input
+                    type="text"
+                    className={styles.formControl}
+                    placeholder="MM/YY"
+                    value={expiryDate}
+                    onChange={(e) => {
+                      let value = e.target.value.replace(/\D/g, '');
+                      if (value.length > 2) {
+                        value = value.substr(0, 2) + '/' + value.substr(2, 2);
+                      }
+                      setExpiryDate(value);
+                    }}
+                    maxLength={5}
+                  />
+                  {formErrors.expiryDate && <div className={styles.fieldError}>{formErrors.expiryDate}</div>}
+                </div>
+                
+                <div className={styles.cardField}>
+                  <label>CVV</label>
+                  <input
+                    type="text"
+                    className={styles.formControl}
+                    placeholder="123"
+                    value={cvv}
+                    onChange={(e) => setCvv(e.target.value.replace(/\D/g, ''))}
+                    maxLength={3}
+                  />
+                  <FaLock className={styles.cardIcon} />
+                  {formErrors.cvv && <div className={styles.fieldError}>{formErrors.cvv}</div>}
+                </div>
+              </div>
+              
+              <div className={styles.formActions}>
+                <button 
+                  className={styles.cancelButton}
+                  onClick={() => setShowPaymentModal(false)}
+                >
+                  Annuler
+                </button>
+                <button 
+                  className={styles.confirmButton}
+                  onClick={handlePaymentSubmit}
+                >
+                  Payer {paymentAmount} €
+                </button>
+              </div>
+            </div>
+          )}
         </Modal>
         
         {/* Modale du journal alimentaire */}

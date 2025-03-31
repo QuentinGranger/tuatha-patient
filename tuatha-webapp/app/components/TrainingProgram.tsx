@@ -20,7 +20,8 @@ import {
   FaDumbbell,
   FaStopwatch,
   FaRunning,
-  FaCommentDots
+  FaCommentDots,
+  FaComment
 } from 'react-icons/fa';
 import SessionDebrief from './SessionDebrief';
 import Portal from './Portal';
@@ -103,19 +104,76 @@ interface TrainingProgramProps {
   coachId?: string;
 }
 
-// Données d'exemple pour le composant
+// Fonction pour générer des dates cohérentes basées sur la date actuelle
+const generateCoherentDates = () => {
+  const today = new Date();
+  
+  // Remonter au lundi de la semaine en cours
+  const currentWeekStart = new Date(today);
+  const dayOfWeek = currentWeekStart.getDay();
+  const diff = currentWeekStart.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+  currentWeekStart.setDate(diff);
+  
+  // Calculer le dimanche de la semaine en cours
+  const currentWeekEnd = new Date(currentWeekStart);
+  currentWeekEnd.setDate(currentWeekEnd.getDate() + 6);
+  
+  // Calculer la semaine suivante
+  const nextWeekStart = new Date(currentWeekStart);
+  nextWeekStart.setDate(nextWeekStart.getDate() + 7);
+  const nextWeekEnd = new Date(nextWeekStart);
+  nextWeekEnd.setDate(nextWeekEnd.getDate() + 6);
+  
+  // Formatter les dates
+  const formatDate = (date: Date) => {
+    return date.toISOString().split('T')[0];
+  };
+  
+  // Générer des jours spécifiques pour les séances
+  const generateSessionDay = (baseDate: Date, addDays: number) => {
+    const sessionDate = new Date(baseDate);
+    sessionDate.setDate(sessionDate.getDate() + addDays);
+    return formatDate(sessionDate);
+  };
+  
+  return {
+    currentWeek: {
+      start: formatDate(currentWeekStart),
+      end: formatDate(currentWeekEnd),
+      sessions: [
+        generateSessionDay(currentWeekStart, 1), // Mardi
+        generateSessionDay(currentWeekStart, 3), // Jeudi
+        generateSessionDay(currentWeekStart, 5), // Samedi
+      ]
+    },
+    nextWeek: {
+      start: formatDate(nextWeekStart),
+      end: formatDate(nextWeekEnd),
+      sessions: [
+        generateSessionDay(nextWeekStart, 1), // Mardi
+        generateSessionDay(nextWeekStart, 3), // Jeudi
+        generateSessionDay(nextWeekStart, 5), // Samedi
+      ]
+    }
+  };
+};
+
+// Générer les dates cohérentes pour le programme d'entraînement
+const coherentDates = generateCoherentDates();
+
+// Données d'exemple pour le composant avec dates cohérentes
 const exampleTrainingData: TrainingWeek[] = [
   {
     id: 'week1',
     weekNumber: 1,
-    startDate: '2025-03-24',
-    endDate: '2025-03-30',
+    startDate: coherentDates.currentWeek.start,
+    endDate: coherentDates.currentWeek.end,
     goal: "Adaptation anatomique et développement de l'endurance musculaire",
     trainingUnits: [
       {
         id: 'tu1',
         name: 'Séance Bas du Corps',
-        date: '2025-03-25',
+        date: coherentDates.currentWeek.sessions[0],
         status: 'completed',
         totalTonnage: 6820,
         duration: 65,
@@ -270,7 +328,7 @@ const exampleTrainingData: TrainingWeek[] = [
       {
         id: 'tu2',
         name: 'Séance Haut du Corps',
-        date: '2025-03-27',
+        date: coherentDates.currentWeek.sessions[1],
         status: 'completed',
         totalTonnage: 5240,
         duration: 70,
@@ -347,7 +405,7 @@ const exampleTrainingData: TrainingWeek[] = [
       {
         id: 'tu3',
         name: 'Séance Bas du Corps',
-        date: '2025-03-30',
+        date: coherentDates.currentWeek.sessions[2],
         status: 'in-progress',
         totalTonnage: 0,
         exercises: [
@@ -424,14 +482,14 @@ const exampleTrainingData: TrainingWeek[] = [
   {
     id: 'week2',
     weekNumber: 2,
-    startDate: '2025-03-31',
-    endDate: '2025-04-06',
+    startDate: coherentDates.nextWeek.start,
+    endDate: coherentDates.nextWeek.end,
     goal: "Développement de la force maximale et hypertrophie",
     trainingUnits: [
       {
-        id: 'tu1',
+        id: 'tu4',
         name: 'Séance Bas du Corps',
-        date: '2025-04-01',
+        date: coherentDates.nextWeek.sessions[0],
         status: 'planned',
         totalTonnage: 0,
         exercises: [
@@ -464,6 +522,114 @@ const exampleTrainingData: TrainingWeek[] = [
                 id: 's4',
                 weight: 105,
                 reps: 4,
+                completed: false
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'tu5',
+        name: 'Séance Haut du Corps',
+        date: coherentDates.nextWeek.sessions[1],
+        status: 'planned',
+        totalTonnage: 0,
+        exercises: [
+          {
+            id: 'ex1',
+            name: 'Développé couché',
+            category: 'Compound',
+            targetMuscleGroups: ['Chest', 'Triceps', 'Shoulders'],
+            restBetweenSets: 120,
+            sets: [
+              {
+                id: 's1',
+                weight: 65,
+                reps: 12,
+                completed: false
+              },
+              {
+                id: 's2',
+                weight: 80,
+                reps: 10,
+                completed: false
+              },
+              {
+                id: 's3',
+                weight: 85,
+                reps: 8,
+                completed: false
+              },
+              {
+                id: 's4',
+                weight: 90,
+                reps: 6,
+                completed: false
+              }
+            ]
+          },
+          {
+            id: 'ex2',
+            name: 'Rowing haltère',
+            category: 'Compound',
+            targetMuscleGroups: ['Back', 'Biceps'],
+            restBetweenSets: 90,
+            sets: [
+              {
+                id: 's1',
+                weight: 24,
+                reps: 12,
+                completed: false
+              },
+              {
+                id: 's2',
+                weight: 26,
+                reps: 12,
+                completed: false
+              },
+              {
+                id: 's3',
+                weight: 28,
+                reps: 10,
+                completed: false
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'tu6',
+        name: 'Séance Cardio et Mobilité',
+        date: coherentDates.nextWeek.sessions[2],
+        status: 'planned',
+        totalTonnage: 0,
+        exercises: [
+          {
+            id: 'ex1',
+            name: 'Course à pied',
+            category: 'Cardio',
+            targetMuscleGroups: ['Cardio'],
+            restBetweenSets: 0,
+            sets: [
+              {
+                id: 's1',
+                weight: 0,
+                reps: 30,
+                completed: false
+              }
+            ]
+          },
+          {
+            id: 'ex2',
+            name: 'Étirements',
+            category: 'Mobilité',
+            targetMuscleGroups: ['Mobilité'],
+            restBetweenSets: 0,
+            sets: [
+              {
+                id: 's1',
+                weight: 0,
+                reps: 10,
                 completed: false
               }
             ]
@@ -938,12 +1104,14 @@ const TrainingProgram: React.FC<TrainingProgramProps> = ({ athleteId, athleteNam
   const [debrief, setDebrief] = useState<any>(null);
 
   const getAllTrainingSessions = () => {
-    return exampleTrainingData.flatMap(week => 
-      week.trainingUnits.map(unit => ({
-        id: unit.id,
+    // Générer des IDs uniques basés sur la semaine et l'unité
+    return trainingData.flatMap((week, weekIndex) => 
+      week.trainingUnits.map((unit, unitIndex) => ({
+        id: `${week.id}_${unit.id}`, // ID unique combinant semaine et unité
         name: unit.name,
         date: unit.date,
-        status: unit.status
+        status: unit.status,
+        originalId: unit.id // Garder l'ID original pour référence
       }))
     );
   };
@@ -952,12 +1120,18 @@ const TrainingProgram: React.FC<TrainingProgramProps> = ({ athleteId, athleteNam
 
   const handleSaveDebrief = (data: any) => {
     console.log('Débrief sauvegardé:', data);
-    // Ici on pourrait mettre à jour les données de la séance avec le débrief
-    const updatedTrainingUnits = exampleTrainingData.map(week => {
+    
+    // Extraire l'ID d'origine depuis l'ID composite (week_id_unit_id)
+    const sessionIdParts = data.sessionId.split('_');
+    const originalUnitId = sessionIdParts[sessionIdParts.length - 1];
+    
+    // Mettre à jour les données avec le débrief
+    const updatedTrainingUnits = trainingData.map(week => {
       return {
         ...week,
         trainingUnits: week.trainingUnits.map(unit => {
-          if (unit.id === data.sessionId) {
+          // Utiliser l'ID original pour la correspondance
+          if (unit.id === originalUnitId) {
             return {
               ...unit,
               sessionDebrief: data
@@ -1017,8 +1191,12 @@ const TrainingProgram: React.FC<TrainingProgramProps> = ({ athleteId, athleteNam
           </button>
           
           <div className={styles.trainingActions}>
-            <button className={styles.debriefButton} onClick={() => setShowDebriefModal(true)}>
-              Compléter une session de débrief
+            <button 
+              className={styles.debriefButton} 
+              onClick={() => setShowDebriefModal(true)}
+              title="Compléter une session de débrief"
+            >
+              <FaComment className={styles.debriefIcon} /> Débrief
             </button>
           </div>
         </div>
@@ -1122,7 +1300,9 @@ const TrainingProgram: React.FC<TrainingProgramProps> = ({ athleteId, athleteNam
                   {unit.exercises.map((exercise) => (
                     <div key={exercise.id} className={styles.exercise}>
                       <div className={styles.exerciseHeader}>
-                        <h3>{exercise.name}</h3>
+                        <div className={styles.exerciseTitle}>
+                          <h3>{exercise.name}</h3>
+                        </div>
                         <div className={styles.exerciseTags}>
                           {exercise.category && (
                             <span className={styles.exerciseCategory}>{exercise.category}</span>

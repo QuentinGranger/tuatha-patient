@@ -64,11 +64,52 @@ const SessionDebrief: React.FC<SessionDebriefProps> = ({
   const [showThanks, setShowThanks] = useState(false);
   const [selectedSession, setSelectedSession] = useState<string>(sessionId || "");
 
+  // Séances par défaut si aucune n'est fournie via les props
+  const defaultSessions = [
+    { id: "session_1", name: "Circuit Kettlebell - Séance 1", date: "2025-03-28", status: "completed" },
+    { id: "session_2", name: "Mobilité articulaire - Séance 2", date: "2025-03-25", status: "completed" },
+    { id: "session_3", name: "HIIT Cardio - Séance 3", date: "2025-03-23", status: "completed" },
+    { id: "session_4", name: "Renforcement musculaire - Séance 4", date: "2025-03-20", status: "completed" },
+    { id: "session_5", name: "Récupération active - Séance 5", date: "2025-03-18", status: "completed" }
+  ];
+
+  // Utiliser les séances fournies ou les séances par défaut
+  const availableSessions = trainingSessions?.length ? trainingSessions : defaultSessions;
+
   useEffect(() => {
     if (sessionId && sessionId !== selectedSession) {
       setSelectedSession(sessionId);
     }
   }, [sessionId]);
+
+  useEffect(() => {
+    if (selectedSession) {
+      if (updateDebrief) {
+        updateDebrief('sessionId', selectedSession);
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          sessionId: selectedSession
+        }));
+      }
+    }
+  }, [selectedSession, updateDebrief]);
+
+  useEffect(() => {
+    if (!selectedSession && availableSessions.length > 0) {
+      const firstSessionId = availableSessions[0].id;
+      setSelectedSession(firstSessionId);
+      
+      if (updateDebrief) {
+        updateDebrief('sessionId', firstSessionId);
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          sessionId: firstSessionId
+        }));
+      }
+    }
+  }, [availableSessions]);
 
   const moodEmojis = {
     great: '😄',
@@ -84,6 +125,11 @@ const SessionDebrief: React.FC<SessionDebriefProps> = ({
     neutral: 'Neutre',
     tired: 'Fatigué',
     bad: 'Mauvais'
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   };
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -243,8 +289,10 @@ const SessionDebrief: React.FC<SessionDebriefProps> = ({
                 onChange={(e) => setSelectedSession(e.target.value)}
                 className={styles.sessionSelector}
               >
-                {trainingSessions && trainingSessions.map(session => (
-                  <option key={session.id} value={session.id}>{session.name}</option>
+                {availableSessions.map(session => (
+                  <option key={session.id} value={session.id}>
+                    {session.name} - {formatDate(session.date)}
+                  </option>
                 ))}
               </select>
             </div>
@@ -354,13 +402,13 @@ const SessionDebrief: React.FC<SessionDebriefProps> = ({
               </div>
             </div>
 
-            <div className={styles.actionButtons}>
+            <div className={styles.footer}>
               <button 
                 type="button" 
                 className={styles.saveButton}
                 onClick={saveDebriefData}
               >
-                <FaSave /> Enregistrer
+                <FaSave /> Enregistrer vos impressions
               </button>
             </div>
           </form>

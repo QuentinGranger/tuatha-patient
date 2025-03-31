@@ -65,6 +65,8 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingVideo, setEditingVideo] = useState<VideoItem | null>(null);
   const [showDebrief, setShowDebrief] = useState(false);
+  const [showShare, setShowShare] = useState(false);
+  const [allVideos, setAllVideos] = useState<VideoItem[]>([]);
 
   // Pour le suivi des miniatures
   const processedVideosRef = useRef<Set<string>>(new Set());
@@ -523,6 +525,16 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
     setEditingVideo(null);
   };
 
+  // Extraire les sessions depuis les vidéos
+  const getVideoSessions = () => {
+    return videos.map(video => ({
+      id: video.id,
+      name: video.title || `Séance du ${new Date(video.date).toLocaleDateString('fr-FR')}`,
+      date: video.date,
+      status: 'completed'
+    }));
+  };
+
   return (
     <div className={styles.videoShareContainer}>
       <div className={styles.header}>
@@ -781,6 +793,7 @@ const VideoShare: React.FC<VideoShareProps> = ({ videos = [], onClose, athleteNa
               <SessionDebrief 
                 sessionId={activeVideo?.id} 
                 athleteName={athleteName || "Baby Groot"}
+                trainingSessions={getVideoSessions()}
                 onClose={() => setShowDebrief(false)}
                 onSave={(data) => {
                   showNotification("Débrief enregistré avec succès");
