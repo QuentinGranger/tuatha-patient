@@ -12,6 +12,7 @@ import ChatMessage, { Professional } from '../components/ChatMessage';
 import VideoCall, { VideoCallStatus } from '../components/VideoCall';
 import AppointmentManager from '../components/AppointmentManager';
 import Calendar from '../components/Calendar';
+import NavHeader from '../components/NavHeader';
 
 // Définition des types
 interface Appointment {
@@ -80,7 +81,7 @@ export default function MesPros() {
     {
       id: 4,
       name: "Tony Stark",
-      title: "Coach High-Tech",
+      title: "Kinésithérapeute",
       subtitle: "Malibu",
       image: "/img/TonyStark.jpg"
     }
@@ -296,47 +297,16 @@ export default function MesPros() {
   return (
     <div className={styles.container}>
       {/* Overlay flou quand dropdown ouvert */}
-      {(showNotifications || showSettings) && (
+      {isMounted && (showNotifications || showSettings) && (
         <div className={styles.blurOverlay} onClick={() => {
           setShowNotifications(false);
           setShowSettings(false);
         }}></div>
       )}
       
-      {/* Barre d'état simulée */}
-      <div className={styles.statusBar}>
-        <div className={styles.time}>14:30</div>
-        <div className={styles.icons}>
-          <div className={styles.signal}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M5 20L19 4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M17 20H5V8" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-          <div className={styles.wifi}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 19.5C12.8284 19.5 13.5 18.8284 13.5 18C13.5 17.1716 12.8284 16.5 12 16.5C11.1716 16.5 10.5 17.1716 10.5 18C10.5 18.8284 11.1716 19.5 12 19.5Z" fill="white"/>
-              <path d="M8.6 15C9.8 13.7 10.9 13 12 13C13.1 13 14.2 13.7 15.4 15" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M5 11.5C6.9 9.4 9.2 8 12 8C14.8 8 17.1 9.4 19 11.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M1 8C3.6 5 7.4 3 12 3C16.6 3 20.4 5 22.01 8" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-          <div className={styles.battery}>
-            <svg width="20" height="12" viewBox="0 0 20 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="0.5" y="0.5" width="17" height="11" rx="2.5" stroke="white"/>
-              <rect x="2" y="2" width="14" height="8" rx="1" fill="white"/>
-              <path d="M19 4V8C19.8333 7.33333 19.8333 4.66667 19 4Z" fill="white"/>
-            </svg>
-          </div>
-        </div>
-      </div>
-
       {/* Navigation */}
-      <div className={styles.nav}>
-        <div className={`${styles.navItem} ${styles.active}`}>Mes Pros</div>
-        <div className={styles.navItem}>Ma journée</div>
-      </div>
-
+      <NavHeader />
+      
       {/* En-tête avec salutation */}
       <header className={styles.header}>
         <div className={styles.greetingContainer}>

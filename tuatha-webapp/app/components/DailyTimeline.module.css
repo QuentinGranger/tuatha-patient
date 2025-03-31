@@ -1,0 +1,299 @@
+.dailyTimeline {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 107, 0, 0.5) rgba(0, 38, 65, 0.3);
+  scroll-behavior: smooth; /* Animation de défilement fluide */
+  position: relative;
+  background-color: rgba(0, 17, 13, 0.5);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0;
+  margin: 0;
+}
+
+/* Customization de la scrollbar pour webkit */
+.dailyTimeline::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dailyTimeline::-webkit-scrollbar-track {
+  background: rgba(0, 38, 65, 0.3);
+}
+
+.dailyTimeline::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 107, 0, 0.5);
+  border-radius: 10px;
+}
+
+.timelineContainer {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+}
+
+/* Style des créneaux horaires */
+.timeSlot {
+  position: relative;
+  display: flex;
+  height: 120px; /* Hauteur fixe pour chaque créneau horaire */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.2s ease;
+}
+
+/* Effet zébré toutes les 2 heures */
+.timeSlot.striped {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.timeLabel {
+  width: 50px;
+  min-width: 50px;
+  padding: 5px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  text-align: center;
+  position: sticky;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  border-right: 1px solid rgba(255, 255, 255, 0.1); /* Ligne horaire fine à gauche */
+  padding-top: 10px;
+  background-color: rgba(0, 38, 65, 0.5);
+  z-index: 2;
+}
+
+.slotContent {
+  flex: 1;
+  position: relative;
+  padding: 5px 10px;
+  transition: background-color 0.2s ease;
+}
+
+.timeSlot:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Cards d'événements */
+.eventCard {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  background-color: rgba(0, 38, 65, 0.75);
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease-out;
+  border-left: 3px solid #FF6B00;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  min-height: 60px;
+  z-index: 1;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.eventCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  background-color: rgba(0, 38, 65, 0.85);
+  z-index: 10;
+  overflow: visible; /* Permet au contenu de déborder lors du survol */
+}
+
+/* Assurer que le contenu est visible sur survol */
+.eventCard:hover .eventTitle,
+.eventCard:hover .eventLocation {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: initial;
+  max-height: none;
+}
+
+/* Conteneur pour le contenu qui peut s'agrandir au besoin */
+.eventContent {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Statuts des événements */
+.eventCard.upcoming {
+  border-left-color: #FF6B00;
+}
+
+.eventCard.past {
+  border-left-color: rgba(255, 255, 255, 0.3);
+  opacity: 0.7;
+}
+
+.eventCard.canceled {
+  border-left-color: #FF3B30;
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.eventCard.ongoing {
+  border-left-color: #30D158;
+  background-color: rgba(48, 209, 88, 0.1);
+}
+
+/* Contenu des événements */
+.eventTime {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 4px;
+  white-space: nowrap;
+}
+
+.eventTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 6px;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2; /* Propriété standard pour compatibilité */
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
+  line-height: 1.3;
+}
+
+.eventProfessional {
+  display: flex;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 4px;
+  min-height: 24px;
+}
+
+.professionalImage {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.professionalImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.professionalInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.professionalName {
+  font-size: 12px;
+  color: white;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.professionalTitle {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eventLocation {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 4px;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1; /* Propriété standard pour compatibilité */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.3;
+}
+
+/* Ligne de temps actuelle */
+.currentTimeLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #FF3B30;
+  z-index: 3;
+  animation: pulseLine 2s infinite;
+}
+
+@keyframes pulseLine {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 5px rgba(255, 59, 48, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 59, 48, 0);
+  }
+}
+
+.timeIndicator {
+  position: absolute;
+  right: 10px;
+  top: -10px;
+  background-color: #FF3B30;
+  color: white;
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+  .eventCard {
+    left: 15px;
+    right: 15px;
+    padding: 10px 15px;
+  }
+  
+  .timeLabel {
+    width: 60px;
+    min-width: 60px;
+    font-size: 13px;
+  }
+}
+
+/* Animation d'apparition des éléments */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dailyTimeline {
+  animation: fadeIn 0.3s ease-out;
+}

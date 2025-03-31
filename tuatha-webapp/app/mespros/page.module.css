@@ -125,19 +125,45 @@
   }
 }
 
+/* Conteneur principal */
 .container {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(145deg, #00110D, #002641);
+  color: white;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  min-height: 100vh;
-  background: linear-gradient(to bottom, #00110D, #002641);
-  color: white;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  padding: 0;
+  overflow-x: hidden;
+  padding-bottom: 80px;
+}
+
+/* Header spécifique à la page */
+.header {
+  padding: 20px 16px 10px;
+}
+
+.greetingContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.greeting h2 {
   margin: 0;
+  font-size: 22px;
+  background: linear-gradient(90deg, #FF6B00, #FF9248);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0px 0px 15px rgba(255, 107, 0, 0.2);
+}
+
+.greeting p {
+  color: rgba(255, 255, 255, 0.8);
+  margin: 4px 0 0;
   font-size: 14px;
-  overflow-y: auto;
-  position: relative;
 }
 
 /* Overlay flou pour les notifications */
@@ -151,389 +177,6 @@
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   z-index: 50;
-}
-
-/* Barre d'état mobile simulée */
-.statusBar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 16px 4px;
-  height: 28px;
-  background-color: rgba(0, 0, 0, 0.15);
-  color: white;
-  font-size: 12px;
-}
-
-.time {
-  font-weight: 600;
-  font-size: 13px;
-}
-
-.icons {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.signal, .wifi, .battery {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Navigation en haut */
-.nav {
-  display: flex;
-  justify-content: center;
-  margin: 0 auto;
-  padding: 10px 0;
-  width: 100%;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.navItem {
-  font-size: 14px;
-  font-weight: 500;
-  padding: 3px 10px;
-  color: rgba(255, 255, 255, 0.5);
-  cursor: pointer;
-  margin: 0 5px;
-  text-align: center;
-}
-
-.active {
-  color: #fff;
-  border-bottom: 2px solid #ff6b00;
-  padding-bottom: 4px;
-}
-
-/* En-tête et bonjour */
-.header {
-  padding: 12px 16px 5px;
-}
-
-.greetingContainer {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.greeting {
-  margin-bottom: 10px;
-}
-
-.greeting h2 {
-  font-size: 17px;
-  font-weight: 500;
-  margin: 0;
-  letter-spacing: -0.2px;
-}
-
-.username {
-  color: #ff6b00;
-  font-weight: 600;
-}
-
-.greeting p {
-  font-size: 12px;
-  margin: 3px 0 0 0;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.headerIcons {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.flexAlignCenter {
-  align-items: center;
-}
-
-.iconButton {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 18px;
-  cursor: pointer;
-  opacity: 0.8;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.notificationBadge {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background-color: #FF6B00;
-  color: white;
-  border-radius: 50%;
-  width: 16px;
-  height: 16px;
-  font-size: 9px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1.5px solid #001E32;
-}
-
-/* Styles pour le dropdown de notifications */
-.notificationContainer {
-  position: relative;
-}
-
-.notificationsDropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  width: 280px;
-  background-color: #0D2738;
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  margin-top: 10px;
-  z-index: 110; /* Supérieur à l'overlay */
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.notificationHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 15px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-.notificationHeader h4 {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 500;
-  color: white;
-}
-
-.notificationCount {
-  background-color: #FF6B00;
-  color: white;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: 600;
-}
-
-.notificationList {
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.notificationItem {
-  display: flex;
-  padding: 12px 15px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-  transition: background-color 0.2s;
-}
-
-.notificationItem:hover {
-  background-color: rgba(255, 255, 255, 0.03);
-}
-
-.notificationIcon {
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background-color: rgba(255, 107, 0, 0.1);
-  color: #FF6B00;
-  margin-right: 12px;
-  padding: 8px;
-}
-
-.notificationContent {
-  flex: 1;
-}
-
-.notificationTitle {
-  margin: 0 0 3px 0;
-  font-size: 12px;
-  font-weight: 500;
-  color: white;
-}
-
-.notificationText {
-  margin: 0 0 5px 0;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1.4;
-}
-
-.notificationTime {
-  margin: 0;
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.notificationFooter {
-  padding: 10px 15px;
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
-  display: flex;
-  justify-content: center;
-}
-
-.notificationButton {
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  border-radius: 5px;
-  color: white;
-  font-size: 11px;
-  padding: 7px 12px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.notificationButton:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-/* Dropdown des paramètres */
-.settingsContainer {
-  position: relative;
-  margin-left: 12px;
-}
-
-.settingsDropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  width: 260px;
-  background-color: #0D2738;
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  margin-top: 10px;
-  z-index: 110;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.settingsHeader {
-  padding: 15px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.settingsHeader h4 {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 500;
-  color: white;
-}
-
-.settingsList {
-  max-height: 350px;
-  overflow-y: auto;
-}
-
-.settingsItem {
-  display: flex;
-  align-items: center;
-  padding: 12px 15px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-  transition: background-color 0.2s;
-  cursor: pointer;
-}
-
-.settingsItem:hover {
-  background-color: rgba(255, 255, 255, 0.03);
-}
-
-.settingsIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  color: rgba(255, 255, 255, 0.7);
-  margin-right: 12px;
-}
-
-.settingsText {
-  flex: 1;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.settingsChevron {
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.settingsDivider {
-  height: 1px;
-  background-color: rgba(255, 255, 255, 0.08);
-  margin: 5px 0;
-}
-
-.settingsFooter {
-  padding: 10px 15px;
-  text-align: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.settingsFooter small {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-/* Toggle switch pour les paramètres */
-.settingsToggle {
-  position: relative;
-  display: inline-block;
-  width: 36px;
-  height: 18px;
-}
-
-.toggleCheckbox {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.toggleLabel {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 34px;
-  cursor: pointer;
-  transition: .4s;
-}
-
-.toggleLabel:before {
-  position: absolute;
-  content: "";
-  height: 14px;
-  width: 14px;
-  left: 2px;
-  bottom: 2px;
-  background-color: white;
-  border-radius: 50%;
-  transition: .4s;
-}
-
-.toggleCheckbox:checked + .toggleLabel {
-  background-color: #FF6B00;
-}
-
-.toggleCheckbox:checked + .toggleLabel:before {
-  transform: translateX(18px);
 }
 
 /* Notification spéciale avec swipe */
@@ -797,5 +440,316 @@
   }
 }
 
-/* Les styles pour les modales ont été supprimés car ils causaient une erreur avec les sélecteurs globaux */
-/* Ces styles seront déplacés dans un fichier CSS séparé */
+/* Styles pour les icônes du header */
+.headerIcons {
+  display: flex;
+  gap: 4px; /* Réduit l'espace entre les icônes */
+  align-items: center;
+  margin-left: auto; /* Pousse les icônes à droite */
+  padding-right: 10px; /* Ajoute un peu d'espace à droite */
+}
+
+.flexAlignCenter {
+  align-items: center;
+}
+
+.iconButton {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  opacity: 0.8;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  transition: all 0.2s ease;
+}
+
+.iconButton:hover {
+  background: rgba(255, 107, 0, 0.15);
+  opacity: 1;
+}
+
+.notificationBadge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #FF6B00;
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  font-size: 9px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #001E32;
+}
+
+/* Styles pour le dropdown de notifications */
+.notificationContainer {
+  position: relative;
+}
+
+.notificationsDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 280px;
+  background-color: rgba(0, 38, 65, 0.85);
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  margin-top: 10px;
+  z-index: 110; /* Supérieur à l'overlay */
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.notificationHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.notificationHeader h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+}
+
+.notificationCount {
+  background-color: #FF6B00;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.notificationList {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.notificationItem {
+  display: flex;
+  padding: 12px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color 0.2s;
+}
+
+.notificationItem:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.notificationIcon {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: rgba(255, 107, 0, 0.15);
+  color: #FF6B00;
+  margin-right: 12px;
+  padding: 8px;
+}
+
+.notificationContent {
+  flex: 1;
+}
+
+.notificationTitle {
+  margin: 0 0 3px 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+}
+
+.notificationText {
+  margin: 0 0 5px 0;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+}
+
+.notificationTime {
+  margin: 0;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.notificationFooter {
+  padding: 10px 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: center;
+}
+
+.notificationButton {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 11px;
+  padding: 7px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.notificationButton:hover {
+  background: rgba(255, 107, 0, 0.25);
+}
+
+/* Dropdown des paramètres */
+.settingsContainer {
+  position: relative;
+  margin-left: 4px; /* Réduit l'espace entre les deux icônes */
+}
+
+.settingsDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 260px;
+  background-color: rgba(0, 38, 65, 0.85);
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  margin-top: 10px;
+  z-index: 110;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.settingsHeader {
+  padding: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.settingsHeader h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+}
+
+.settingsList {
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.settingsItem {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.settingsItem:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.settingsIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-right: 12px;
+}
+
+.settingsText {
+  flex: 1;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.settingsChevron {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.settingsDivider {
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.08);
+  margin: 5px 0;
+}
+
+.settingsFooter {
+  padding: 10px 15px;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.settingsFooter small {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Toggle switch pour les paramètres */
+.settingsToggle {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 18px;
+}
+
+.toggleCheckbox {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggleLabel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 34px;
+  cursor: pointer;
+  transition: .4s;
+}
+
+.toggleLabel:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  border-radius: 50%;
+  transition: .4s;
+}
+
+.toggleCheckbox:checked + .toggleLabel {
+  background-color: #FF6B00;
+}
+
+.toggleCheckbox:checked + .toggleLabel:before {
+  transform: translateX(18px);
+}

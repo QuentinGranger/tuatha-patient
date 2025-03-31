@@ -1,0 +1,123 @@
+.header {
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
+
+/* Barre d'état mobile stylisée */
+.statusBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  height: 44px;
+  background-color: transparent;
+  color: white;
+  font-size: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.statusLeft {
+  padding-left: 20px;
+  flex: 1;
+  display: flex;
+  justify-content: flex-start;
+  z-index: 2;
+}
+
+.statusRight {
+  padding-right: 20px;
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  z-index: 2;
+}
+
+.statusNotch {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 180px;
+  height: 30px;
+  background-color: transparent;
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 18px;
+  z-index: 1;
+}
+
+.time {
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+}
+
+.cellular, .wifi, .battery {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Navigation en haut */
+.nav {
+  display: flex;
+  justify-content: space-around;
+  margin: 0 auto;
+  padding: 12px 0 10px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: none;
+  position: relative;
+}
+
+.navItem {
+  padding: 10px 20px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  position: relative;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.navItem:hover {
+  color: white;
+  background: transparent;
+}
+
+.active {
+  color: #FF6B00;
+  font-weight: 600;
+  background: transparent;
+  box-shadow: none;
+}
+
+.active::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 3px;
+  background: linear-gradient(90deg, #FF6B00, #FF9248);
+  border-radius: 3px;
+}
+
+@media (max-width: 480px) {
+  .navItem {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+}

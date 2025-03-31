@@ -3,7 +3,7 @@
   flex-direction: column;
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(to bottom, #00110D, #002641);
+  background: linear-gradient(145deg, #00110D, #002641);
   color: white;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   padding: 0;
@@ -12,64 +12,9 @@
   overflow-y: auto;
 }
 
-/* Barre d'état mobile simulée */
-.statusBar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 16px 4px;
-  height: 28px;
-  background-color: rgba(0, 0, 0, 0.15);
-  color: white;
-  font-size: 12px;
-}
-
-.time {
-  font-weight: 600;
-  font-size: 13px;
-}
-
-.icons {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.signal, .wifi, .battery {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Navigation en haut */
-.nav {
-  display: flex;
-  justify-content: center;
-  margin: 0 auto;
-  padding: 10px 0;
-  width: 100%;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.navItem {
-  font-size: 14px;
-  font-weight: 500;
-  padding: 3px 10px;
-  color: rgba(255, 255, 255, 0.5);
-  cursor: pointer;
-  margin: 0 5px;
-  text-align: center;
-}
-
-.active {
-  color: #fff;
-  border-bottom: 2px solid #ff6b00;
-  padding-bottom: 4px;
-}
-
 /* En-tête et titre */
 .header {
-  padding: 12px 16px 5px;
+  padding: 20px 16px 10px;
 }
 
 .greetingContainer {
@@ -83,16 +28,20 @@
 }
 
 .greeting h2 {
-  font-size: 17px;
-  font-weight: 500;
+  font-size: 22px;
+  font-weight: 600;
   margin: 0;
-  letter-spacing: -0.2px;
+  background: linear-gradient(90deg, #FF6B00, #FF9248);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0px 0px 15px rgba(255, 107, 0, 0.2);
 }
 
 .greeting p {
-  font-size: 12px;
-  margin: 3px 0 0 0;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  margin: 4px 0 0;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .headerIcons {
@@ -102,64 +51,106 @@
 }
 
 .iconButton {
-  background: none;
+  background: rgba(255, 255, 255, 0.05);
   border: none;
   color: white;
   font-size: 18px;
   cursor: pointer;
   opacity: 0.8;
-  padding: 0;
+  padding: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
+  border-radius: 50%;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
-/* Contenu vide pour démonstration */
+.iconButton:hover {
+  background: rgba(255, 107, 0, 0.2);
+  opacity: 1;
+  box-shadow: 0 0 15px rgba(255, 107, 0, 0.3);
+}
+
+/* Contenu vide */
 .emptyContent {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 30px 20px;
   text-align: center;
+  padding: 40px 20px;
+  margin: 30px 16px;
+  height: 50vh;
+  background: rgba(0, 38, 65, 0.15);
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .emptyIcon {
-  font-size: 40px;
-  margin-bottom: 16px;
-  opacity: 0.6;
+  margin-bottom: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .emptyText {
-  font-size: 16px;
-  margin: 0 0 8px 0;
-  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 20px;
+  font-weight: 600;
+  margin: 15px 0 10px;
 }
 
 .emptySubtext {
-  font-size: 13px;
-  opacity: 0.7;
-  max-width: 240px;
-  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  max-width: 300px;
+  line-height: 1.5;
 }
 
-/* Media queries pour les écrans plus grands */
+/* Action button */
+.addButton {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #FF6B00, #FF8534);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  box-shadow: 0 4px 15px rgba(255, 107, 0, 0.4);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.addButton:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 25px rgba(255, 107, 0, 0.5);
+}
+
+/* Responsive */
 @media (min-width: 768px) {
-  .container {
-    max-width: 414px;
-    margin: 0 auto;
+  .emptyContent {
+    max-width: 600px;
+    margin: 30px auto;
   }
   
-  .greeting h2 {
-    font-size: 18px;
-  }
-  
-  .greeting p {
-    font-size: 14px;
-  }
-  
-  .navItem {
-    font-size: 15px;
+  .addButton {
+    bottom: 40px;
+    right: 40px;
   }
 }
