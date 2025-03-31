@@ -11,7 +11,7 @@
   background-color: rgba(255, 255, 255, 0.07);
   border-radius: 10px;
   overflow: hidden;
-  height: 230px; /* Hauteur pour le format portrait */
+  height: 230px; /* Hauteur fixe pour le format portrait */
   position: relative;
   display: flex;
   flex-direction: column;
@@ -23,6 +23,65 @@
 .professionalCard:hover {
   transform: translateY(-5px);
   box-shadow: 0 12px 30px rgba(255, 107, 0, 0.15);
+}
+
+.professionalImage {
+  height: 140px;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.proInfo {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.proInfo h3 {
+  margin: 0 0 5px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.proInfo p {
+  margin: 0 0 2px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 400;
+}
+
+.subtitle {
+  font-size: 12px !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.cardActions {
+  display: flex;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.actionIcon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 107, 0, 0.1);
+  color: #FF6B00;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionIcon:hover {
+  background-color: rgba(255, 107, 0, 0.2);
+  transform: scale(1.1);
 }
 
 .professionalLink {
@@ -221,7 +280,7 @@
 
 .specialNotifIcon {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   width: 30px;
   height: 30px;
@@ -229,7 +288,7 @@
   background-color: rgba(255, 107, 0, 0.1);
   color: #FF6B00;
   margin-right: 10px;
-  flex-shrink: 0;
+  padding: 8px;
 }
 
 .specialNotifMessage {
@@ -244,7 +303,7 @@
 }
 
 .specialNotifText {
-  margin: 0;
+  margin: 0 0 5px 0;
   font-size: 11px;
   color: rgba(255, 255, 255, 0.85);
   line-height: 1.4;
@@ -1052,6 +1111,9 @@
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
+  width: 100%;
+  height: auto;
+  min-width: 0; /* Permet aux éléments flex de rétrécir en dessous de leur taille minimale */
 }
 
 .professionalCard::before {
@@ -1124,12 +1186,16 @@
   background: rgba(255, 255, 255, 0.05);
   padding: 12px;
   border-radius: 8px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .radioGroup {
   display: flex;
-  gap: 14px;
+  gap: 10px;
   flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
 }
 
 .radioOption {
@@ -1137,60 +1203,23 @@
   align-items: center;
   gap: 6px;
   position: relative;
-}
-
-.radioOption input[type="radio"] {
-  opacity: 0;
-  position: absolute;
+  margin-bottom: 5px;
 }
 
 .radioOption label {
   font-size: 13px;
   color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
-  padding: 6px 10px;
+  padding: 6px 8px;
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
-}
-
-.radioOption label::before {
-  content: '';
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 6px;
-  background-color: rgba(255, 255, 255, 0.3);
-  transition: all 0.2s ease;
-}
-
-.radioOption input[type="radio"]:checked + label {
-  background: rgba(255, 107, 0, 0.15);
-  color: white;
-}
-
-.radioOption input[type="radio"]:checked + label::before {
-  background-color: #FF6B00;
-  box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.3);
-}
-
-.infoButton {
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
-  transition: all 0.2s ease;
-}
-
-.infoButton:hover {
-  color: rgba(255, 255, 255, 1);
-  background: rgba(255, 255, 255, 0.2);
-  transform: rotate(15deg);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 100px;
 }
 
 .permissionDetails {
@@ -1198,14 +1227,7 @@
   border-radius: 10px;
   padding: 14px;
   border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.permissionDetails h6 {
-  margin: 0 0 10px;
-  font-size: 13px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
-  letter-spacing: 0.3px;
+  width: 100%;
 }
 
 .permissionOption {
@@ -1215,58 +1237,28 @@
   margin-bottom: 8px;
   transition: all 0.2s ease;
   padding: 4px 0;
+  flex-wrap: wrap;
 }
 
-.permissionOption:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
-}
-
-.permissionOption input[type="checkbox"] {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  position: relative;
-  transition: all 0.2s ease;
-}
-
-.permissionOption input[type="checkbox"]:checked {
-  background: #FF6B00;
-  border-color: #FF6B00;
-}
-
-.permissionOption input[type="checkbox"]:checked::after {
-  content: '✓';
-  color: white;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 10px;
-}
-
-.permissionOption label {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.8);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.permissionOption input[type="checkbox"]:checked + label {
-  color: white;
-  font-weight: 500;
-}
-
-.cardFooter {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  padding-top: 10px;
+@media (max-width: 600px) {
+  .radioOption label {
+    font-size: 12px;
+    padding: 5px 6px;
+    max-width: 80px;
+  }
+  
+  .radioGroup {
+    gap: 5px;
+  }
+  
+  .accessControls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .professionalInfo {
+    flex-wrap: wrap;
+  }
 }
 
 .privacyFooter {
@@ -1320,4 +1312,125 @@
 .permissionOption input[type="checkbox"],
 .radioOption input[type="radio"] {
   accent-color: #FF6B00;
+}
+
+/* Style personnalisé pour les éléments radio */
+.radioInput {
+  opacity: 0;
+  position: absolute;
+}
+
+.radioLabel {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 100px;
+}
+
+.radioLabel::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  background-color: rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease;
+}
+
+.radioInput:checked + .radioLabel {
+  background: rgba(255, 107, 0, 0.15);
+  color: white;
+}
+
+.radioInput:checked + .radioLabel::before {
+  background-color: #FF6B00;
+  box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.3);
+}
+
+/* Style personnalisé pour l'icône d'information */
+.infoButton {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.infoButton:hover {
+  color: rgba(255, 255, 255, 1);
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(15deg);
+}
+
+/* Style personnalisé pour les éléments checkbox */
+.checkboxInput {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.checkboxInput:checked {
+  background: #FF6B00;
+  border-color: #FF6B00;
+}
+
+.checkboxInput:checked::after {
+  content: '✓';
+  color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+}
+
+.checkboxLabel {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.checkboxInput:checked + .checkboxLabel {
+  color: white;
+  font-weight: 500;
+}
+
+.permissionDetails h6 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.3px;
+}
+
+.permissionOption:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 10px;
 }

@@ -664,8 +664,9 @@ export default function MesPros() {
                                       id={`full-${pro.id}`} 
                                       name={`access-${pro.id}`} 
                                       defaultChecked={pro.accessLevel === "full"} 
+                                      className={styles.radioInput}
                                     />
-                                    <label htmlFor={`full-${pro.id}`}>Accès complet</label>
+                                    <label htmlFor={`full-${pro.id}`} className={styles.radioLabel}>Accès complet</label>
                                   </div>
                                   
                                   <div className={styles.radioOption}>
@@ -674,8 +675,9 @@ export default function MesPros() {
                                       id={`partial-${pro.id}`} 
                                       name={`access-${pro.id}`} 
                                       defaultChecked={pro.accessLevel === "partial"} 
+                                      className={styles.radioInput}
                                     />
-                                    <label htmlFor={`partial-${pro.id}`}>Accès limité</label>
+                                    <label htmlFor={`partial-${pro.id}`} className={styles.radioLabel}>Accès limité</label>
                                   </div>
                                   
                                   <div className={styles.radioOption}>
@@ -684,8 +686,9 @@ export default function MesPros() {
                                       id={`none-${pro.id}`} 
                                       name={`access-${pro.id}`} 
                                       defaultChecked={pro.accessLevel === "none"} 
+                                      className={styles.radioInput}
                                     />
-                                    <label htmlFor={`none-${pro.id}`}>Aucun accès</label>
+                                    <label htmlFor={`none-${pro.id}`} className={styles.radioLabel}>Aucun accès</label>
                                   </div>
                                 </div>
                                 <button className={styles.infoButton} title="Plus d'informations">
@@ -700,32 +703,36 @@ export default function MesPros() {
                                     type="checkbox" 
                                     id={`data-medical-${pro.id}`} 
                                     defaultChecked={pro.accessLevel !== "none"} 
+                                    className={styles.checkboxInput}
                                   />
-                                  <label htmlFor={`data-medical-${pro.id}`}>Données médicales</label>
+                                  <label htmlFor={`data-medical-${pro.id}`} className={styles.checkboxLabel}>Données médicales</label>
                                 </div>
                                 <div className={styles.permissionOption}>
                                   <input 
                                     type="checkbox" 
                                     id={`data-training-${pro.id}`} 
                                     defaultChecked={pro.accessLevel !== "none"} 
+                                    className={styles.checkboxInput}
                                   />
-                                  <label htmlFor={`data-training-${pro.id}`}>Données d'entraînement</label>
+                                  <label htmlFor={`data-training-${pro.id}`} className={styles.checkboxLabel}>Données d'entraînement</label>
                                 </div>
                                 <div className={styles.permissionOption}>
                                   <input 
                                     type="checkbox" 
                                     id={`data-sleep-${pro.id}`} 
                                     defaultChecked={pro.accessLevel === "full"} 
+                                    className={styles.checkboxInput}
                                   />
-                                  <label htmlFor={`data-sleep-${pro.id}`}>Données de sommeil</label>
+                                  <label htmlFor={`data-sleep-${pro.id}`} className={styles.checkboxLabel}>Données de sommeil</label>
                                 </div>
                                 <div className={styles.permissionOption}>
                                   <input 
                                     type="checkbox" 
                                     id={`data-collab-${pro.id}`} 
                                     defaultChecked={pro.accessLevel === "full"} 
+                                    className={styles.checkboxInput}
                                   />
-                                  <label htmlFor={`data-collab-${pro.id}`}>Autoriser la collaboration</label>
+                                  <label htmlFor={`data-collab-${pro.id}`} className={styles.checkboxLabel}>Autoriser la collaboration</label>
                                 </div>
                               </div>
                               
