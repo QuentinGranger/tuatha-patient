@@ -25,65 +25,6 @@
   box-shadow: 0 12px 30px rgba(255, 107, 0, 0.15);
 }
 
-.professionalImage {
-  height: 140px;
-  width: 100%;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-.proInfo {
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.proInfo h3 {
-  margin: 0 0 5px;
-  font-size: 16px;
-  font-weight: 500;
-  color: #ffffff;
-}
-
-.proInfo p {
-  margin: 0 0 2px;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 400;
-}
-
-.subtitle {
-  font-size: 12px !important;
-  color: rgba(255, 255, 255, 0.5) !important;
-}
-
-.cardActions {
-  display: flex;
-  gap: 12px;
-  margin-top: auto;
-  padding-top: 10px;
-}
-
-.actionIcon {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(255, 107, 0, 0.1);
-  color: #FF6B00;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.actionIcon:hover {
-  background-color: rgba(255, 107, 0, 0.2);
-  transform: scale(1.1);
-}
-
 .professionalLink {
   display: block;
   text-decoration: none;
