@@ -40,7 +40,7 @@
 .timeSlot {
   position: relative;
   display: flex;
-  height: 120px; /* Hauteur fixe pour chaque créneau horaire */
+  height: 140px; /* Hauteur fixe pour chaque créneau horaire */
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   transition: all 0.2s ease;
 }
@@ -85,20 +85,20 @@
   position: absolute;
   left: 10px;
   right: 10px;
-  background-color: rgba(0, 38, 65, 0.75);
-  border-radius: 8px;
-  padding: 8px 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background-color: rgba(0, 38, 65, 0.9);
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease-out;
-  border-left: 3px solid #FF6B00;
-  overflow: hidden;
+  border-left: 4px solid #FF6B00;
+  overflow: visible;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  min-height: 60px;
-  z-index: 1;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  min-height: 80px;
+  z-index: 5;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .eventCard:hover {
