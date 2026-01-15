@@ -31,6 +31,7 @@
   color: inherit;
   width: 100%;
   height: 100%;
+  position: relative;
 }
 
 .professionalImage {
@@ -39,8 +40,10 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-position: top center; /* Centré sur le visage */
+  background-position: top center;
   background-size: cover;
+  background-repeat: no-repeat;
+  background-color: #1a1a2e;
   z-index: 1;
 }
 
@@ -1041,7 +1044,7 @@
   margin-bottom: 20px;
 }
 
-.professionalCard {
+.privacyProCard {
   background: rgba(0, 0, 0, 0.2);
   border-radius: 12px;
   padding: 16px;
@@ -1054,10 +1057,10 @@
   overflow: hidden;
   width: 100%;
   height: auto;
-  min-width: 0; /* Permet aux éléments flex de rétrécir en dessous de leur taille minimale */
+  min-width: 0;
 }
 
-.professionalCard::before {
+.privacyProCard::before {
   content: '';
   position: absolute;
   top: 0;
@@ -1069,12 +1072,12 @@
   transition: opacity 0.3s ease;
 }
 
-.professionalCard:hover {
+.privacyProCard:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
-.professionalCard:hover::before {
+.privacyProCard:hover::before {
   opacity: 1;
 }
 
@@ -1095,7 +1098,7 @@
   transition: all 0.2s ease;
 }
 
-.professionalCard:hover .professionalAvatar {
+.privacyProCard:hover .professionalAvatar {
   border-color: rgba(255, 107, 0, 0.8);
   transform: scale(1.05);
 }

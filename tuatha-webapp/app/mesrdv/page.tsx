@@ -147,70 +147,133 @@ export default function MesRDV() {
     }
   ];
 
-  // Données de démonstration pour les rendez-vous
-  useEffect(() => {
-    // Simuler le chargement des données
-    const demoAppointments: Appointment[] = [
-      {
-        id: "app1",
-        title: "Consultation nutrition",
-        date: "2025-03-31", // Aujourd'hui
-        time: "14:30",
-        duration: 45,
-        professional: professionals[0], // Jessica Jones
-        location: "Vidéo consultation",
-        status: "upcoming",
-        type: "Consultation",
-        notes: "Bilan mensuel"
-      },
-      {
-        id: "app2",
-        title: "Séance de kinésithérapie",
-        date: "2025-04-01", // Demain
-        time: "10:00",
-        duration: 60,
-        professional: professionals[1], // Beverly Crusher
-        location: "Centre médical Paris",
-        status: "upcoming",
-        type: "Soin"
-      },
-      {
-        id: "app3",
-        title: "Entraînement sportif",
-        date: "2025-04-02",
-        time: "17:15",
-        duration: 90,
-        professional: professionals[2], // Rocky Balboa
-        location: "Salle de sport",
-        status: "upcoming",
-        type: "Entraînement"
-      },
-      {
-        id: "app4",
-        title: "Séance de kinésithérapie",
-        date: "2025-04-10",
-        time: "11:30",
-        duration: 30,
-        professional: professionals[3], // Tony Stark
-        location: "Centre médical Malibu",
-        status: "upcoming",
-        type: "Soin"
-      },
-      {
-        id: "app5",
-        title: "Contrôle médical",
-        date: "2025-03-28", // Avant-hier
-        time: "09:00",
-        duration: 30,
-        professional: professionals[0], // Jessica Jones
-        location: "Centre médical Paris",
-        status: "past",
-        type: "Contrôle"
-      }
+  // Fonction pour générer des rendez-vous dynamiques basés sur la date actuelle
+  const generateDynamicAppointments = (): Appointment[] => {
+    const today = new Date();
+    const appointments: Appointment[] = [];
+    
+    // Templates de rendez-vous réalistes
+    const appointmentTemplates = [
+      { title: "Consultation nutrition", type: "Consultation", duration: 45, proIndex: 0, locations: ["Vidéo consultation", "Cabinet Paris 15e"], notes: "Suivi du plan alimentaire" },
+      { title: "Séance de kinésithérapie", type: "Soin", duration: 60, proIndex: 1, locations: ["Centre médical Paris", "Cabinet kinésithérapie"], notes: "Rééducation lombaire" },
+      { title: "Entraînement sportif", type: "Entraînement", duration: 90, proIndex: 2, locations: ["Salle de sport Fitness Park", "Gymnase municipal"], notes: "Programme renforcement" },
+      { title: "Bilan postural", type: "Soin", duration: 30, proIndex: 3, locations: ["Centre médical Malibu", "Clinique du sport"], notes: "Évaluation posture" },
+      { title: "Suivi diététique", type: "Consultation", duration: 30, proIndex: 0, locations: ["Vidéo consultation", "Cabinet Paris 15e"], notes: "Point sur les objectifs" },
+      { title: "Massage thérapeutique", type: "Soin", duration: 45, proIndex: 1, locations: ["Centre bien-être", "Cabinet kinésithérapie"], notes: "Détente musculaire" },
+      { title: "Coaching personnalisé", type: "Entraînement", duration: 60, proIndex: 2, locations: ["À domicile", "Parc Monceau"], notes: "Séance cardio" },
+      { title: "Consultation de suivi", type: "Consultation", duration: 30, proIndex: 3, locations: ["Téléconsultation", "Cabinet médical"], notes: "Bilan trimestriel" },
     ];
     
-    setAppointments(demoAppointments);
-    setFilteredAppointments(demoAppointments);
+    const times = ["09:00", "09:30", "10:00", "10:30", "11:00", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30"];
+    
+    // Générer des rendez-vous passés (7 derniers jours)
+    for (let i = 7; i >= 1; i--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      
+      // 60% de chance d'avoir un rdv ce jour-là
+      if (Math.random() < 0.6) {
+        const template = appointmentTemplates[Math.floor(Math.random() * appointmentTemplates.length)];
+        const time = times[Math.floor(Math.random() * times.length)];
+        const dateStr = date.toISOString().split('T')[0];
+        
+        appointments.push({
+          id: `past-${dateStr}-${i}`,
+          title: template.title,
+          date: dateStr,
+          time: time,
+          duration: template.duration,
+          professional: professionals[template.proIndex],
+          location: template.locations[Math.floor(Math.random() * template.locations.length)],
+          status: "past" as const,
+          type: template.type,
+          notes: template.notes
+        });
+      }
+    }
+    
+    // Rendez-vous aujourd'hui (si après 8h)
+    const todayStr = today.toISOString().split('T')[0];
+    const currentHour = today.getHours();
+    
+    if (currentHour >= 8) {
+      // RDV passé aujourd'hui
+      if (currentHour >= 12) {
+        appointments.push({
+          id: `today-morning`,
+          title: "Suivi diététique",
+          date: todayStr,
+          time: "10:00",
+          duration: 30,
+          professional: professionals[0],
+          location: "Vidéo consultation",
+          status: "past" as const,
+          type: "Consultation",
+          notes: "Bilan du matin"
+        });
+      }
+      
+      // RDV à venir aujourd'hui
+      if (currentHour < 17) {
+        appointments.push({
+          id: `today-afternoon`,
+          title: "Séance de kinésithérapie",
+          date: todayStr,
+          time: "17:30",
+          duration: 45,
+          professional: professionals[1],
+          location: "Centre médical Paris",
+          status: "upcoming" as const,
+          type: "Soin",
+          notes: "Séance hebdomadaire"
+        });
+      }
+    }
+    
+    // Générer des rendez-vous futurs (14 prochains jours)
+    for (let i = 1; i <= 14; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      const dayOfWeek = date.getDay();
+      
+      // Pas de rdv le dimanche, moins le samedi
+      if (dayOfWeek === 0) continue;
+      if (dayOfWeek === 6 && Math.random() > 0.3) continue;
+      
+      // 50-70% de chance d'avoir un rdv
+      if (Math.random() < (dayOfWeek === 6 ? 0.3 : 0.55)) {
+        const template = appointmentTemplates[Math.floor(Math.random() * appointmentTemplates.length)];
+        const time = times[Math.floor(Math.random() * times.length)];
+        const dateStr = date.toISOString().split('T')[0];
+        
+        appointments.push({
+          id: `future-${dateStr}-${i}`,
+          title: template.title,
+          date: dateStr,
+          time: time,
+          duration: template.duration,
+          professional: professionals[template.proIndex],
+          location: template.locations[Math.floor(Math.random() * template.locations.length)],
+          status: "upcoming" as const,
+          type: template.type,
+          notes: template.notes
+        });
+      }
+    }
+    
+    // Trier par date et heure
+    return appointments.sort((a, b) => {
+      const dateCompare = a.date.localeCompare(b.date);
+      if (dateCompare !== 0) return dateCompare;
+      return a.time.localeCompare(b.time);
+    });
+  };
+
+  // Charger les rendez-vous dynamiques
+  useEffect(() => {
+    const dynamicAppointments = generateDynamicAppointments();
+    setAppointments(dynamicAppointments);
+    setFilteredAppointments(dynamicAppointments);
   }, []);
 
   // Génère les jours de la semaine courante
@@ -553,7 +616,7 @@ export default function MesRDV() {
       // Simuler l'annulation du rendez-vous
       const updatedAppointments = appointments.map(app => 
         app.id === selectedAppointment.id 
-          ? { ...app, status: 'canceled' } 
+          ? { ...app, status: 'canceled' as const } 
           : app
       );
       

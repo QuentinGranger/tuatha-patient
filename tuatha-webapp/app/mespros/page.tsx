@@ -645,7 +645,7 @@ export default function MesPros() {
                         {/* Liste des professionnels */}
                         <div className={styles.professionalsList}>
                           {healthProfessionals.map(pro => (
-                            <div key={pro.id} className={styles.professionalCard}>
+                            <div key={pro.id} className={styles.privacyProCard}>
                               <div className={styles.professionalInfo}>
                                 <div className={styles.professionalAvatar}>
                                   <img src={pro.image} alt={pro.name} />
